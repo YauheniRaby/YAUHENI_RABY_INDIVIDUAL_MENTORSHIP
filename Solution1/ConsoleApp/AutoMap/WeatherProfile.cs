@@ -14,7 +14,7 @@ namespace ConsoleApp.AutoMap
         public WeatherProfile()
         {
             CreateMap<Weather, WeatherDTO>()
-                .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.Name))
+                .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.CityName))
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.Main.Temp))
                 .ForMember(dest => dest.Comment, conf => conf.MapFrom(src => GetCommentByTemp(src.Main.Temp)));
         }

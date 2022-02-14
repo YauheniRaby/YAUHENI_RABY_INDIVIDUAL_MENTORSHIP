@@ -9,7 +9,7 @@ namespace DataAccessLayer.Model
     public class Weather
     {
         public WeatherInfo Main { get; set; }
-        public string Name { get; set; }
+        public string CityName { get; set; }
         
     }
 
