@@ -6,6 +6,8 @@ using DataAccessLayer.Abstract;
 using DataAccessLayer.Repository;
 using AutoMapper;
 using ConsoleApp.AutoMap;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace ConsoleApp
 {
@@ -23,13 +25,22 @@ namespace ConsoleApp
 
             IWeatherServise weatherService = ninjectKernel.Get<IWeatherServise>();
 
-
             while (true)
             {
                 Console.WriteLine("\nPlease, enter city name:");
-                Console.WriteLine(weatherService.GetByCityName(Console.ReadLine()).ToString());
-            }
-            
+
+                var cityName = Console.ReadLine();
+                if (String.IsNullOrEmpty(cityName)) continue;
+                
+                try
+                {
+                    Console.WriteLine(weatherService.GetByCityName(cityName).ToString());
+                }
+                catch (WebException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }               
+            }            
         }
     }
 }
