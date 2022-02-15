@@ -10,6 +10,6 @@ namespace BusinessLayer.Abstract
 {
     public interface IWeatherServise
     {
-        WeatherDTO GetByCityName(string CityName);
+        string GetByCityName(string CityName);
     }
 }

@@ -32,14 +32,7 @@ namespace ConsoleApp
                 var cityName = Console.ReadLine();
                 if (String.IsNullOrEmpty(cityName)) continue;
                 
-                try
-                {
-                    Console.WriteLine(weatherService.GetByCityName(cityName).ToString());
-                }
-                catch (WebException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }               
+                Console.WriteLine(weatherService.GetByCityName(cityName));
             }            
         }
     }
