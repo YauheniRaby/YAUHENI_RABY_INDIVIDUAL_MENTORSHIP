@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Abstract
+namespace BusinessLayer.Service.Abstract
 {
-    public interface IWeatherServise
+    public interface IPrintService
     {
-        Task<string> GetByCityNameAsync(string cityName);
+        string Print(WeatherDTO weatherDTO);
     }
 }

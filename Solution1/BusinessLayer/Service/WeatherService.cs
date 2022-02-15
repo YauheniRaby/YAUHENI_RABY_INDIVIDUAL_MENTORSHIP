@@ -1,43 +1,43 @@
 ﻿using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Abstract;
-using DataAccessLayer.Model;
-using DataAccessLayer.Repository;
+using BusinessLayer.Service.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Service
 {
     public class WeatherService : IWeatherServise
     {
-        readonly IWetherRepository _wetherRepository;
         readonly IMapper _mapper;
+        readonly IApiService _apiService;
+        readonly IPrintService _printService;
 
-        public WeatherService(IWetherRepository wetherRepository, IMapper mapper) 
+        public WeatherService(IMapper mapper, IApiService apiService, IPrintService printService) 
         { 
-            _wetherRepository = wetherRepository; 
             _mapper = mapper;
+            _apiService = apiService;
+            _printService = printService;
         }
 
-        public string GetByCityName(string CityName)
+        public async Task<string> GetByCityNameAsync(string cityName)
         {
-
             try
             {
-                var weather = _wetherRepository.GetByCityName(CityName);
-                return _mapper.Map<WeatherDTO>(weather).ToString();
+                var weather = await _apiService.GetJsonByCityName(cityName);
+                var weatherShort = _mapper.Map<WeatherDTO>(weather);
+                return _printService.Print(_mapper.Map<WeatherDTO>(weather));                 
             }
-            catch (WebException ex)
+            catch (HttpRequestException)
             {
-                return ex.Message;
-            }
-
-                   
+                return Const.BadCityName;
+            }                   
         }
     }
 }

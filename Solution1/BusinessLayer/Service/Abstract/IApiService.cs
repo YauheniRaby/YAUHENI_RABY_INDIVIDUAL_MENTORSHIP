@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Abstract
+namespace BusinessLayer.Service.Abstract
 {
-    public interface IWetherRepository
+    public interface IApiService
     {
-        Weather GetByCityName(string cityName);
+        Task<WeatherShortDTO> GetJsonByCityName(string cityName);
     }
 }

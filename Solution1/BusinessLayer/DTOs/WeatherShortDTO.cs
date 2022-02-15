@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Model
 {
-    public class Weather
+    public class WeatherShortDTO
     {
         public WeatherInfo Main { get; set; }
-        public string CityName { get; set; }
-        
+
+        [JsonPropertyName("name")]
+        public string CityName { get; set; }        
     }
 
     public class WeatherInfo

@@ -1,37 +1,26 @@
-﻿using DataAccessLayer.Model;
-using BusinessLayer.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using BusinessLayer.DTOs;
+using DataAccessLayer.Model;
 
 namespace ConsoleApp.AutoMap
 {
-    public class WeatherProfile : AutoMapper.Profile 
+    public class WeatherProfile : AutoMapper.Profile
     {
         public WeatherProfile()
         {
-            CreateMap<Weather, WeatherDTO>()
-                .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.CityName))
+            CreateMap<WeatherShortDTO, WeatherDTO>()
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.Main.Temp))
                 .ForMember(dest => dest.Comment, conf => conf.MapFrom(src => GetCommentByTemp(src.Main.Temp)));
         }
 
-        string GetCommentByTemp(double temp)
+        private string GetCommentByTemp(double temp)
         {
-            switch (temp)
+            return temp switch
             {
-                case double n when (n < 0):
-                    return "Dress warmly.";                    
-                case double n when (n >= 0 && n<20 ):
-                    return "It's fresh";
-                case double n when (n >= 20 && n < 30):
-                    return "Good weather.";
-                default:
-                    return "It's time to go to the beach.";
-            }
+                double n when n < 0 => "Dress warmly.",
+                double n when n >= 0 && n < 20 => "It's fresh",
+                double n when n >= 20 && n < 30 => "Good weather.",
+                _ => "It's time to go to the beach.",
+            };
         }
     }
 }
