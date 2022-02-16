@@ -3,13 +3,6 @@ using BusinessLayer.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Extension;
 using BusinessLayer.Service.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Service

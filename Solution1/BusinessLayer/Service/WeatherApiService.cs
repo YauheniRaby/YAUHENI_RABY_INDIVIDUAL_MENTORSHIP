@@ -16,7 +16,7 @@ namespace BusinessLayer.Service.Abstract
 
         public Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
         {
-            var urlResult = Constants.WeatherAPI.UrlApi.Replace("cityName", cityName).Replace("keyApi", Constants.WeatherAPI.KeyApi);
+            var urlResult = string.Format(Constants.WeatherAPI.UrlApi, cityName, Constants.WeatherAPI.KeyApi);
 
             return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
         }

@@ -3,12 +3,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLayer.Abstract;
-using BusinessLayer.DTOs;
 using BusinessLayer.Extension;
 using ConsoleApp.Configuration;
 using ConsoleApp.Extension;
 using Microsoft.Extensions.Logging;
 using Ninject;
+using static ConsoleApp.Constants;
 
 namespace ConsoleApp
 {
@@ -30,8 +30,8 @@ namespace ConsoleApp
                 var cityName = Console.ReadLine();
                 if (string.IsNullOrEmpty(cityName))
                 {
-                    Console.WriteLine("City name can't be empty.");
-                    log.LogInformation("The user entered an empty city name.");
+                    Console.WriteLine(Validation.User.EmptyCityName);
+                    log.LogInformation(Validation.Dev.EmptyCityName);
                     continue;
                 }
 
@@ -43,19 +43,34 @@ namespace ConsoleApp
                 {
                     if (ex.StatusCode == HttpStatusCode.NotFound)
                     {
-                        Console.WriteLine("Entered incorrect city name. Try one time yet.");
-                        log.LogWarning($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
+                        Console.WriteLine(Errors.User.BadCityName);
+                        log.LogWarning(
+                            string.Format(
+                                Errors.Dev.BadCityName,
+                                DateTime.Now,
+                                (int)HttpStatusCode.NotFound,
+                                HttpStatusCode.NotFound, "User entered incorrect city name."));
                     }
                     else
                     {
-                        Console.WriteLine("Request error. Try again later.");
-                        log.LogWarning($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
+                        Console.WriteLine(Errors.User.RequestError);
+                        log.LogWarning(
+                            string.Format(
+                                Errors.Dev.RequestError,
+                                DateTime.Now,
+                                (int)ex.StatusCode,
+                                ex.StatusCode,
+                                ex.Message));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Unexpected error. Try one time yet.");
-                    log.LogWarning($"{DateTime.Now}| {ex.Message}");
+                    Console.WriteLine(Errors.User.UnexpectedError);
+                    log.LogWarning(
+                        string.Format(
+                            Errors.Dev.UnexpectedError,
+                            DateTime.Now,
+                            ex.Message));
                 }
             }
         }

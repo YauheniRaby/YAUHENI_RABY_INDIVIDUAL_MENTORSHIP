@@ -4,8 +4,6 @@ using BusinessLayer.Abstract;
 using BusinessLayer.Service;
 using BusinessLayer.Service.Abstract;
 using ConsoleApp.AutoMap;
-using ConsoleApp.Configuration;
-using Microsoft.Extensions.Logging;
 using Ninject;
 
 namespace ConsoleApp.Extension
@@ -21,6 +19,4 @@ namespace ConsoleApp.Extension
                 .WithConstructorArgument("configurationProvider", MapperConfig.GetConfiguration());
         }
     }
-
-
 }
