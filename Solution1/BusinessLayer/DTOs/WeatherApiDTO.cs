@@ -5,17 +5,18 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Model
+namespace BusinessLayer.DTOs
 {
-    public class WeatherShortDTO
+    public class WeatherApiDTO
     {
-        public WeatherInfo Main { get; set; }
+        [JsonPropertyName("main")]
+        public WeatherApiTempsDTO TemperaturaValues { get; set; }
 
         [JsonPropertyName("name")]
         public string CityName { get; set; }        
     }
 
-    public class WeatherInfo
+    public class WeatherApiTempsDTO
     {
         public double Temp { get; set; }
     }

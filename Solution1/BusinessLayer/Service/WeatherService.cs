@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.DTOs;
+using BusinessLayer.Extension;
 using BusinessLayer.Service.Abstract;
 using System;
 using System.Collections.Generic;
@@ -13,31 +14,21 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Service
 {
-    public class WeatherService : IWeatherServise
+    public class WeatherService : IWeatherServiсe
     {
-        readonly IMapper _mapper;
-        readonly IApiService _apiService;
-        readonly IPrintService _printService;
-
-        public WeatherService(IMapper mapper, IApiService apiService, IPrintService printService) 
+        private readonly IMapper _mapper;
+        private readonly IWeatherApiService _weatherApiService;
+        
+        public WeatherService(IMapper mapper, IWeatherApiService weatherApiService) 
         { 
             _mapper = mapper;
-            _apiService = apiService;
-            _printService = printService;
+            _weatherApiService = weatherApiService;
         }
 
-        public async Task<string> GetByCityNameAsync(string cityName)
+        public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
-            try
-            {
-                var weather = await _apiService.GetJsonByCityName(cityName);
-                var weatherShort = _mapper.Map<WeatherDTO>(weather);
-                return _printService.Print(_mapper.Map<WeatherDTO>(weather));                 
-            }
-            catch (HttpRequestException)
-            {
-                return Const.BadCityName;
-            }                   
+            var weather = await _weatherApiService.GetByCityNameAsync(cityName);
+            return _mapper.Map<WeatherDTO>(weather).GetCommentByTemp();
         }
     }
 }
