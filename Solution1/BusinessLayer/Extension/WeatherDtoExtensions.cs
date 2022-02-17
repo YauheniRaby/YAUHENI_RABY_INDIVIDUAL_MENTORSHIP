@@ -4,12 +4,12 @@ namespace BusinessLayer.Extension
 {
     public static class WeatherDtoExtensions
     {
-        public static string PrintToString (this WeatherDTO weatherDTO)
+        public static string GetStringRepresentation(this WeatherDTO weatherDTO)
         {
             return $"In {weatherDTO.CityName} {weatherDTO.Temp} C. {weatherDTO.Comment}";
         }
 
-        public static WeatherDTO GetCommentByTemp(this WeatherDTO weatherDTO)
+        public static WeatherDTO FillCommentByTemp(this WeatherDTO weatherDTO)
         {
             weatherDTO.Comment = weatherDTO.Temp switch
             {

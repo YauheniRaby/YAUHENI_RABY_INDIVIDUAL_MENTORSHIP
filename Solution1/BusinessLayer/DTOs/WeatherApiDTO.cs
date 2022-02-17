@@ -5,13 +5,13 @@ namespace BusinessLayer.DTOs
     public class WeatherApiDTO
     {
         [JsonPropertyName("main")]
-        public WeatherApiTempsDTO TemperaturaValues { get; set; }
+        public WeatherApiTempDTO TemperatureValues { get; set; }
 
         [JsonPropertyName("name")]
         public string CityName { get; set; }        
     }
 
-    public class WeatherApiTempsDTO
+    public class WeatherApiTempDTO
     {
         public double Temp { get; set; }
     }

@@ -21,7 +21,7 @@ namespace BusinessLayer.Service
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
             var weather = await _weatherApiService.GetByCityNameAsync(cityName);
-            return _mapper.Map<WeatherDTO>(weather).GetCommentByTemp();
+            return _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
         }
     }
 }

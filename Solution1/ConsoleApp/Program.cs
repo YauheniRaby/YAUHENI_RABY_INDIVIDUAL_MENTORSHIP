@@ -16,12 +16,12 @@ namespace ConsoleApp
     {
         private static async Task Main(string[] args)
         {
-            var log = LoggerConfiguration.GetConfiguration<Program>();
+            var logger = LoggerConfiguration.GetConfiguration<Program>();
 
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
 
-            IWeatherServiсe weatherService = ninjectKernel.Get<IWeatherServiсe>();
+            var weatherService = ninjectKernel.Get<IWeatherServiсe>();
 
             while (true)
             {
@@ -30,47 +30,32 @@ namespace ConsoleApp
                 var cityName = Console.ReadLine();
                 if (string.IsNullOrEmpty(cityName))
                 {
-                    Console.WriteLine(Validation.User.EmptyCityName);
-                    log.LogInformation(Validation.Dev.EmptyCityName);
+                    Console.WriteLine(Validation.EmptyCityName);
+                    logger.LogInformation("The user entered an empty city name.");
                     continue;
                 }
 
                 try
                 {
-                    Console.WriteLine((await weatherService.GetByCityNameAsync(cityName)).PrintToString());
+                    Console.WriteLine((await weatherService.GetByCityNameAsync(cityName)).GetStringRepresentation());
                 }
                 catch (HttpRequestException ex)
                 {
                     if (ex.StatusCode == HttpStatusCode.NotFound)
                     {
-                        Console.WriteLine(Errors.User.BadCityName);
-                        log.LogWarning(
-                            string.Format(
-                                Errors.Dev.BadCityName,
-                                DateTime.Now,
-                                (int)HttpStatusCode.NotFound,
-                                HttpStatusCode.NotFound, "User entered incorrect city name."));
+                        Console.WriteLine(Errors.BadCityName);
+                        logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
                     }
                     else
                     {
-                        Console.WriteLine(Errors.User.RequestError);
-                        log.LogWarning(
-                            string.Format(
-                                Errors.Dev.RequestError,
-                                DateTime.Now,
-                                (int)ex.StatusCode,
-                                ex.StatusCode,
-                                ex.Message));
+                        Console.WriteLine(Errors.RequestError);
+                        logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(Errors.User.UnexpectedError);
-                    log.LogWarning(
-                        string.Format(
-                            Errors.Dev.UnexpectedError,
-                            DateTime.Now,
-                            ex.Message));
+                    Console.WriteLine(Errors.UnexpectedError);
+                    logger.LogError($"{DateTime.Now}| {ex.Message}");
                 }
             }
         }

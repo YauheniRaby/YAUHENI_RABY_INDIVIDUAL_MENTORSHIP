@@ -4,10 +4,7 @@
     {
         public static partial class Validation
         {
-            public class User
-            {
-                public const string EmptyCityName = "City name can't be empty.";
-            }
+            public const string EmptyCityName = "City name can't be empty.";
         }
     }
 }

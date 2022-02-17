@@ -8,7 +8,7 @@ namespace BusinessLayer.Service.Abstract
     public class WeatherApiService : IWeatherApiService
     {
         private readonly HttpClient _httpClient;
-
+        
         public WeatherApiService(HttpClient httpClient)
         {
             _httpClient=httpClient;

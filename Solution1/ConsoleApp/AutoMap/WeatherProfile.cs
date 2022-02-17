@@ -8,7 +8,7 @@ namespace ConsoleApp.AutoMap
         public WeatherProfile()
         {
             CreateMap<WeatherApiDTO, WeatherDTO>()
-                .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.TemperaturaValues.Temp))
+                .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.TemperatureValues.Temp))
                 .ForMember(dest => dest.Comment, opt => opt.Ignore());
         }
     }
