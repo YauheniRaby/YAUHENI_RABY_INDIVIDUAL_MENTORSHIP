@@ -28,13 +28,13 @@ namespace Solution1.Tests.BL.Tests
         {
             // Arrange
             var cityName = "Minsk";
-            var temp = 10;
+            var temp = 11;
             var WeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
             _weatherApiServiceMock
-                .Setup(weatherApi => 
-                    weatherApi
+                .Setup(weatherApiService => 
+                    weatherApiService
                     .GetByCityNameAsync(cityName))
-                    .ReturnsAsync(WeatherApiDto);
+                .ReturnsAsync(WeatherApiDto);
 
             var expectedObject = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh"};
             

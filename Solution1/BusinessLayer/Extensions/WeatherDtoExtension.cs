@@ -1,8 +1,8 @@
 ﻿using BusinessLayer.DTOs;
 
-namespace BusinessLayer.Extension
+namespace BusinessLayer.Extensions
 {
-    public static class WeatherDtoExtensions
+    public static class WeatherDtoExtension
     {
         public static string GetStringRepresentation(this WeatherDTO weatherDTO)
         {

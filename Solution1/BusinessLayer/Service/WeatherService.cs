@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.DTOs;
-using BusinessLayer.Extension;
+using BusinessLayer.Extensions;
 using BusinessLayer.Service.Abstract;
 using System.Threading.Tasks;
 

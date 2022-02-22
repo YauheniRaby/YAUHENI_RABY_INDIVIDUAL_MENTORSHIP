@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLayer.Abstract;
-using BusinessLayer.Extension;
+using BusinessLayer.Extensions;
 using ConsoleApp.Configuration;
 using ConsoleApp.Extension;
 using Microsoft.Extensions.Logging;
