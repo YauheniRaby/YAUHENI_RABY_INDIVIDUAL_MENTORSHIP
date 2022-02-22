@@ -8,7 +8,7 @@ using Moq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Solution1.Tests.BL.Tests
+namespace Weather.Tests.BL.Service
 {
     public class WeatherServiceTests
     {
@@ -24,25 +24,24 @@ namespace Solution1.Tests.BL.Tests
         }
 
         [Fact]
-        public async Task GetByCityNameAsync_ReternedWeatherDTO()
+        public async Task GetByCityNameAsync_ReturnedWeatherDTO_Success()
         {
             // Arrange
             var cityName = "Minsk";
             var temp = 11;
-            var WeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
+            var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
             _weatherApiServiceMock
                 .Setup(weatherApiService => 
                     weatherApiService
                     .GetByCityNameAsync(cityName))
-                .ReturnsAsync(WeatherApiDto);
-
-            var expectedObject = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh"};
+                .ReturnsAsync(weatherApiDto);           
             
             // Act
-            var actualObject = await _weatherService.GetByCityNameAsync(cityName);
+            var result = await _weatherService.GetByCityNameAsync(cityName);
 
             // Assert
-            Assert.True(new CompareLogic().Compare(expectedObject, actualObject).AreEqual);
+            var expectedWeatherDTO = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh." };
+            Assert.True(new CompareLogic().Compare(expectedWeatherDTO, result).AreEqual);
         }               
     }
 }

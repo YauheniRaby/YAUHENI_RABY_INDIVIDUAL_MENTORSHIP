@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAcce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{18C98DFC-34ED-40D2-A408-A65E7D040531}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solution1.Tests", "Solution1.Tests\Solution1.Tests.csproj", "{9840ACBB-D119-49A3-AC81-04782335A165}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weather.Tests", "Solution1.Tests\Weather.Tests.csproj", "{9840ACBB-D119-49A3-AC81-04782335A165}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
