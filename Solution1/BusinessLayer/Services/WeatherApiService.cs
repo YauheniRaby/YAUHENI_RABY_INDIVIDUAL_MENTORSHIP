@@ -1,9 +1,10 @@
 ﻿using BusinessLayer.DTOs;
+using BusinessLayer.Services.Abstract;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Service.Abstract
+namespace BusinessLayer.Services
 {
     public class WeatherApiService : IWeatherApiService
     {

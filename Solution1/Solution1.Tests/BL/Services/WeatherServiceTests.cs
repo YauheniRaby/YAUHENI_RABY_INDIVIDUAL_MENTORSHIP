@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using BusinessLayer.DTOs;
-using BusinessLayer.Service;
-using BusinessLayer.Service.Abstract;
+using BusinessLayer.Services;
+using BusinessLayer.Services.Abstract;
 using ConsoleApp.AutoMap;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Weather.Tests.BL.Service
+namespace Weather.Tests.BL.Services
 {
     public class WeatherServiceTests
     {
@@ -40,8 +40,8 @@ namespace Weather.Tests.BL.Service
             var result = await _weatherService.GetByCityNameAsync(cityName);
 
             // Assert
-            var expectedWeatherDTO = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh." };
-            Assert.True(new CompareLogic().Compare(expectedWeatherDTO, result).AreEqual);
+            var expectedWeatherDto = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh." };
+            Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }               
     }
 }

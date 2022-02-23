@@ -3,7 +3,7 @@ using BusinessLayer.Extensions;
 using KellermanSoftware.CompareNetObjects;
 using Xunit;
 
-namespace Weather.Tests.BL.Extension
+namespace Weather.Tests.BL.Extensions
 {
     public class WeatherDtoExtensionTests
     {
@@ -21,8 +21,8 @@ namespace Weather.Tests.BL.Extension
             var result = weatherDto.FillCommentByTemp();
 
             // Assert
-            var expectedWeatherDTO = new WeatherDTO() { Temp = temp, Comment = comment };
-            Assert.True(new CompareLogic().Compare(expectedWeatherDTO, result).AreEqual);
+            var expectedWeatherDto = new WeatherDTO() { Temp = temp, Comment = comment };
+            Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace Weather.Tests.BL.Extension
 
             // Assert
             var expected = $"In Minsk 10 C. It's fresh.";
-            Assert.True(new CompareLogic().Compare(result, expected).AreEqual);
+            Assert.Equal(expected, result);
         }
     }
 }

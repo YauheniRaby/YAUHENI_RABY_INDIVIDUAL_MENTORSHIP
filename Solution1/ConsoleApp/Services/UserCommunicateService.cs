@@ -2,26 +2,26 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BusinessLayer.Abstract;
 using BusinessLayer.Extensions;
-using ConsoleApp.Service.Abstract;
+using BusinessLayer.Services.Abstract;
+using ConsoleApp.Services.Abstract;
 using Microsoft.Extensions.Logging;
 using static ConsoleApp.Constants;
 
-namespace ConsoleApp.Service
+namespace ConsoleApp.Services
 {
-    public class UserCommunicationService : IUserCommunicationService
+    public class UserCommunicateService : IUserCommunicateService
     {
         private readonly ILogger _logger;
         private readonly IWeatherServiсe _weatherServiсe;
 
-        public UserCommunicationService(ILogger logger, IWeatherServiсe weatherService)
+        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService)
         {
             _logger = logger;
             _weatherServiсe = weatherService;
         }
 
-        public async Task Communication()
+        public async Task CommunicateAsync()
         {
             Console.WriteLine("Please, enter city name:");
 
@@ -34,9 +34,10 @@ namespace ConsoleApp.Service
                 return;
             }
 
+            var weatherRepresentation = (string)default;
             try
             {
-                Console.WriteLine((await _weatherServiсe.GetByCityNameAsync(cityName)).GetStringRepresentation());
+                weatherRepresentation = (await _weatherServiсe.GetByCityNameAsync(cityName)).GetStringRepresentation();
             }
             catch (HttpRequestException ex)
             {
@@ -44,18 +45,23 @@ namespace ConsoleApp.Service
                 {
                     Console.WriteLine(Errors.BadCityName);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
+                    return;
                 }
                 else
                 {
                     Console.WriteLine(Errors.RequestError);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
+                    return;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(Errors.UnexpectedError);
                 _logger.LogError($"{DateTime.Now}| {ex.Message}");
+                return;
             }
+
+            Console.WriteLine(weatherRepresentation);
         }
     }
 }

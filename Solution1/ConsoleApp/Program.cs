@@ -1,15 +1,7 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using BusinessLayer.Abstract;
-using BusinessLayer.Extensions;
-using ConsoleApp.Configuration;
-using ConsoleApp.Extension;
-using ConsoleApp.Service.Abstract;
-using Microsoft.Extensions.Logging;
+﻿using System.Threading.Tasks;
+using ConsoleApp.Extensions;
+using ConsoleApp.Services.Abstract;
 using Ninject;
-using static ConsoleApp.Constants;
 
 namespace ConsoleApp
 {
@@ -20,11 +12,11 @@ namespace ConsoleApp
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
 
-            var userCommunicationService = ninjectKernel.Get<IUserCommunicationService>();
+            var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
 
             while (true)
             {
-                await userCommunicationService.Communication();
+                await userCommunicationService.CommunicateAsync();
             }
         }
     }

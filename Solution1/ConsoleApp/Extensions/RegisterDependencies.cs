@@ -1,22 +1,21 @@
 ﻿using System.Net.Http;
 using AutoMapper;
-using BusinessLayer.Abstract;
-using BusinessLayer.Service;
-using BusinessLayer.Service.Abstract;
+using BusinessLayer.Services;
+using BusinessLayer.Services.Abstract;
 using ConsoleApp.AutoMap;
 using ConsoleApp.Configuration;
-using ConsoleApp.Service;
-using ConsoleApp.Service.Abstract;
+using ConsoleApp.Services;
+using ConsoleApp.Services.Abstract;
 using Microsoft.Extensions.Logging;
 using Ninject;
 
-namespace ConsoleApp.Extension
+namespace ConsoleApp.Extensions
 {
     public static class RegisterDependencies
     {
         public static void AddServices(this IKernel ninjectKernel)
         {
-            ninjectKernel.Bind<IUserCommunicationService>().To<UserCommunicationService>();
+            ninjectKernel.Bind<IUserCommunicateService>().To<UserCommunicateService>();
             ninjectKernel.Bind<IWeatherServiсe>().To<WeatherService>();
             ninjectKernel.Bind<IWeatherApiService>().To<WeatherApiService>()
                 .WithConstructorArgument("httpClient", new HttpClient());

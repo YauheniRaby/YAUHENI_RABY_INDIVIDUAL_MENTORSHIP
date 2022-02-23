@@ -1,5 +1,5 @@
 ﻿using BusinessLayer.DTOs;
-using BusinessLayer.Service.Abstract;
+using BusinessLayer.Services;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Moq.Protected;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 
 
-namespace Weather.Tests.BL.Service
+namespace Weather.Tests.BL.Services
 {
     public class WeatherApiServiceTests
     {
@@ -53,8 +53,8 @@ namespace Weather.Tests.BL.Service
             var result = await _weatherApiService.GetByCityNameAsync(cityName);
 
             // Assert
-            var expectedWeatherApiDTO = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = 1.86 } };
-            Assert.True(new CompareLogic().Compare(expectedWeatherApiDTO, result).AreEqual);
+            var expectedWeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = 1.86 } };
+            Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
         }
     }
 }
