@@ -74,17 +74,8 @@ namespace Weather.Tests.ConsoleApp.Services
         public async Task Communicate_EnterCityName_HandlingExceptionAndShowNoticeAsync(string cityName, string message, HttpStatusCode? statusCode)
         {
             // Arrange
-            Exception exception;
+            var exception = statusCode.HasValue ? new HttpRequestException(null, null, statusCode) : new Exception();
 
-            if (statusCode.HasValue)
-            {
-                exception = new HttpRequestException(null, null, statusCode);
-            }
-            else
-            {
-                exception = new Exception();
-            }
-            
             _weatherServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService
