@@ -1,9 +1,10 @@
 ﻿using BusinessLayer.DTOs;
+using BusinessLayer.Services.Abstract;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Service.Abstract
+namespace BusinessLayer.Services
 {
     public class WeatherApiService : IWeatherApiService
     {
@@ -17,7 +18,7 @@ namespace BusinessLayer.Service.Abstract
         public Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
         {
             var urlResult = string.Format(Constants.WeatherAPI.UrlApi, cityName, Constants.WeatherAPI.KeyApi);
-
+            
             return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
         }
     }

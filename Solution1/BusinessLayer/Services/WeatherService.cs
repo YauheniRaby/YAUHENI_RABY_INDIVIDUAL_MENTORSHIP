@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using BusinessLayer.Abstract;
+using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
-using BusinessLayer.Extension;
-using BusinessLayer.Service.Abstract;
+using BusinessLayer.Extensions;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Service
+namespace BusinessLayer.Services
 {
     public class WeatherService : IWeatherServiсe
     {

@@ -1,7 +1,7 @@
 ﻿using BusinessLayer.DTOs;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Abstract
+namespace BusinessLayer.Services.Abstract
 {
     public interface IWeatherServiсe
     {
