@@ -21,17 +21,22 @@ namespace ConsoleApp.Services
             _weatherServiсe = weatherService;
         }
 
-        public async Task CommunicateAsync()
+        public async Task<bool> CommunicateAsync()
         {
             Console.WriteLine("Please, enter city name:");
 
             var cityName = Console.ReadLine();
 
+            if (cityName.ToUpper() == "EXIT")
+            {
+                return false;
+            }
+
             if (string.IsNullOrEmpty(cityName))
             {
                 Console.WriteLine(Validation.EmptyCityName);
                 _logger.LogInformation("The user entered an empty city name. Try again");
-                return;
+                return true;
             }
 
             var weatherRepresentation = (string)default;
@@ -45,23 +50,24 @@ namespace ConsoleApp.Services
                 {
                     Console.WriteLine(Errors.BadCityName);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
-                    return;
+                    return true;
                 }
                 else
                 {
                     Console.WriteLine(Errors.RequestError);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
-                    return;
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(Errors.UnexpectedError);
                 _logger.LogError($"{DateTime.Now}| {ex.Message}");
-                return;
+                return true;
             }
 
             Console.WriteLine(weatherRepresentation);
+            return true;
         }
     }
 }

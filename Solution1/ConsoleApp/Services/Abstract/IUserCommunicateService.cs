@@ -4,6 +4,6 @@ namespace ConsoleApp.Services.Abstract
 {
     public interface IUserCommunicateService
     {
-        Task CommunicateAsync();
+        Task<bool> CommunicateAsync();
     }
 }

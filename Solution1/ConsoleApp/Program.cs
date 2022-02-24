@@ -7,16 +7,15 @@ namespace ConsoleApp
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static async Task Main()
         {
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
 
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
 
-            while (true)
+            while (await userCommunicationService.CommunicateAsync())
             {
-                await userCommunicationService.CommunicateAsync();
             }
         }
     }
