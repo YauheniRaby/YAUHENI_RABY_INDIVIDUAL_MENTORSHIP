@@ -6,7 +6,6 @@ using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Services.Abstract;
 using Microsoft.Extensions.Logging;
-using static ConsoleApp.Constants;
 
 namespace ConsoleApp.Services
 {
@@ -21,17 +20,22 @@ namespace ConsoleApp.Services
             _weatherServiсe = weatherService;
         }
 
-        public async Task CommunicateAsync()
+        public async Task<bool> CommunicateAsync()
         {
             Console.WriteLine("Please, enter city name:");
 
             var cityName = Console.ReadLine();
 
+            if (cityName.ToUpper() == Constants.Commands.Exit)
+            {
+                return false;
+            }
+
             if (string.IsNullOrEmpty(cityName))
             {
-                Console.WriteLine(Validation.EmptyCityName);
+                Console.WriteLine(Constants.Validation.EmptyCityName);
                 _logger.LogInformation("The user entered an empty city name. Try again");
-                return;
+                return true;
             }
 
             var weatherRepresentation = (string)default;
@@ -43,25 +47,26 @@ namespace ConsoleApp.Services
             {
                 if (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    Console.WriteLine(Errors.BadCityName);
+                    Console.WriteLine(Constants.Errors.BadCityName);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
-                    return;
+                    return true;
                 }
                 else
                 {
-                    Console.WriteLine(Errors.RequestError);
+                    Console.WriteLine(Constants.Errors.RequestError);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
-                    return;
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(Errors.UnexpectedError);
+                Console.WriteLine(Constants.Errors.UnexpectedError);
                 _logger.LogError($"{DateTime.Now}| {ex.Message}");
-                return;
+                return true;
             }
 
             Console.WriteLine(weatherRepresentation);
+            return true;
         }
     }
 }
