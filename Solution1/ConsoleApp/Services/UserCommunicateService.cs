@@ -27,7 +27,7 @@ namespace ConsoleApp.Services
 
             var cityName = Console.ReadLine();
 
-            if (cityName.ToUpper() == Commands.Exit)
+            if (cityName.ToUpper() == Constants.Commands.Exit)
             {
                 return false;
             }
