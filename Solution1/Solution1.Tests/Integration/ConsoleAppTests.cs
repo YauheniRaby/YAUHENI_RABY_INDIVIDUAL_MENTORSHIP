@@ -14,12 +14,12 @@ namespace Weather.Tests.Integration
             // Arrange
             var cityName = "Minsk";
             
-            var doublePettern = @"\d{1,2}.\d{1,2}";
+            var temperaturePattern = @"\d{1,2}.\d{1,2}";
             var comment1 = "Dress warmly.";
             var comment2 = "It's fresh.";
             var comment3 = "Good weather.";
             var comment4 = "It's time to go to the beach.";
-            var pattern = $"^In {cityName} {doublePettern} C. ({comment1}|{comment2}|{comment3}|{comment4})\r\n$";
+            var pattern = $"^In {cityName} {temperaturePattern} C. ({comment1}|{comment2}|{comment3}|{comment4})\r\n$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
