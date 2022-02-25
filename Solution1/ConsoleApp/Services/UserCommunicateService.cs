@@ -6,7 +6,6 @@ using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Services.Abstract;
 using Microsoft.Extensions.Logging;
-using static ConsoleApp.Constants;
 
 namespace ConsoleApp.Services
 {
@@ -34,7 +33,7 @@ namespace ConsoleApp.Services
 
             if (string.IsNullOrEmpty(cityName))
             {
-                Console.WriteLine(Validation.EmptyCityName);
+                Console.WriteLine(Constants.Validation.EmptyCityName);
                 _logger.LogInformation("The user entered an empty city name. Try again");
                 return true;
             }
@@ -48,20 +47,20 @@ namespace ConsoleApp.Services
             {
                 if (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    Console.WriteLine(Errors.BadCityName);
+                    Console.WriteLine(Constants.Errors.BadCityName);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine(Errors.RequestError);
+                    Console.WriteLine(Constants.Errors.RequestError);
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(Errors.UnexpectedError);
+                Console.WriteLine(Constants.Errors.UnexpectedError);
                 _logger.LogError($"{DateTime.Now}| {ex.Message}");
                 return true;
             }
