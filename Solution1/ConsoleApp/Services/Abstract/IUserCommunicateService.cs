@@ -4,6 +4,8 @@ namespace ConsoleApp.Services.Abstract
 {
     public interface IUserCommunicateService
     {
-        Task<bool> CommunicateAsync();
+        Task GetCurrentlyWeatherAsync();
+
+        Task MenuAsync();
     }
 }

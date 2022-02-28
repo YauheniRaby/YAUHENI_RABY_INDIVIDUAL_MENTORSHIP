@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using ConsoleApp.Command;
+using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using Ninject;
@@ -14,8 +18,9 @@ namespace ConsoleApp
 
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
 
-            while (await userCommunicationService.CommunicateAsync())
+            while (true)
             {
+               await userCommunicationService.MenuAsync();
             }
         }
     }
