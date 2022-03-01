@@ -26,13 +26,15 @@ namespace BusinessLayer.Services
             return _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
         }
         
-        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay)
+        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(DataForWeatherRequestDTO dataForWeatherRequestDTO)
         {
-            var countPointForCurrentDay = (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3; ///////////////////////
-            var countWeatherPoint = countDay * 8 + countPointForCurrentDay;
+            var countPointForCurrentDay = 
+                (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
+                (24/Constants.WeatherAPI.CountWeatherPointinDay); 
+            var countWeatherPoint = dataForWeatherRequestDTO.PeriodOfDays * Constants.WeatherAPI.CountWeatherPointinDay + countPointForCurrentDay;
 
-            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint);
-            forecast.City.Name = cityName;
+            var forecast = await _weatherApiService.GetForecastByCityNameAsync(dataForWeatherRequestDTO.CityName, countWeatherPoint);
+            forecast.City.Name = dataForWeatherRequestDTO.CityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast);
         }        

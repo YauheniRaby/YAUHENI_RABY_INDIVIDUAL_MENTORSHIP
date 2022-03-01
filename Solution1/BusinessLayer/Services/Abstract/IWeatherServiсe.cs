@@ -7,6 +7,6 @@ namespace BusinessLayer.Services.Abstract
     {
         Task<WeatherDTO> GetByCityNameAsync(string cityName);
 
-        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay);
+        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(DataForWeatherRequestDTO dataForWeatherRequestDTO);
     }
 }

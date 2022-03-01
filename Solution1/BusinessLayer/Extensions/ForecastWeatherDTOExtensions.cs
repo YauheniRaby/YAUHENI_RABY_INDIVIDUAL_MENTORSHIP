@@ -16,7 +16,7 @@ namespace BusinessLayer.Extensions
 
             foreach (var e in weatherDTO.WeatherValuesForPeriod)
             {                
-                result += $"\nDay {i++} ({e.DateTime.ToString("D")}): {e.Temp:f1} C. {e.Comment}";
+                result += $"\nDay {i++} ({e.DateTime:D}): {e.Temp:f1} C. {e.Comment}";
             }
 
             return result;

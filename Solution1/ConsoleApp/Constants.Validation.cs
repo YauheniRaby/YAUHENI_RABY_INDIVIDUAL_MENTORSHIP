@@ -4,7 +4,7 @@
     {
         public static partial class Validation
         {
-            public const string EmptyCityName = "City name can't be empty. Try again.";
+            public const string IncorrectValues = "Entered incorrect values. Try again.";
         }
     }
 }

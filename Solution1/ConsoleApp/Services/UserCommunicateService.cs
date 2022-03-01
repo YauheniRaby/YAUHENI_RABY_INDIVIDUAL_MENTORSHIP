@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace ConsoleApp.Services
@@ -17,11 +19,13 @@ namespace ConsoleApp.Services
         private readonly ILogger _logger;
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IList<ICommand> _commands;
+        private readonly IValidator<DataForWeatherRequestDTO> _validator;
 
-        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService)
+        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IValidator<DataForWeatherRequestDTO> validator)
         {
             _logger = logger;
             _weatherServiсe = weatherService;
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
             _commands = new List<ICommand>();
             _commands.FillCommands(this);
         }
@@ -52,6 +56,14 @@ namespace ConsoleApp.Services
                     _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
                 }
             }
+            catch (ValidationException ex)
+            {
+                Console.WriteLine(Constants.Validation.IncorrectValues);
+                foreach (var e in ex.Errors)
+                {
+                    _logger.LogError($"{DateTime.Now}| {e.PropertyName}: {e.ErrorMessage}");
+                }
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(Constants.Errors.UnexpectedError);
@@ -61,48 +73,38 @@ namespace ConsoleApp.Services
 
         public async Task GetCurrentlyWeatherAsync()
         {
-            var cityName = string.Empty;
+            var weatherRequest = new DataForWeatherRequestDTO();
+
             Console.WriteLine("Please, enter city name:");
+            weatherRequest.CityName = Console.ReadLine();
 
-            do
+            var validationResult = await _validator.ValidateAsync(weatherRequest, options => options.IncludeRuleSets("CityName"));
+            if (!validationResult.IsValid)
             {
-                cityName = Console.ReadLine();
-                if (!string.IsNullOrEmpty(cityName))
-                {
-                    break;
-                }
-
-                Console.WriteLine(Constants.Validation.EmptyCityName);
-                _logger.LogInformation("The user entered an empty city name");
+                throw new ValidationException(validationResult.Errors);
             }
-            while (true);
 
-            var weather = await _weatherServiсe.GetByCityNameAsync(cityName);
-
+            var weather = await _weatherServiсe.GetByCityNameAsync(weatherRequest.CityName);
             Console.WriteLine(weather.GetStringRepresentation());
         }
 
         public async Task GetForecastByCityNameAsync()
         {
-            var cityName = string.Empty;
+            var weatherRequest = new DataForWeatherRequestDTO();
+
             Console.WriteLine("Please, enter city name:");
-
-            do
-            {
-                cityName = Console.ReadLine();
-                if (!string.IsNullOrEmpty(cityName))
-                {
-                    break;
-                }
-
-                Console.WriteLine(Constants.Validation.EmptyCityName);
-                _logger.LogInformation("The user entered an empty city name");
-            }
-            while (true);
+            weatherRequest.CityName = Console.ReadLine();
 
             Console.WriteLine("Please, enter count day:");
-            var countDay = Convert.ToInt32(Console.ReadLine());
-            var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
+            weatherRequest.PeriodOfDays = Convert.ToInt32(Console.ReadLine());
+
+            var validationResult = await _validator.ValidateAsync(weatherRequest, options => options.IncludeAllRuleSets());
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
+            var weather = await _weatherServiсe.GetForecastByCityNameAsync(weatherRequest);
             weather.FillCommentByTemp();
             Console.WriteLine(weather.GetMultiStringRepresentation());
         }

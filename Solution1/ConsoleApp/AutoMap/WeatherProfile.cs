@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using BusinessLayer.DTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using BusinessLayer.DTOs;
 
 namespace ConsoleApp.AutoMap
 {
