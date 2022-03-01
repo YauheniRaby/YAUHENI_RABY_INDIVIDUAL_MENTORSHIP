@@ -10,7 +10,7 @@ namespace ConsoleApp.Extensions
         public static void FillCommands(this IList<ICommand> commands, IUserCommunicateService userCommunicateService)
         {
             commands.Add(new CurrentlyWeatherCommand(userCommunicateService));
-            commands.Add(new ExitCommand());
+            commands.Add(new ForecastWeatherCommand(userCommunicateService));
             commands.Add(new ExitCommand());
         }
     }

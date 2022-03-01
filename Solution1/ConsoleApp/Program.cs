@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ConsoleApp.Command;
-using ConsoleApp.Command.Abstract;
+﻿using System.Threading.Tasks;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using Ninject;

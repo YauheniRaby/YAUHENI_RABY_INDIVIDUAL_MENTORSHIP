@@ -6,6 +6,8 @@ namespace ConsoleApp.Services.Abstract
     {
         Task GetCurrentlyWeatherAsync();
 
+        Task GetForecastByCityNameAsync();
+
         Task MenuAsync();
     }
 }

@@ -81,5 +81,30 @@ namespace ConsoleApp.Services
 
             Console.WriteLine(weather.GetStringRepresentation());
         }
+
+        public async Task GetForecastByCityNameAsync()
+        {
+            var cityName = string.Empty;
+            Console.WriteLine("Please, enter city name:");
+
+            do
+            {
+                cityName = Console.ReadLine();
+                if (!string.IsNullOrEmpty(cityName))
+                {
+                    break;
+                }
+
+                Console.WriteLine(Constants.Validation.EmptyCityName);
+                _logger.LogInformation("The user entered an empty city name");
+            }
+            while (true);
+
+            Console.WriteLine("Please, enter count day:");
+            var countDay = Convert.ToInt32(Console.ReadLine());
+            var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
+            weather.FillCommentByTemp();
+            Console.WriteLine(weather.GetMultiStringRepresentation());
+        }
     }
 }
