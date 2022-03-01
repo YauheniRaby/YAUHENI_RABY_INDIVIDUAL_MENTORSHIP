@@ -1,16 +1,13 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace BusinessLayer.Vlidators
 {
-    public class WeatherRequestValidator : AbstractValidator<DataForWeatherRequestDTO>
+    public class DataForWeatherRequestValidator : AbstractValidator<DataForWeatherRequestDTO>
     {
-        public WeatherRequestValidator()
+        public DataForWeatherRequestValidator()
         {
             RuleSet("CityName", () =>
             {
@@ -22,7 +19,9 @@ namespace BusinessLayer.Vlidators
             });
 
             RuleFor(p => p.PeriodOfDays)
-                .InclusiveBetween(1, 5)
+                .InclusiveBetween(
+                    Convert.ToInt32(ConfigurationManager.AppSettings["minCounDays"]),
+                    Convert.ToInt32(ConfigurationManager.AppSettings["maxCounDays"]))
                 .WithMessage("Entered value is out of range.");
         }
     }

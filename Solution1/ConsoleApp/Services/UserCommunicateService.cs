@@ -25,7 +25,7 @@ namespace ConsoleApp.Services
         {
             _logger = logger;
             _weatherServiсe = weatherService;
-            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
+            _validator = validator;
             _commands = new List<ICommand>();
             _commands.FillCommands(this);
         }
