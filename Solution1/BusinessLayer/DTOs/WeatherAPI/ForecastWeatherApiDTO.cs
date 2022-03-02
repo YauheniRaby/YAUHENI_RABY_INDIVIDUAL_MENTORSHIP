@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace BusinessLayer.DTOs
+namespace BusinessLayer.DTOs.WeatherAPI
 {
     public class ForecastWeatherApiDTO
     {
         [JsonPropertyName("list")]
-        public List<WeatherInfo> WeatherPoints { get; set; }
+        public List<WeatherInfoApiDTO> WeatherPoints { get; set; }
        
         [JsonPropertyName("city")]
-        public City City { get; set; }
+        public CityApiDTO City { get; set; }
     }
 
-    public class City
+    public class CityApiDTO
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }        
     }
 
-    public class WeatherInfo
+    public class WeatherInfoApiDTO
     {
         [JsonPropertyName("main")]
-        public Temp Temp { get; set; }
+        public TempApiDTO Temp { get; set; }
 
         [JsonPropertyName("dt_txt")]
-        public string Date { get; set; }
+        public DateTime DateTime { get; set; }
     }
 
-    public class Temp
+    public class TempApiDTO
     {
         [JsonPropertyName("temp")]
         public double Value { get; set; }

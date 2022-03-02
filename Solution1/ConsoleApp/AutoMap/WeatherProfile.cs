@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLayer.DTOs;
+using BusinessLayer.DTOs.WeatherAPI;
+using BusinessLayer.Extensions;
 
 namespace ConsoleApp.AutoMap
 {
@@ -13,21 +12,13 @@ namespace ConsoleApp.AutoMap
             CreateMap<WeatherApiDTO, WeatherDTO>()
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.TemperatureValues.Temp))
                 .ForMember(dest => dest.Comment, opt => opt.Ignore());
-            CreateMap<WeatherInfo, WeatherForDate>()
-                .ForMember(dest => dest.DateTime, conf => conf.MapFrom(src => src.Date))
+            CreateMap<WeatherInfoApiDTO, WeatherForDateDTO>()
+                .ForMember(dest => dest.DateTime, conf => conf.MapFrom(src => src.DateTime))
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.Temp.Value))
                 .ForMember(dest => dest.Comment, opt => opt.Ignore());
             CreateMap<ForecastWeatherApiDTO, ForecastWeatherDTO>()
                 .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.City.Name))
-                .ForMember(dest => dest.WeatherValuesForPeriod, conf => conf.MapFrom(src => GetMeanValueWeather(src.WeatherPoints)));
-        }
-
-        private IEnumerable<WeatherForDate> GetMeanValueWeather(IEnumerable<WeatherInfo> weathersInfoList)
-        {
-            return weathersInfoList
-                    .GroupBy(w => Convert.ToDateTime(w.Date).Date)
-                    .ToDictionary(x => x.Key, v => v.Select(w => w.Temp.Value).Sum() / v.Count())
-                    .Select(x => new WeatherForDate() { DateTime = x.Key, Temp = x.Value });
+                .ForMember(dest => dest.WeatherForPeriod, conf => conf.MapFrom(src => src.WeatherPoints.GetMeanValueWeather()));
         }
     }
 }

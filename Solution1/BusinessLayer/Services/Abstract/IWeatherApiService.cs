@@ -1,4 +1,4 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs.WeatherAPI;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services.Abstract

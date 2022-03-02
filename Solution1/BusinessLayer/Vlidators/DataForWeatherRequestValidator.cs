@@ -13,15 +13,13 @@ namespace BusinessLayer.Vlidators
             {
                 RuleFor(p => p.CityName)
                     .NotEmpty()
-                    .WithMessage("Entered empty value.")
-                    .MaximumLength(20)
-                    .WithMessage("Entered very long value.");
+                    .MaximumLength(20);
             });
 
             RuleFor(p => p.PeriodOfDays)
                 .InclusiveBetween(
-                    Convert.ToInt32(ConfigurationManager.AppSettings["minCounDays"]),
-                    Convert.ToInt32(ConfigurationManager.AppSettings["maxCounDays"]))
+                    Convert.ToInt32(ConfigurationManager.AppSettings["minCountDays"]),
+                    Convert.ToInt32(ConfigurationManager.AppSettings["maxCountDays"]))
                 .WithMessage("Entered value is out of range.");
         }
     }

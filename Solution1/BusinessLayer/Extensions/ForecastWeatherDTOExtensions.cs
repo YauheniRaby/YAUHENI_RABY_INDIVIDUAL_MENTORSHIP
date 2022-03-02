@@ -1,9 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLayer.Extensions
 {
@@ -11,20 +8,15 @@ namespace BusinessLayer.Extensions
     {
         public static string GetMultiStringRepresentation(this ForecastWeatherDTO weatherDTO)
         {
-            var result = $"{weatherDTO.CityName} weather forecast:";
             int i = 0;
-
-            foreach (var e in weatherDTO.WeatherValuesForPeriod)
-            {                
-                result += $"\nDay {i++} ({e.DateTime:D}): {e.Temp:f1} C. {e.Comment}";
-            }
-
-            return result;
+            return weatherDTO.WeatherForPeriod
+                    .Aggregate($"{weatherDTO.CityName} weather forecast:", 
+                        (first, next) => $"{first} \nDay {i++} ({next.DateTime:D}): {next.Temp:f1} C. {next.Comment}");    
         }
 
         public static ForecastWeatherDTO FillCommentByTemp(this ForecastWeatherDTO weatherDTO)
         {
-            weatherDTO.WeatherValuesForPeriod.ForEach(x => x.Comment = Comment.FillByTemp(x.Temp));
+            weatherDTO.WeatherForPeriod.ForEach(x => x.FillCommentByTemp());
             return weatherDTO;
         }
     }

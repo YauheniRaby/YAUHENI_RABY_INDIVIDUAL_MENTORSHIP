@@ -8,6 +8,6 @@ namespace ConsoleApp.Services.Abstract
 
         Task GetForecastByCityNameAsync();
 
-        Task MenuAsync();
+        Task ShowMenuAsync();
     }
 }

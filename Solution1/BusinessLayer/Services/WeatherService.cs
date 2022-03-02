@@ -3,8 +3,6 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
 using System;
 
 namespace BusinessLayer.Services
@@ -23,15 +21,16 @@ namespace BusinessLayer.Services
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
             var weather = await _weatherApiService.GetByCityNameAsync(cityName);
-            return _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
+            var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
+            return result as WeatherDTO;
         }
         
         public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(DataForWeatherRequestDTO dataForWeatherRequestDTO)
         {
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
-                (24/Constants.WeatherAPI.CountWeatherPointinDay); 
-            var countWeatherPoint = dataForWeatherRequestDTO.PeriodOfDays * Constants.WeatherAPI.CountWeatherPointinDay + countPointForCurrentDay;
+                (24/Constants.WeatherAPI.WeatherPointsInDay); 
+            var countWeatherPoint = dataForWeatherRequestDTO.PeriodOfDays * Constants.WeatherAPI.WeatherPointsInDay + countPointForCurrentDay;
 
             var forecast = await _weatherApiService.GetForecastByCityNameAsync(dataForWeatherRequestDTO.CityName, countWeatherPoint);
             forecast.City.Name = dataForWeatherRequestDTO.CityName;

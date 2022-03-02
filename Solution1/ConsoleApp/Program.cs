@@ -18,7 +18,7 @@ namespace ConsoleApp
 
             while (true)
             {
-               await userCommunicationService.MenuAsync();
+               await userCommunicationService.ShowMenuAsync();
             }
         }
     }

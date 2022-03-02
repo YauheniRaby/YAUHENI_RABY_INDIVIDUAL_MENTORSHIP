@@ -13,7 +13,7 @@ namespace ConsoleApp.Command
             _userCommunicateService = userCommunicateService;
         }
 
-        public async Task Execute()
+        public async Task ExecuteAsync()
         {
             await _userCommunicateService.GetCurrentlyWeatherAsync();
         }

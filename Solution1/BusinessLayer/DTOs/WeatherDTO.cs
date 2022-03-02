@@ -1,9 +1,7 @@
 ﻿namespace BusinessLayer.DTOs
 {
-    public class WeatherDTO
+    public class WeatherDTO : BaseWeatherDTO
     {
-        public string CityName { get; set; }
-        public double Temp { get; set; }
-        public string Comment { get; set; }        
+        public string CityName { get; set; }       
     }     
 }

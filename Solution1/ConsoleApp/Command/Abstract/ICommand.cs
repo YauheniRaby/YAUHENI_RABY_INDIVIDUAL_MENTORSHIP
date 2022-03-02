@@ -8,6 +8,6 @@ namespace ConsoleApp.Command.Abstract
 {
     public interface ICommand
     {
-        Task Execute();
+        Task ExecuteAsync();
     }
 }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
+using ConsoleApp.Command;
 using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
@@ -18,56 +21,72 @@ namespace ConsoleApp.Services
     {
         private readonly ILogger _logger;
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly IList<ICommand> _commands;
         private readonly IValidator<DataForWeatherRequestDTO> _validator;
+        private readonly Invoker _invoker;
+
 
         public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IValidator<DataForWeatherRequestDTO> validator)
         {
             _logger = logger;
             _weatherServiсe = weatherService;
             _validator = validator;
-            _commands = new List<ICommand>();
-            _commands.FillCommands(this);
+            _invoker = new Invoker();
         }
 
-        public async Task MenuAsync()
+        public async Task ShowMenuAsync()
         {
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Get currently weather");
             Console.WriteLine("1 - Get weather for a period of time");
             Console.WriteLine("2 - Exit");
 
-            var i = int.Parse(Console.ReadLine());
-
-            try
+            bool rarseResult = int.TryParse(Console.ReadLine(), out var pointMenu);
+            if (rarseResult && pointMenu >= 0 && pointMenu <= 2)
             {
-                await _commands[i].Execute();
-            }
-            catch (HttpRequestException ex)
-            {
-                if (ex.StatusCode == HttpStatusCode.NotFound)
+                try
                 {
-                    Console.WriteLine(Constants.Errors.BadCityName);
-                    _logger.LogError($"{DateTime.Now}| Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
+                    switch (pointMenu)
+                    {
+                        case 0:
+                            _invoker.SetCommand(new CurrentlyWeatherCommand(this));
+                            await _invoker.RunAsync();
+                            break;
+                        case 1:
+                            _invoker.SetCommand(new ForecastWeatherCommand(this));
+                            await _invoker.RunAsync();
+                            break;
+                        case 2:
+                            _invoker.SetCommand(new ExitCommand());
+                            await _invoker.RunAsync();
+                            break;
+                    }
                 }
-                else
+                catch (HttpRequestException ex)
                 {
-                    Console.WriteLine(Constants.Errors.RequestError);
-                    _logger.LogError($"{DateTime.Now}| Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
+                    if (ex.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        Console.WriteLine(Constants.Errors.BadCityName);
+                        _logger.LogError($"Status code: {(int)HttpStatusCode.NotFound} {HttpStatusCode.NotFound}. User entered incorrect city name.");
+                    }
+                    else
+                    {
+                        Console.WriteLine(Constants.Errors.RequestError);
+                        _logger.LogError($"Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
+                    }
                 }
-            }
-            catch (ValidationException ex)
-            {
-                Console.WriteLine(Constants.Validation.IncorrectValues);
-                foreach (var e in ex.Errors)
+                catch (ValidationException ex)
                 {
-                    _logger.LogError($"{DateTime.Now}| {e.PropertyName}: {e.ErrorMessage}");
+                    Console.WriteLine(Constants.Validation.IncorrectValues);
+                    foreach (var error in ex.Errors)
+                    {
+                        _logger.LogError(error.ErrorMessage);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(Constants.Errors.UnexpectedError);
-                _logger.LogError($"{DateTime.Now}| {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine(Constants.Errors.UnexpectedError);
+                    _logger.LogError(ex.Message);
+                }
             }
         }
 
