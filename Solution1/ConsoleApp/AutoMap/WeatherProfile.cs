@@ -13,7 +13,6 @@ namespace ConsoleApp.AutoMap
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.TemperatureValues.Temp))
                 .ForMember(dest => dest.Comment, opt => opt.Ignore());
             CreateMap<WeatherInfoApiDTO, WeatherForDateDTO>()
-                .ForMember(dest => dest.DateTime, conf => conf.MapFrom(src => src.DateTime))
                 .ForMember(dest => dest.Temp, conf => conf.MapFrom(src => src.Temp.Value))
                 .ForMember(dest => dest.Comment, opt => opt.Ignore());
             CreateMap<ForecastWeatherApiDTO, ForecastWeatherDTO>()

@@ -5,7 +5,7 @@ using System.Configuration;
 
 namespace BusinessLayer.Vlidators
 {
-    public class DataForWeatherRequestValidator : AbstractValidator<DataForWeatherRequestDTO>
+    public class DataForWeatherRequestValidator : AbstractValidator<ForecastWeatherRequestDTO>
     {
         public DataForWeatherRequestValidator()
         {

@@ -4,6 +4,7 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using System.Threading.Tasks;
 using System;
+using FluentValidation;
 
 namespace BusinessLayer.Services
 {
@@ -11,29 +12,44 @@ namespace BusinessLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IWeatherApiService _weatherApiService;
-        
-        public WeatherService(IMapper mapper, IWeatherApiService weatherApiService) 
+        private readonly IValidator<ForecastWeatherRequestDTO> _validator;
+
+
+        public WeatherService(IMapper mapper, IWeatherApiService weatherApiService, IValidator<ForecastWeatherRequestDTO> validator) 
         { 
             _mapper = mapper;
             _weatherApiService = weatherApiService;
+            _validator = validator;
         }
 
-        public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
+        public async Task<WeatherDTO> GetByCityNameAsync(ForecastWeatherRequestDTO forecastWeatherRequestDTO)
         {
-            var weather = await _weatherApiService.GetByCityNameAsync(cityName);
+            var validationResult = await _validator.ValidateAsync(forecastWeatherRequestDTO, options => options.IncludeRuleSets("CityName"));
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
+            var weather = await _weatherApiService.GetByCityNameAsync(forecastWeatherRequestDTO.CityName);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
-            return result as WeatherDTO;
+            return result;
         }
         
-        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(DataForWeatherRequestDTO dataForWeatherRequestDTO)
+        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(ForecastWeatherRequestDTO forecastWeatherRequestDTO)
         {
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
-            var countWeatherPoint = dataForWeatherRequestDTO.PeriodOfDays * Constants.WeatherAPI.WeatherPointsInDay + countPointForCurrentDay;
+            var countWeatherPoint = forecastWeatherRequestDTO.PeriodOfDays * Constants.WeatherAPI.WeatherPointsInDay + countPointForCurrentDay;
 
-            var forecast = await _weatherApiService.GetForecastByCityNameAsync(dataForWeatherRequestDTO.CityName, countWeatherPoint);
-            forecast.City.Name = dataForWeatherRequestDTO.CityName;
+            var validationResult = await _validator.ValidateAsync(forecastWeatherRequestDTO, options => options.IncludeAllRuleSets());
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
+            var forecast = await _weatherApiService.GetForecastByCityNameAsync(forecastWeatherRequestDTO.CityName, countWeatherPoint);
+            forecast.City.Name = forecastWeatherRequestDTO.CityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast);
         }        

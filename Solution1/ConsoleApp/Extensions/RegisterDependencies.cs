@@ -29,7 +29,7 @@ namespace ConsoleApp.Extensions
 
         public static void AddValidators(this IKernel ninjectKernel)
         {
-            ninjectKernel.Bind<IValidator<DataForWeatherRequestDTO>>().To<DataForWeatherRequestValidator>();
+            ninjectKernel.Bind<IValidator<ForecastWeatherRequestDTO>>().To<DataForWeatherRequestValidator>();
         }
     }
 }

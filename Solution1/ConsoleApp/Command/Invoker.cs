@@ -1,5 +1,5 @@
-﻿using ConsoleApp.Command.Abstract;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using ConsoleApp.Command.Abstract;
 
 namespace ConsoleApp.Command
 {
@@ -14,10 +14,7 @@ namespace ConsoleApp.Command
 
         public async Task RunAsync()
         {
-            if (_command != null)
-            {
-                await _command.ExecuteAsync();
-            }
+            await _command?.ExecuteAsync();
         }
     }
 }

@@ -4,7 +4,8 @@ namespace BusinessLayer.Extensions
 {
     public static class BaseWeatherDTOExtensions
     {
-        public static BaseWeatherDTO FillCommentByTemp(this BaseWeatherDTO weatherDTO)
+        public static T FillCommentByTemp <T> (this T weatherDTO)
+            where T : BaseWeatherDTO
         {
             weatherDTO.Comment = weatherDTO.Temp switch
             {

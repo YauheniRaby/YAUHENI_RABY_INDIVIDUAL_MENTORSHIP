@@ -20,11 +20,11 @@ namespace BusinessLayer.Services
             _httpClient=httpClient;
         }
 
-        public Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
+        public async Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
         {
             var urlResult = string.Format(Constants.WeatherAPI.WeatherByCityName, cityName, Constants.WeatherAPI.KeyApi);
             
-            return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
+            return await _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
         }
 
         public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint)

@@ -1,7 +1,7 @@
 ﻿
 namespace BusinessLayer.DTOs
 {
-    public class DataForWeatherRequestDTO
+    public class ForecastWeatherRequestDTO
     {
         public string CityName { get; set; }
 

@@ -4,7 +4,8 @@
     {
         public static partial class Validation
         {
-            public const string IncorrectValues = "Entered incorrect values. Try again.";
+            public const string IncorrectCityName = "Entered incorrect values city name. Try again.";
+            public const string IncorrectPeriod = "Entered incorrect values count day. Try again.";
         }
     }
 }
