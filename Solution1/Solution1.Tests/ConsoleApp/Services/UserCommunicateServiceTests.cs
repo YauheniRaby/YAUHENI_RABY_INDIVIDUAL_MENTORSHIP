@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
+using ConsoleApp.Command.Abstract;
 using ConsoleApp.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,12 +18,15 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly UserCommunicateService _userCommunicationService;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
+        private readonly Mock<IInvoker> _invokerMock;
 
         public UserCommunicateServiceTests()
         {
             _loggerMock = new Mock<ILogger>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _weatherServiceMock.Object);
+            _invokerMock = new Mock<IInvoker>();
+
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _weatherServiceMock.Object, _invokerMock.Object);
         }
 
         [Fact]

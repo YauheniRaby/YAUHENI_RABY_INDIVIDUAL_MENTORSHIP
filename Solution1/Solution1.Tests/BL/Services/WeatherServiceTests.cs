@@ -4,6 +4,8 @@ using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.AutoMap;
+using ConsoleApp.Command.Abstract;
+using FluentValidation;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using System.Threading.Tasks;
@@ -15,13 +17,15 @@ namespace Weather.Tests.BL.Services
     {
         private readonly IMapper _mapper;
         private readonly WeatherService _weatherService;
+        private readonly Mock<IValidator<ForecastWeatherRequestDTO>> _validator;
         private readonly Mock<IWeatherApiService> _weatherApiServiceMock;
 
         public WeatherServiceTests()
         {
             _weatherApiServiceMock = new Mock<IWeatherApiService>();
+            _validator = new Mock<IValidator<ForecastWeatherRequestDTO>>();
             _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _weatherService = new WeatherService(_mapper, _weatherApiServiceMock.Object);
+            _weatherService = new WeatherService(_mapper, _weatherApiServiceMock.Object, _validator.Object);
         }
 
         [Fact]

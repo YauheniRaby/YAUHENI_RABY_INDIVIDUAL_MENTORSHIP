@@ -40,7 +40,7 @@ namespace BusinessLayer.Services
             var forecastResponse = await _httpClient.GetAsync(urlResultForForecast);
             var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync();
 
-            JsonSerializerOptions options = new JsonSerializerOptions();
+            JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
 
             return JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);

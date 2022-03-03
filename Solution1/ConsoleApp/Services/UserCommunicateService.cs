@@ -97,8 +97,6 @@ namespace ConsoleApp.Services
 
         public async Task GetCurrentWeatherAsync()
         {
-            var weatherRequest = new ForecastWeatherRequestDTO();
-
             Console.WriteLine("Please, enter city name:");
             var weather = await _weatherServiсe.GetByCityNameAsync(Console.ReadLine());
 
