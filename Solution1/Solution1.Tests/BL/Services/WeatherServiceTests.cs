@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLayer.DTOs;
+using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.AutoMap;

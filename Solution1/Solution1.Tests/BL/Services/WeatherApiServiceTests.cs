@@ -1,4 +1,4 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Services;
 using KellermanSoftware.CompareNetObjects;
 using Moq;

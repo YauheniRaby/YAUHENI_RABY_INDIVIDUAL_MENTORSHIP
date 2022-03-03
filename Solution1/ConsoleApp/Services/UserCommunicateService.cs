@@ -6,6 +6,7 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Command;
+using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using FluentValidation;
@@ -17,15 +18,13 @@ namespace ConsoleApp.Services
     {
         private readonly ILogger _logger;
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly IValidator<ForecastWeatherRequestDTO> _validator;
-        private readonly Invoker _invoker;
+        private readonly IInvoker _invoker;
 
-        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IValidator<ForecastWeatherRequestDTO> validator)
+        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IInvoker invoker)
         {
             _logger = logger;
             _weatherServiсe = weatherService;
-            _validator = validator;
-            _invoker = new Invoker();
+            _invoker = invoker;
         }
 
         public async Task CommunicateAsync()
@@ -112,13 +111,18 @@ namespace ConsoleApp.Services
             string cityName = Console.ReadLine();
 
             Console.WriteLine("Please, enter count day:");
-            var parseResult = int.TryParse(Console.ReadLine(), out var countDay);
+            int countDay;
 
-            if (!parseResult)
+            while (true)
             {
+                if (int.TryParse(Console.ReadLine(), out var days))
+                {
+                    countDay = days;
+                    break;
+                }
+
                 Console.WriteLine(Constants.Errors.IncorrectValue);
                 _logger.LogError($"User entered incorrect value for 'countDay'.");
-                return;
             }
 
             var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);

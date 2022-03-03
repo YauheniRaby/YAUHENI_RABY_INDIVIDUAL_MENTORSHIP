@@ -3,7 +3,7 @@ using ConsoleApp.Command.Abstract;
 
 namespace ConsoleApp.Command
 {
-    public class Invoker
+    public class Invoker : IInvoker
     {
         private ICommand _command;
 
