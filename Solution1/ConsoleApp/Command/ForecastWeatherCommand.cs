@@ -13,9 +13,9 @@ namespace ConsoleApp.Command
             _userCommunicateService = userCommunicateService;
         }
 
-        public async Task ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            await _userCommunicateService.GetForecastByCityNameAsync();
+            return _userCommunicateService.GetForecastByCityNameAsync();
         }
     }
 }

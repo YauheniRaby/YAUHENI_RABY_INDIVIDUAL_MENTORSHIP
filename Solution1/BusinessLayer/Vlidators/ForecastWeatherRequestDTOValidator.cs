@@ -5,9 +5,9 @@ using System.Configuration;
 
 namespace BusinessLayer.Vlidators
 {
-    public class DataForWeatherRequestValidator : AbstractValidator<ForecastWeatherRequestDTO>
+    public class ForecastWeatherRequestDTOValidator : AbstractValidator<ForecastWeatherRequestDTO>
     {
-        public DataForWeatherRequestValidator()
+        public ForecastWeatherRequestDTOValidator()
         {
             RuleSet("CityName", () =>
             {
@@ -19,8 +19,7 @@ namespace BusinessLayer.Vlidators
             RuleFor(p => p.PeriodOfDays)
                 .InclusiveBetween(
                     Convert.ToInt32(ConfigurationManager.AppSettings["minCountDays"]),
-                    Convert.ToInt32(ConfigurationManager.AppSettings["maxCountDays"]))
-                .WithMessage("Entered value is out of range.");
+                    Convert.ToInt32(ConfigurationManager.AppSettings["maxCountDays"]));
         }
     }
 }

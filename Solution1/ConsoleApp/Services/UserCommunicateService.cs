@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Command;
-using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using FluentValidation;
@@ -32,7 +28,7 @@ namespace ConsoleApp.Services
             _invoker = new Invoker();
         }
 
-        public async Task StartUpApplicationAsync()
+        public async Task CommunicateAsync()
         {
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Get currently weather");
@@ -58,7 +54,7 @@ namespace ConsoleApp.Services
             switch (pointMenu)
             {
                 case 0:
-                    _invoker.SetCommand(new CurrentlyWeatherCommand(this));
+                    _invoker.SetCommand(new CurrentWeatherCommand(this));
                     break;
                 case 1:
                     _invoker.SetCommand(new ForecastWeatherCommand(this));
@@ -77,12 +73,12 @@ namespace ConsoleApp.Services
                 if (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     Console.WriteLine(Constants.Errors.BadCityName);
-                    _logger.LogError($"Status code: {(int)ex.StatusCode} {ex.StatusCode}. User entered incorrect city name.");
+                    _logger.LogError($"Status code: {ex.StatusCode.GetStringRepresentation()} User entered incorrect city name.");
                 }
                 else
                 {
                     Console.WriteLine(Constants.Errors.RequestError);
-                    _logger.LogError($"Status code: {(int)ex.StatusCode} {ex.StatusCode}. {ex.Message}");
+                    _logger.LogError($"Status code: {ex.StatusCode.GetStringRepresentation()}");
                 }
             }
             catch (ValidationException ex)
@@ -90,16 +86,7 @@ namespace ConsoleApp.Services
                 foreach (var error in ex.Errors)
                 {
                     _logger.LogError(error.ErrorMessage);
-
-                    if (error.PropertyName == nameof(ForecastWeatherDTO.CityName))
-                    {
-                        Console.WriteLine(Constants.Validation.IncorrectCityName);
-                    }
-
-                    if (error.PropertyName == nameof(ForecastWeatherDTO.WeatherForPeriod))
-                    {
-                        Console.WriteLine(Constants.Validation.IncorrectPeriod);
-                    }
+                    Console.WriteLine(error.ErrorMessage);
                 }
             }
             catch (Exception ex)
@@ -109,33 +96,32 @@ namespace ConsoleApp.Services
             }
         }
 
-        public async Task GetCurrentlyWeatherAsync()
+        public async Task GetCurrentWeatherAsync()
         {
             var weatherRequest = new ForecastWeatherRequestDTO();
 
             Console.WriteLine("Please, enter city name:");
-            weatherRequest.CityName = Console.ReadLine();
+            var weather = await _weatherServiсe.GetByCityNameAsync(Console.ReadLine());
 
-            var weather = await _weatherServiсe.GetByCityNameAsync(weatherRequest);
             Console.WriteLine(weather.GetStringRepresentation());
         }
 
         public async Task GetForecastByCityNameAsync()
         {
-            var weatherRequest = new ForecastWeatherRequestDTO();
-
             Console.WriteLine("Please, enter city name:");
-            weatherRequest.CityName = Console.ReadLine();
+            string cityName = Console.ReadLine();
 
             Console.WriteLine("Please, enter count day:");
-            bool parseResult = int.TryParse(Console.ReadLine(), out var countDay);
+            var parseResult = int.TryParse(Console.ReadLine(), out var countDay);
 
-            if (parseResult)
+            if (!parseResult)
             {
-                weatherRequest.PeriodOfDays = countDay;
+                Console.WriteLine(Constants.Errors.IncorrectValue);
+                _logger.LogError($"User entered incorrect value for 'countDay'.");
+                return;
             }
 
-            var weather = await _weatherServiсe.GetForecastByCityNameAsync(weatherRequest);
+            var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
             weather.FillCommentByTemp();
             Console.WriteLine(weather.GetMultiStringRepresentation());
         }

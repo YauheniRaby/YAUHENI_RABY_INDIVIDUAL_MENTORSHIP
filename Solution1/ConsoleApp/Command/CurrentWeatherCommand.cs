@@ -4,18 +4,18 @@ using ConsoleApp.Services.Abstract;
 
 namespace ConsoleApp.Command
 {
-    public class CurrentlyWeatherCommand : ICommand
+    public class CurrentWeatherCommand : ICommand
     {
         private readonly IUserCommunicateService _userCommunicateService;
 
-        public CurrentlyWeatherCommand(IUserCommunicateService userCommunicateService)
+        public CurrentWeatherCommand(IUserCommunicateService userCommunicateService)
         {
             _userCommunicateService = userCommunicateService;
         }
 
-        public async Task ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            await _userCommunicateService.GetCurrentlyWeatherAsync();
+            return _userCommunicateService.GetCurrentWeatherAsync();
         }
     }
 }

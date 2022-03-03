@@ -5,8 +5,8 @@ namespace BusinessLayer.Services.Abstract
 {
     public interface IWeatherServiсe
     {
-        Task<WeatherDTO> GetByCityNameAsync(ForecastWeatherRequestDTO dataForWeatherRequestDTO);
+        Task<WeatherDTO> GetByCityNameAsync(string cityName);
 
-        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(ForecastWeatherRequestDTO dataForWeatherRequestDTO);
+        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay);
     }
 }

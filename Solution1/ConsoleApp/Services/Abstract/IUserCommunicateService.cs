@@ -4,10 +4,10 @@ namespace ConsoleApp.Services.Abstract
 {
     public interface IUserCommunicateService
     {
-        Task GetCurrentlyWeatherAsync();
+        Task GetCurrentWeatherAsync();
 
         Task GetForecastByCityNameAsync();
 
-        Task StartUpApplicationAsync();
+        Task CommunicateAsync();
     }
 }
