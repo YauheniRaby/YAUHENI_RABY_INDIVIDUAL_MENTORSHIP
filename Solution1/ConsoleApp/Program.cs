@@ -16,9 +16,8 @@ namespace ConsoleApp
 
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
 
-            while (true)
+            while (await userCommunicationService.CommunicateAsync())
             {
-                await userCommunicationService.CommunicateAsync();
             }
         }
     }

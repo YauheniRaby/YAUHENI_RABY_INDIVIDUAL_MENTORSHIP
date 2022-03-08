@@ -7,24 +7,6 @@ namespace Weather.Tests.BL.Extensions
 {
     public class WeatherDtoExtensionTests
     {
-        [Theory]
-        [InlineData(-1, "Dress warmly.")]
-        [InlineData(10, "It's fresh.")]
-        [InlineData(25, "Good weather.")]
-        [InlineData(40, "It's time to go to the beach.")]
-        public void FillCommentByTemp_FillsComment_Success(double temp, string comment)
-        {
-            // Arrange
-            var weatherDto = new WeatherDTO() { Temp = temp };
-
-            // Act
-            var result = weatherDto.FillCommentByTemp();
-
-            // Assert
-            var expectedWeatherDto = new WeatherDTO() { Temp = temp, Comment = comment };
-            Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
-        }
-
         [Fact]
         public void GetStringRepresentation_GetStringRepresentationFromWeatherDTO_Success()
         {

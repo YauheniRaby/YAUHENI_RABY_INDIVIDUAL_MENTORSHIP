@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ConsoleApp.Command.Abstract;
+using ConsoleApp.Services.Abstract;
 
 namespace ConsoleApp.Command
 {
     public class ExitCommand : ICommand
     {
-        public Task ExecuteAsync()
+        private readonly ICloseApplicationService _closeApplicationService;
+
+        public ExitCommand(ICloseApplicationService closeApplicationService)
         {
-            Environment.Exit(0);
-            return Task.CompletedTask;
+            _closeApplicationService = closeApplicationService;
+        }
+
+        public Task<bool> ExecuteAsync()
+        {
+            return _closeApplicationService.Exit();
         }
     }
 }

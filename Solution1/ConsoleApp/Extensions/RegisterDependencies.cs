@@ -28,6 +28,7 @@ namespace ConsoleApp.Extensions
                 .WithConstructorArgument("configurationProvider", MapperConfig.GetConfiguration());
             ninjectKernel.Bind<ILogger>().ToMethod(x => LoggerConfiguration.GetConfiguration<Program>());
             ninjectKernel.Bind<IInvoker>().To<Invoker>();
+            ninjectKernel.Bind<ICloseApplicationService>().To<CloseApplicationService>();
         }
 
         public static void AddValidators(this IKernel ninjectKernel)

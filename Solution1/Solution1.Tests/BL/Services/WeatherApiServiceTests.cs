@@ -3,6 +3,8 @@ using BusinessLayer.Services;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Moq.Protected;
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -16,13 +18,13 @@ namespace Weather.Tests.BL.Services
     {
         private readonly Mock<HttpMessageHandler> _httpMessageHandler;
         private readonly HttpClient _httpClient;
-        private readonly WeatherApiService _weatherApiService;        
+        private readonly WeatherApiService _weatherApiService;
 
         public WeatherApiServiceTests()
         {
             _httpMessageHandler = new Mock<HttpMessageHandler>();
             _httpClient = new HttpClient(_httpMessageHandler.Object);
-            _weatherApiService = new WeatherApiService(_httpClient);            
+            _weatherApiService = new WeatherApiService(_httpClient);
         }
 
         [Fact]
@@ -43,7 +45,7 @@ namespace Weather.Tests.BL.Services
                .Setup<Task<HttpResponseMessage>>(
                   "SendAsync",
                   ItExpr.Is<HttpRequestMessage>(
-                      request => 
+                      request =>
                       request.Method == HttpMethod.Get
                       && request.RequestUri.ToString() == urlString),
                   ItExpr.IsAny<CancellationToken>())
@@ -55,6 +57,84 @@ namespace Weather.Tests.BL.Services
             // Assert
             var expectedWeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = 1.86 } };
             Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
+        }
+
+        [Fact]
+        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherApiDTO_Success()
+        {
+            // Arrange
+            var cityName = "Minsk";
+            var lat = 53;
+            var lon = 27;
+            var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
+            var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
+            
+            var responseCoordinates = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(@"[{""name"": ""Minsk"", ""lat"" : 53, ""lon"" : 27}]"),
+            };
+            var responseForecast = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(@"{""city"":
+                                                    {
+                                                        ""name"":""Minsk""
+                                                    },
+                                                ""list"":
+                                                    [
+                                                        {""dt_txt"":""2022-03-05 18:00:00"",
+                                                        ""main"":{""temp"":2}},
+                                                        {""dt_txt"":""2022-03-05 21:00:00"",
+                                                        ""main"":{""temp"":4}}
+                                                    ]}"),
+            };
+
+            _httpMessageHandler
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.Is<HttpRequestMessage>(
+                      request =>
+                      request.Method == HttpMethod.Get
+                      && request.RequestUri.ToString() == urlCoordinates),
+                  ItExpr.IsAny<CancellationToken>())
+               .ReturnsAsync(responseCoordinates);
+
+            _httpMessageHandler
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.Is<HttpRequestMessage>(
+                      request =>
+                      request.Method == HttpMethod.Get
+                      && request.RequestUri.ToString() == urlForecast),
+                  ItExpr.IsAny<CancellationToken>())
+               .ReturnsAsync(responseForecast);
+            
+            // Act
+            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, 2);
+
+            // Assert
+            var expected = new ForecastWeatherApiDTO()
+            {
+                City = new CityApiDTO() { Name = cityName },
+                WeatherPoints = new List<WeatherInfoApiDTO>()
+                {
+                    new WeatherInfoApiDTO()
+                    {
+                        DateTime = new DateTime(2022, 03, 05, 18, 00, 00),
+                        Temp = new TempApiDTO() { Value = 2 }
+                    },
+                    new WeatherInfoApiDTO()
+                    {
+                        DateTime = new DateTime(2022, 03, 05, 21, 00, 00),
+                        Temp = new TempApiDTO() { Value = 4 }
+                    },
+                }
+            };
+
+            Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
     }
 }

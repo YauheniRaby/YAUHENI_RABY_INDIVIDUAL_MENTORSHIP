@@ -5,6 +5,7 @@ using BusinessLayer.Extensions;
 using System.Threading.Tasks;
 using System;
 using FluentValidation;
+using System.Configuration;
 
 namespace BusinessLayer.Services
 {
@@ -54,7 +55,7 @@ namespace BusinessLayer.Services
             var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint);
             forecast.City.Name = cityName;
 
-            return _mapper.Map<ForecastWeatherDTO>(forecast);
+            return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }        
     }
 }

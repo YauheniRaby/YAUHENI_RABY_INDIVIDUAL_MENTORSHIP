@@ -19,15 +19,17 @@ namespace ConsoleApp.Services
         private readonly ILogger _logger;
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IInvoker _invoker;
+        private readonly ICloseApplicationService _closeApplicationService;
 
-        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IInvoker invoker)
+        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IInvoker invoker, ICloseApplicationService closeApplicationService)
         {
             _logger = logger;
             _weatherServiсe = weatherService;
             _invoker = invoker;
+            _closeApplicationService = closeApplicationService;
         }
 
-        public async Task CommunicateAsync()
+        public async Task<bool> CommunicateAsync()
         {
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Get currently weather");
@@ -40,14 +42,14 @@ namespace ConsoleApp.Services
             {
                 Console.WriteLine(Constants.Errors.IncorrectValue);
                 _logger.LogError($"User entered incorrect value.");
-                return;
+                return true;
             }
 
             if (pointMenu < 0 || pointMenu > 2)
             {
-                Console.WriteLine(Constants.Errors.IncorrectValue);
+                Console.WriteLine(Constants.Errors.UnacceptableValue);
                 _logger.LogError($"User entered value out of range.");
-                return;
+                return true;
             }
 
             switch (pointMenu)
@@ -59,13 +61,15 @@ namespace ConsoleApp.Services
                     _invoker.SetCommand(new ForecastWeatherCommand(this));
                     break;
                 case 2:
-                    _invoker.SetCommand(new ExitCommand());
+                    _invoker.SetCommand(new ExitCommand(_closeApplicationService));
                     break;
             }
 
+            var result = true;
+
             try
             {
-                await _invoker.RunAsync();
+                result = await _invoker.RunAsync();
             }
             catch (HttpRequestException ex)
             {
@@ -93,17 +97,20 @@ namespace ConsoleApp.Services
                 Console.WriteLine(Constants.Errors.UnexpectedError);
                 _logger.LogError(ex.Message);
             }
+
+            return result;
         }
 
-        public async Task GetCurrentWeatherAsync()
+        public async Task<bool> GetCurrentWeatherAsync()
         {
             Console.WriteLine("Please, enter city name:");
             var weather = await _weatherServiсe.GetByCityNameAsync(Console.ReadLine());
 
             Console.WriteLine(weather.GetStringRepresentation());
+            return true;
         }
 
-        public async Task GetForecastByCityNameAsync()
+        public async Task<bool> GetForecastByCityNameAsync()
         {
             Console.WriteLine("Please, enter city name:");
             string cityName = Console.ReadLine();
@@ -124,8 +131,8 @@ namespace ConsoleApp.Services
             }
 
             var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
-            weather.FillCommentByTemp();
             Console.WriteLine(weather.GetMultiStringRepresentation());
+            return true;
         }
     }
 }

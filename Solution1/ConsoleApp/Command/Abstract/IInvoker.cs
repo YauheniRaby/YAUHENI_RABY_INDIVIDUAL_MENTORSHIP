@@ -6,6 +6,6 @@ namespace ConsoleApp.Command.Abstract
     {
         void SetCommand(ICommand command);
 
-        Task RunAsync();
+        Task<bool> RunAsync();
     }
 }

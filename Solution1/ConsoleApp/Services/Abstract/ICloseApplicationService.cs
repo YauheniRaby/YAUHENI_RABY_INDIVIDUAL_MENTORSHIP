@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp.Command.Abstract
+namespace ConsoleApp.Services.Abstract
 {
-    public interface ICommand
+    public interface ICloseApplicationService
     {
-        Task<bool> ExecuteAsync();
+        Task<bool> Exit();
     }
 }
