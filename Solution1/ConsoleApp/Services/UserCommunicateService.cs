@@ -40,7 +40,7 @@ namespace ConsoleApp.Services
 
             if (!parseResult)
             {
-                Console.WriteLine(Constants.Errors.IncorrectValue);
+                Console.WriteLine(Constants.Validation.IncorrectValue);
                 _logger.LogError($"User entered incorrect value.");
                 return true;
             }
@@ -126,7 +126,7 @@ namespace ConsoleApp.Services
                     break;
                 }
 
-                Console.WriteLine(Constants.Errors.IncorrectValue);
+                Console.WriteLine(Constants.Validation.IncorrectValue);
                 _logger.LogError($"User entered incorrect value for 'countDay'.");
             }
 
