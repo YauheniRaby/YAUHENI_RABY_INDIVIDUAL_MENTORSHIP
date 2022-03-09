@@ -32,9 +32,9 @@ namespace ConsoleApp.Services
             Console.WriteLine("1 - Get currently weather");
             Console.WriteLine("2 - Get weather for a period of time");
 
-            bool parseResult = int.TryParse(Console.ReadLine(), out var pointMenu);
+            bool isGoodParse = int.TryParse(Console.ReadLine(), out var pointMenu);
 
-            if (!parseResult)
+            if (!isGoodParse)
             {
                 Console.WriteLine(Constants.Validation.IncorrectValue);
                 _logger.LogError($"User entered incorrect value.");

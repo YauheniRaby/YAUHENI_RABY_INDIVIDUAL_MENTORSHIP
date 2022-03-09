@@ -39,7 +39,6 @@ namespace Weather.Tests.BL.Services
             var cityName = "Minsk";
             var forecast = new ForecastWeatherRequestDTO() { CityName = cityName };
 
-
             var temp = 11;
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
 
@@ -57,30 +56,33 @@ namespace Weather.Tests.BL.Services
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }
 
-        [Fact]
-        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherDTO_Success()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(3)]
+        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherDTO_Success(int countDay)
         {
             // Arrange
             var cityName = "Minsk";
-            var countWeatherPoint = 8 + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
-
+            var countWeatherPoint = 8*countDay + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
                 WeatherPoints = new List<WeatherInfoApiDTO>()
-                {
-                    new WeatherInfoApiDTO()
-                    {
-                        DateTime = new DateTime(2022, 3, 5, 18, 00, 00),
-                        Temp = new TempApiDTO() { Value = 2 }
-                    },
-                    new WeatherInfoApiDTO()
-                    {
-                        DateTime = new DateTime(2022, 3, 5, 21, 00, 00),
-                        Temp = new TempApiDTO() { Value = 4 }
-                    },
-                }
             };
+
+            for(int i = 1; i <= countDay; i ++)
+            {
+                for(int j = 0; j < 24; j += 3)
+                {
+                    forecastWeatherApiDTO.WeatherPoints
+                        .Add(
+                            new WeatherInfoApiDTO()
+                            {
+                                DateTime = new DateTime(2022, 3, i, j, 00, 00),
+                                Temp = new TempApiDTO() { Value = 2 }
+                            });
+                }
+            }
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
@@ -89,17 +91,20 @@ namespace Weather.Tests.BL.Services
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
-            var result = await _weatherService.GetForecastByCityNameAsync(cityName, 1);
+            var result = await _weatherService.GetForecastByCityNameAsync(cityName, countDay);
 
             //Assert
             var expectedWeatherDto = new ForecastWeatherDTO()
             {
                 CityName = cityName,
-                WeatherForPeriod = new List<WeatherForDateDTO>()
-                {
-                    new WeatherForDateDTO() { DateTime = new DateTime(2022, 3, 5), Temp = 3, Comment = "It's fresh."}
-                }
-            };
+                WeatherForPeriod = new List<WeatherForDateDTO>()};
+
+            for (int i = 1; i <= countDay; i++)
+            {
+                expectedWeatherDto.WeatherForPeriod
+                    .Add(new WeatherForDateDTO() { DateTime = new DateTime(2022, 3, i), Temp = 2, Comment = "It's fresh." });                
+            }
+
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }
     }

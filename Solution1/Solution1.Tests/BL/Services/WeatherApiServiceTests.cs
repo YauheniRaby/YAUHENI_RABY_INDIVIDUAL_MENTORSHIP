@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-
 
 namespace Weather.Tests.BL.Services
 {
@@ -33,11 +33,11 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var cityName = "Minsk";
             var urlString = "https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=3fe39edadae3ae57d133a80598d5b120&units=metric";
-
+            
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(@"{ ""main"": {""temp"": 1.86}, ""name"": ""Minsk""}"),
+                Content = new StringContent(JsonSerializer.Serialize(new { main = new { temp = 1.86 }, name = "Minsk" })),
             };
 
             _httpMessageHandler
@@ -68,26 +68,28 @@ namespace Weather.Tests.BL.Services
             var lon = 27;
             var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
             var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
-            
+
             var responseCoordinates = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(@"[{""name"": ""Minsk"", ""lat"" : 53, ""lon"" : 27}]"),
+                Content = new StringContent(JsonSerializer.Serialize(new[] { new { name = "Minsk", lat = 53, lon = 27 } })),
             };
+            
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(@"{""city"":
-                                                    {
-                                                        ""name"":""Minsk""
-                                                    },
-                                                ""list"":
-                                                    [
-                                                        {""dt_txt"":""2022-03-05 18:00:00"",
-                                                        ""main"":{""temp"":2}},
-                                                        {""dt_txt"":""2022-03-05 21:00:00"",
-                                                        ""main"":{""temp"":4}}
-                                                    ]}"),
+                Content = new StringContent
+                (
+                    JsonSerializer.Serialize(new
+                    {
+                        city = new { name = "Minsk" },
+                        list = new[]
+                            {
+                                new { dt_txt = "2022-03-05 18:00:00", main = new { temp = 2 } },
+                                new { dt_txt = "2022-03-05 21:00:00", main = new { temp = 4 } }
+                            }
+                    })
+                ),
             };
 
             _httpMessageHandler

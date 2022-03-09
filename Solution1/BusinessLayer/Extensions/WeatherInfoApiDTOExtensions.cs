@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BusinessLayer.Extensions
 {
-    public static class WeatherInfoExtensions
+    public static class WeatherInfoApiDTOExtensions
     {
         public static IEnumerable<WeatherForDateDTO> GetMeanValueWeather(this IEnumerable<WeatherInfoApiDTO> weathersInfoList)
         {

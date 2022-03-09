@@ -1,11 +1,7 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using KellermanSoftware.CompareNetObjects;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -16,9 +12,10 @@ namespace Weather.Tests.BL.Extensions
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
         {
             // Arrange
-            
+            var forecastWeatherDTO = GetForecastWeatherDTO().FillCommentByTemp();
+
             // Act
-            var result = GetForecastWeatherDTO().FillCommentByTemp().GetMultiStringRepresentation();
+            var result = forecastWeatherDTO.GetMultiStringRepresentation();
 
             // Assert
             var expected = $"Minsk weather forecast: " +
@@ -35,10 +32,9 @@ namespace Weather.Tests.BL.Extensions
             var forecastWeatherDTO = GetForecastWeatherDTO();
 
             // Act
-            var result = forecastWeatherDTO.FillCommentByTemp();
+            forecastWeatherDTO.FillCommentByTemp();
 
-            // Assert
-            
+            // Assert            
             Assert.Equal("It's fresh.", forecastWeatherDTO.WeatherForPeriod[0].Comment);
             Assert.Equal("Good weather.", forecastWeatherDTO.WeatherForPeriod[1].Comment);
         }
@@ -52,6 +48,5 @@ namespace Weather.Tests.BL.Extensions
             };
             return new ForecastWeatherDTO() { CityName = "Minsk", WeatherForPeriod = weatherForPeriod };
         }
-
     }
 }

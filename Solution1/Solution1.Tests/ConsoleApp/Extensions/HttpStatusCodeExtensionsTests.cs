@@ -16,10 +16,11 @@ namespace Weather.Tests.ConsoleApp.Extensions
         public void GetStringRepresentation_GetStringRepresentationFromHttpStatusCode_Success()
         {
             // Arrange
-            
-            // Act
-            var result = new HttpStatusCode?(HttpStatusCode.BadRequest).GetStringRepresentation();
+            HttpStatusCode? httpStatusCode = HttpStatusCode.BadRequest;
 
+            // Act
+            var result = httpStatusCode.GetStringRepresentation();
+            
             // Assert
             var expected = "400 BadRequest.";
             Assert.Equal(expected, result);

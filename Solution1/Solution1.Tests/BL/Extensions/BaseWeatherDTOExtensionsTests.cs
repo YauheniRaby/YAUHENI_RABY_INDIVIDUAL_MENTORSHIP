@@ -1,11 +1,5 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using KellermanSoftware.CompareNetObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -17,18 +11,33 @@ namespace Weather.Tests.BL.Extensions
         [InlineData(10, "It's fresh.")]
         [InlineData(25, "Good weather.")]
         [InlineData(40, "It's time to go to the beach.")]
-        public void FillCommentByTemp_FillsComment_Success(double temp, string comment)
+        public void FillCommentByTemp_FillsCommentForWeatherDTO_Success(double temp, string comment)
         {
             // Arrange
-
             var weatherDto = new WeatherDTO() { Temp = temp };
 
             // Act
-            var result = weatherDto.FillCommentByTemp();
+            weatherDto.FillCommentByTemp();
 
             // Assert
-            var expectedWeatherDto = new WeatherDTO() { Temp = temp, Comment = comment };
-            Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
+            Assert.Equal(comment, weatherDto.Comment);
+        }
+
+        [Theory]
+        [InlineData(-5, "Dress warmly.")]
+        [InlineData(15, "It's fresh.")]
+        [InlineData(27, "Good weather.")]
+        [InlineData(50, "It's time to go to the beach.")]
+        public void FillCommentByTemp_FillsCommentForWeatherForDateDTO_Success(double temp, string comment)
+        {
+            // Arrange
+            var weatherForDateDTO = new WeatherForDateDTO() { Temp = temp };
+
+            // Act
+            weatherForDateDTO.FillCommentByTemp();
+
+            // Assert
+            Assert.Equal(comment, weatherForDateDTO.Comment);
         }
     }
 }
