@@ -12,13 +12,6 @@ namespace Weather.Tests.Integration
 {
     public class ConsoleAppTests
     {
-        private readonly Mock<ICloseApplicationService> _closeApplicationService;
-
-        public ConsoleAppTests()
-        {
-            _closeApplicationService = new Mock<ICloseApplicationService>();
-        }
-
         [Fact]
         public async Task Main_GetCurrentWeather_Seccess()
         {
@@ -28,7 +21,7 @@ namespace Weather.Tests.Integration
             var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
             var menu = Menu.GetMenuRepresentation();
             var commentRegex = GetCommentsPattern();
-            var pattern = $"^{menu}\r\nIn {cityName} {temperaturePattern} C. {commentRegex}\r\n{menu}\r\n$";
+            var pattern = $"^{menu}\r\nIn {cityName} {temperaturePattern} C. {commentRegex}\r\n{menu}\r\nСlose the application\r\n$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
@@ -53,7 +46,7 @@ namespace Weather.Tests.Integration
 
             var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
             var forecastPattern = $@"(\nDay [0-5]{{1}} \(\d{{1,2}} \w+ \d{{4}} г.\): {temperaturePattern} C. {GetCommentsPattern()}\s{{0,1}}){{{countDays},{countDays + 1}}}";
-            var pattern = $"^{menu}\r\nPlease, enter city name:\r\nPlease, enter count day:\r\n{cityName} weather forecast: {forecastPattern}\r\n{menu}\r\n$";
+            var pattern = $"^{menu}\r\nPlease, enter city name:\r\nPlease, enter count day:\r\n{cityName} weather forecast: {forecastPattern}\r\n{menu}\r\nСlose the application\r\n$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
