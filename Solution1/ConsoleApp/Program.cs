@@ -1,5 +1,4 @@
-﻿
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using Ninject;

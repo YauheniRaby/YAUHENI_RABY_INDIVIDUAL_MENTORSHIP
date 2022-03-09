@@ -1,11 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Vlidators;
 using FluentValidation;
-using FluentValidation.Results;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -42,7 +37,7 @@ namespace Weather.Tests.BL.Validators
             else
             {
                 Assert.False(result.IsValid);
-                Assert.True(result.Errors.Count() == countErrorMessages);
+                Assert.True(result.Errors.Count == countErrorMessages);
             }
         }
 
@@ -68,7 +63,7 @@ namespace Weather.Tests.BL.Validators
             else
             {
                 Assert.False(result.IsValid);
-                Assert.True(result.Errors.Count() == 1);
+                Assert.True(result.Errors.Count == 1);
             }
         }
     }
