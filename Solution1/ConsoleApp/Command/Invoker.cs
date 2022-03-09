@@ -12,7 +12,7 @@ namespace ConsoleApp.Command
             _command = command;
         }
 
-        public Task<bool> RunAsync()
+        public Task RunAsync()
         {
             return _command?.ExecuteAsync();
         }

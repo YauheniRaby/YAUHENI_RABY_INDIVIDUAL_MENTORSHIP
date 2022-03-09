@@ -6,16 +6,16 @@ namespace ConsoleApp.Command
 {
     public class ForecastWeatherCommand : ICommand
     {
-        private readonly IUserCommunicateService _userCommunicateService;
+        private readonly IPerformerCommandsService _performerCommandsService;
 
-        public ForecastWeatherCommand(IUserCommunicateService userCommunicateService)
+        public ForecastWeatherCommand(IPerformerCommandsService performerCommandsService)
         {
-            _userCommunicateService = userCommunicateService;
+            _performerCommandsService = performerCommandsService;
         }
 
-        public Task<bool> ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            return _userCommunicateService.GetForecastByCityNameAsync();
+            return _performerCommandsService.GetForecastByCityNameAsync();
         }
     }
 }

@@ -6,16 +6,16 @@ namespace ConsoleApp.Command
 {
     public class CurrentWeatherCommand : ICommand
     {
-        private readonly IUserCommunicateService _userCommunicateService;
+        private readonly IPerformerCommandsService _performerCommandsService;
 
-        public CurrentWeatherCommand(IUserCommunicateService userCommunicateService)
+        public CurrentWeatherCommand(IPerformerCommandsService performerCommandsService)
         {
-            _userCommunicateService = userCommunicateService;
+            _performerCommandsService = performerCommandsService;
         }
 
-        public Task<bool> ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            return _userCommunicateService.GetCurrentWeatherAsync();
+            return _performerCommandsService.GetCurrentWeatherAsync();
         }
     }
 }

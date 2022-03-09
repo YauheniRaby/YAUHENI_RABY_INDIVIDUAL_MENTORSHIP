@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System;
 using FluentValidation;
 using System.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using FluentValidation.Results;
 
 namespace BusinessLayer.Services
 {
@@ -56,6 +59,6 @@ namespace BusinessLayer.Services
             forecast.City.Name = cityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
-        }        
+        }
     }
 }

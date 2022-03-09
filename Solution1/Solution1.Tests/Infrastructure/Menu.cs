@@ -11,9 +11,9 @@ namespace Weather.Tests.Infrastructure
         public static string GetMenuRepresentation()
         {
             return "Select menu item:" +
-                "\r\n0 - Get currently weather" +
-                "\r\n1 - Get weather for a period of time" +
-                "\r\n2 - Exit";
+                "\r\n0 - Exit" +
+                "\r\n1 - Get currently weather" +
+                "\r\n2 - Get weather for a period of time";
         }
     }
 }

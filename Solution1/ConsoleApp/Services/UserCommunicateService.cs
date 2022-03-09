@@ -2,9 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using BusinessLayer.Services.Abstract;
 using ConsoleApp.Command;
 using ConsoleApp.Command.Abstract;
 using ConsoleApp.Extensions;
@@ -17,24 +15,22 @@ namespace ConsoleApp.Services
     public class UserCommunicateService : IUserCommunicateService
     {
         private readonly ILogger _logger;
-        private readonly IWeatherServiсe _weatherServiсe;
         private readonly IInvoker _invoker;
-        private readonly ICloseApplicationService _closeApplicationService;
+        private readonly IPerformerCommandsService _performerCommandsService;
 
-        public UserCommunicateService(ILogger logger, IWeatherServiсe weatherService, IInvoker invoker, ICloseApplicationService closeApplicationService)
+        public UserCommunicateService(ILogger logger, IInvoker invoker, IPerformerCommandsService performerCommandsService)
         {
             _logger = logger;
-            _weatherServiсe = weatherService;
             _invoker = invoker;
-            _closeApplicationService = closeApplicationService;
+            _performerCommandsService = performerCommandsService;
         }
 
         public async Task<bool> CommunicateAsync()
         {
             Console.WriteLine("Select menu item:");
-            Console.WriteLine("0 - Get currently weather");
-            Console.WriteLine("1 - Get weather for a period of time");
-            Console.WriteLine("2 - Exit");
+            Console.WriteLine("0 - Exit");
+            Console.WriteLine("1 - Get currently weather");
+            Console.WriteLine("2 - Get weather for a period of time");
 
             bool parseResult = int.TryParse(Console.ReadLine(), out var pointMenu);
 
@@ -52,24 +48,25 @@ namespace ConsoleApp.Services
                 return true;
             }
 
+            var result = true;
+
             switch (pointMenu)
             {
                 case 0:
-                    _invoker.SetCommand(new CurrentWeatherCommand(this));
+                    _invoker.SetCommand(new ExitCommand(_performerCommandsService));
+                    result = false;
                     break;
                 case 1:
-                    _invoker.SetCommand(new ForecastWeatherCommand(this));
+                    _invoker.SetCommand(new CurrentWeatherCommand(_performerCommandsService));
                     break;
                 case 2:
-                    _invoker.SetCommand(new ExitCommand(_closeApplicationService));
+                    _invoker.SetCommand(new ForecastWeatherCommand(_performerCommandsService));
                     break;
             }
 
-            var result = true;
-
             try
             {
-                result = await _invoker.RunAsync();
+                await _invoker.RunAsync();
             }
             catch (HttpRequestException ex)
             {
@@ -99,40 +96,6 @@ namespace ConsoleApp.Services
             }
 
             return result;
-        }
-
-        public async Task<bool> GetCurrentWeatherAsync()
-        {
-            Console.WriteLine("Please, enter city name:");
-            var weather = await _weatherServiсe.GetByCityNameAsync(Console.ReadLine());
-
-            Console.WriteLine(weather.GetStringRepresentation());
-            return true;
-        }
-
-        public async Task<bool> GetForecastByCityNameAsync()
-        {
-            Console.WriteLine("Please, enter city name:");
-            string cityName = Console.ReadLine();
-
-            Console.WriteLine("Please, enter count day:");
-            int countDay;
-
-            while (true)
-            {
-                if (int.TryParse(Console.ReadLine(), out var days))
-                {
-                    countDay = days;
-                    break;
-                }
-
-                Console.WriteLine(Constants.Validation.IncorrectValue);
-                _logger.LogError($"User entered incorrect value for 'countDay'.");
-            }
-
-            var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
-            Console.WriteLine(weather.GetMultiStringRepresentation());
-            return true;
         }
     }
 }

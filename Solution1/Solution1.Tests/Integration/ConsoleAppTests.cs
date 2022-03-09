@@ -33,7 +33,7 @@ namespace Weather.Tests.Integration
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
 
-            Console.SetIn(new StringReader(string.Format("0{0}{1}{0}2{0}", Environment.NewLine, cityName)));
+            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}0{0}", Environment.NewLine, cityName)));
 
             //Act
             await Program.Main();
@@ -58,7 +58,7 @@ namespace Weather.Tests.Integration
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
 
-            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}{2}{0}2{0}", Environment.NewLine, cityName, countDays)));
+            Console.SetIn(new StringReader(string.Format("2{0}{1}{0}{2}{0}0{0}", Environment.NewLine, cityName, countDays)));
             
             //Act
             await Program.Main();

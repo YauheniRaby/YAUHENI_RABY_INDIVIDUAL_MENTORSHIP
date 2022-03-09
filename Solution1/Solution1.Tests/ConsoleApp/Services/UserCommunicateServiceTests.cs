@@ -21,7 +21,7 @@ namespace Weather.Tests.ConsoleApp.Services
 {
     public class UserCommunicateServiceTests
     {
-        private readonly UserCommunicateService _userCommunicationService;
+        private readonly SelectionCommandService _userCommunicationService;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
@@ -34,13 +34,13 @@ namespace Weather.Tests.ConsoleApp.Services
             _invokerMock = new Mock<IInvoker>();
             _closeApplicationService = new Mock<ICloseApplicationService>();
 
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _weatherServiceMock.Object, _invokerMock.Object, _closeApplicationService.Object);
+            _userCommunicationService = new SelectionCommandService(_loggerMock.Object, _weatherServiceMock.Object, _invokerMock.Object, _closeApplicationService.Object);
         }
 
         [Theory]
-        [InlineData(0, typeof(CurrentWeatherCommand))]
-        [InlineData(1, typeof(ForecastWeatherCommand))]
-        [InlineData(2, typeof(ExitCommand))]
+        [InlineData(0, typeof(ExitCommand))]
+        [InlineData(1, typeof(CurrentWeatherCommand))]
+        [InlineData(2, typeof(ForecastWeatherCommand))]
         public async Task CommunicateAsync_EnterPointMenu_InvokerSetRightCommand(int point, Type type)
         {
             // Arrange
@@ -77,7 +77,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
 
-            Console.SetIn(new StringReader(string.Format("0{0}{1}{0}", Environment.NewLine, cityName)));
+            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}", Environment.NewLine, cityName)));
 
             //Act
             await _userCommunicationService.CommunicateAsync();

@@ -7,16 +7,16 @@ namespace ConsoleApp.Command
 {
     public class ExitCommand : ICommand
     {
-        private readonly ICloseApplicationService _closeApplicationService;
+        private readonly IPerformerCommandsService _performerCommandsService;
 
-        public ExitCommand(ICloseApplicationService closeApplicationService)
+        public ExitCommand(IPerformerCommandsService performerCommandsService)
         {
-            _closeApplicationService = closeApplicationService;
+            _performerCommandsService = performerCommandsService;
         }
 
-        public Task<bool> ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            return _closeApplicationService.Exit();
+            return _performerCommandsService.CloseApplication();
         }
     }
 }
