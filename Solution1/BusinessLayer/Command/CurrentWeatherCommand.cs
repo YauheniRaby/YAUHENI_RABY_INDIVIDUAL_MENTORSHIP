@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
 using BusinessLayer.Command.Abstract;
+using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
 
 namespace BusinessLayer.Command
 {
-    public class CurrentWeatherCommand : ICommand
+    public class CurrentWeatherCommand : ICommand<WeatherDTO>
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly string _cityName;
@@ -15,9 +16,9 @@ namespace BusinessLayer.Command
             _cityName = cityName;
         }
 
-        public async Task<object> ExecuteAsync()
+        public Task<WeatherDTO> ExecuteAsync()
         {
-            return await _weatherServiсe.GetByCityNameAsync(_cityName);            
+            return _weatherServiсe.GetByCityNameAsync(_cityName);
         }
     }
 }

@@ -100,8 +100,8 @@ namespace ConsoleApp.Services
         private async Task GetCurrentWeatherCommand()
         {
             Console.WriteLine("Please, enter city name:");
-            _invoker.SetCommand(new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine()));
-            var result = await _invoker.RunAsync<WeatherDTO>();
+            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine());
+            var result = await _invoker.RunAsync(command);
             Console.WriteLine(result.GetStringRepresentation());
         }
 
@@ -125,8 +125,8 @@ namespace ConsoleApp.Services
                 _logger.LogError($"User entered incorrect value for 'countDay'.");
             }
 
-            _invoker.SetCommand(new ForecastWeatherCommand(_weatherServiсe, cityName, countDay));
-            var result = await _invoker.RunAsync<ForecastWeatherDTO>();
+            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDay);
+            var result = await _invoker.RunAsync(command);
             Console.WriteLine(result.GetMultiStringRepresentation());
         }
     }

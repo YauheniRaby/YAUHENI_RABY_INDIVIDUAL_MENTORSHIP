@@ -2,8 +2,8 @@
 
 namespace BusinessLayer.Command.Abstract
 {
-    public interface ICommand
+    public interface ICommand<T>
     {
-        Task<object> ExecuteAsync();
+        Task<T> ExecuteAsync();
     }
 }

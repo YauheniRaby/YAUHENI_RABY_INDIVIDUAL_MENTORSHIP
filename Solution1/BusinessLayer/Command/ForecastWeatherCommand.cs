@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
 using BusinessLayer.Command.Abstract;
+using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
 
 namespace BusinessLayer.Command
 {
-    public class ForecastWeatherCommand : ICommand
+    public class ForecastWeatherCommand: ICommand<ForecastWeatherDTO>
     {
         private readonly IWeatherServiсe _weatherServiсe;
-        private string _cityName;
-        private int _countDay;
+        private readonly string _cityName;
+        private readonly int _countDay;
 
         public ForecastWeatherCommand(IWeatherServiсe weatherServiсe, string cityName, int countDay)
         {
@@ -17,9 +18,9 @@ namespace BusinessLayer.Command
             _countDay = countDay;
         }
 
-        public async Task<object> ExecuteAsync()
+        public Task<ForecastWeatherDTO> ExecuteAsync()
         {
-            return await _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay);
+            return _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay);
         }
     }
 }

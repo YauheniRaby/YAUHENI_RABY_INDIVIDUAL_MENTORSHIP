@@ -5,7 +5,6 @@ using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using BusinessLayer.Vlidators;
 using ConsoleApp.AutoMap;
-using ConsoleApp.Command.Abstract;
 using FluentValidation;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
