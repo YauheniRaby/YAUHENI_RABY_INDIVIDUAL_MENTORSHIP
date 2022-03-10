@@ -8,7 +8,7 @@ using FluentValidation;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
-using FluentValidation.Results;
+using System.Diagnostics;
 
 namespace BusinessLayer.Services
 {
@@ -28,17 +28,11 @@ namespace BusinessLayer.Services
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
-            var validationResult = await _validator
-                                            .ValidateAsync(
-                                                new ForecastWeatherRequestDTO() { CityName = cityName}, 
-                                                options => options.IncludeRuleSets("CityName"));
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            ValidationCityName(cityName);
 
             var weather = await _weatherApiService.GetByCityNameAsync(cityName);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
+            
             return result;
         }
         
@@ -59,6 +53,49 @@ namespace BusinessLayer.Services
             forecast.City.Name = cityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
+        }
+
+        public async Task<IEnumerable<WeatherResponseDTO>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
+        {
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var t = cityNames.Select(async cityName => 
+            {
+                var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
+                try
+                {
+                    ValidationCityName(cityName);
+                    weatherResponseDTO.Temp = (await _weatherApiService.GetByCityNameAsync(cityName)).TemperatureValues.Temp;
+                    weatherResponseDTO.IsSuccessfulRequest = true;                    
+                }
+                catch (ValidationException ex)
+                {
+                    weatherResponseDTO.IsSuccessfulRequest = false;
+                    weatherResponseDTO.ErrorMessage = ex.Errors.FirstOrDefault().ErrorMessage;
+                }
+                catch (Exception ex)
+                {
+                    weatherResponseDTO.IsSuccessfulRequest = false;
+                    weatherResponseDTO.ErrorMessage = ex.Message;
+                }
+                weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
+                return weatherResponseDTO;
+            }).ToList();
+
+            return await Task.WhenAll(t);            
+        }
+
+        private void ValidationCityName(string cityName)
+        {
+            var validationResult = _validator
+                                            .Validate(
+                                                new ForecastWeatherRequestDTO() { CityName = cityName },
+                                                options => options.IncludeRuleSets("CityName"));
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
         }
     }
 }

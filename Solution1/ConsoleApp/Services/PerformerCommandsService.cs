@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
@@ -54,6 +56,48 @@ namespace ConsoleApp.Services
         {
             Console.WriteLine(Constants.Notifications.CloseApp);
             return Task.CompletedTask;
+        }
+
+        public async Task GetBestWeatherAsync()
+        {
+            Console.WriteLine("Please, enter array city name (separator symbal - ',') :");
+            var stringCityNames = Console.ReadLine();
+            if (string.IsNullOrEmpty(stringCityNames))
+            {
+                Console.WriteLine(Constants.Validation.IncorrectValue);
+                _logger.LogError($"User entered incorrect value for 'countDay'.");
+                return;
+            }
+
+            var listCityNames = stringCityNames.Split(',').Select(cityName => cityName.Trim());
+            var weatherResponsesDTO = await _weatherServiсe.GetWeatherByArrayCityNameAsync(listCityNames);
+            var bestWeather = weatherResponsesDTO.Where(w => w.IsSuccessfulRequest).OrderByDescending(w => w.Temp).FirstOrDefault();
+
+            if (bestWeather != null)
+            {
+                Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}.");
+            }
+
+            var dictionaryWeatherResponsesDTO = weatherResponsesDTO.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.ToList());
+            int countSuccessRequest = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successRequest) ? successRequest.Count() : 0;
+            int countFailRequest = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failRequest) ? failRequest.Count() : 0;
+
+            Console.WriteLine
+                ($"Successful request count: {countSuccessRequest}, " +
+                $"failed: {countFailRequest}.");
+
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"]))
+            {
+                if (countSuccessRequest > 0)
+                {
+                    Console.WriteLine(dictionaryWeatherResponsesDTO[true].GetRepresentationSuccessResponse());
+                }
+
+                if (countFailRequest > 0)
+                {
+                    Console.WriteLine(dictionaryWeatherResponsesDTO[false].GetRepresentationFailResponse());
+                }
+            }
         }
     }
 }

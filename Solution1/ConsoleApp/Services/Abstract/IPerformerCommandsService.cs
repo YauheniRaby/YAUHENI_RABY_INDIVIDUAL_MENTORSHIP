@@ -13,5 +13,7 @@ namespace ConsoleApp.Services.Abstract
         Task GetForecastByCityNameAsync();
 
         Task CloseApplication();
+
+        Task GetBestWeatherAsync();
     }
 }
