@@ -14,6 +14,4 @@ namespace BusinessLayer.DTOs
     {
         public DateTime DateTime { get; set; }
     }
-
-
 }

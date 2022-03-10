@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
-using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Extensions;

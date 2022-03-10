@@ -1,8 +1,4 @@
-﻿using BusinessLayer.DTOs;
-using BusinessLayer.Services.Abstract;
-using ConsoleApp.Command;
-using ConsoleApp.Command.Abstract;
-using ConsoleApp.Services;
+﻿using ConsoleApp.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -16,13 +12,13 @@ using FluentValidation;
 using FluentValidation.Results;
 using ConsoleApp.Services.Abstract;
 using Weather.Tests.Infrastructure;
+using BusinessLayer.Command.Abstract;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
     public class UserCommunicateServiceTests
     {
         private readonly IUserCommunicateService _userCommunicationService;
-        private readonly Mock<IPerformerCommandsService> _performerCommandsService;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
         
@@ -30,11 +26,10 @@ namespace Weather.Tests.ConsoleApp.Services
         public UserCommunicateServiceTests()
         {
             _loggerMock = new Mock<ILogger>();
-            _performerCommandsService = new Mock<IPerformerCommandsService>();
             _invokerMock = new Mock<IInvoker>();
             
 
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _performerCommandsService.Object);
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object);
         }
 
         [Theory]

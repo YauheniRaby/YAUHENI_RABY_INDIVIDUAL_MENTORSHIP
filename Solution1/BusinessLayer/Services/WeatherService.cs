@@ -5,10 +5,6 @@ using BusinessLayer.Extensions;
 using System.Threading.Tasks;
 using System;
 using FluentValidation;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Linq;
-using FluentValidation.Results;
 
 namespace BusinessLayer.Services
 {
@@ -17,7 +13,6 @@ namespace BusinessLayer.Services
         private readonly IMapper _mapper;
         private readonly IWeatherApiService _weatherApiService;
         private readonly IValidator<ForecastWeatherRequestDTO> _validator;
-
 
         public WeatherService(IMapper mapper, IWeatherApiService weatherApiService, IValidator<ForecastWeatherRequestDTO> validator) 
         { 

@@ -1,15 +1,10 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
-using ConsoleApp.Command.Abstract;
-using ConsoleApp.Services;
-using ConsoleApp.Services.Abstract;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -17,16 +12,13 @@ namespace Weather.Tests.ConsoleApp.Services
 {
     public class PerformerCommandsServiceTests
     {
-        private readonly IPerformerCommandsService _performerCommandsService;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
-
 
         public PerformerCommandsServiceTests()
         {
             _loggerMock = new Mock<ILogger>();
-            _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _performerCommandsService = new PerformerCommandsService(_loggerMock.Object, _weatherServiceMock.Object);
+            _weatherServiceMock = new Mock<IWeatherServiсe>();            
         }
 
         [Fact]

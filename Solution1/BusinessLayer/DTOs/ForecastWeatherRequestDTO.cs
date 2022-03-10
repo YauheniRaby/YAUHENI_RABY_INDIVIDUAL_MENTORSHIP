@@ -1,5 +1,4 @@
-﻿
-namespace BusinessLayer.DTOs
+﻿namespace BusinessLayer.DTOs
 {
     public class ForecastWeatherRequestDTO
     {
