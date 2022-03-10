@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace ConsoleApp.Command.Abstract
+namespace BusinessLayer.Command.Abstract
 {
     public interface IInvoker
     {
         void SetCommand(ICommand command);
 
-        Task RunAsync();
+        Task<T> RunAsync<T>();
     }
 }

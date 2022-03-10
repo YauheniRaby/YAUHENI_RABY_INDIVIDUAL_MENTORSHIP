@@ -2,9 +2,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BusinessLayer.Command;
+using BusinessLayer.Command.Abstract;
+using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using ConsoleApp.Command;
-using ConsoleApp.Command.Abstract;
+using BusinessLayer.Services.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using FluentValidation;
@@ -16,13 +18,13 @@ namespace ConsoleApp.Services
     {
         private readonly ILogger _logger;
         private readonly IInvoker _invoker;
-        private readonly IPerformerCommandsService _performerCommandsService;
+        private readonly IWeatherServiсe _weatherServiсe;
 
-        public UserCommunicateService(ILogger logger, IInvoker invoker, IPerformerCommandsService performerCommandsService)
+        public UserCommunicateService(ILogger logger, IInvoker invoker, IWeatherServiсe weatherServiсe)
         {
             _logger = logger;
             _invoker = invoker;
-            _performerCommandsService = performerCommandsService;
+            _weatherServiсe = weatherServiсe;
         }
 
         public async Task<bool> CommunicateAsync()
@@ -48,25 +50,22 @@ namespace ConsoleApp.Services
                 return true;
             }
 
-            var result = true;
-
-            switch (pointMenu)
-            {
-                case 0:
-                    _invoker.SetCommand(new ExitCommand(_performerCommandsService));
-                    result = false;
-                    break;
-                case 1:
-                    _invoker.SetCommand(new CurrentWeatherCommand(_performerCommandsService));
-                    break;
-                case 2:
-                    _invoker.SetCommand(new ForecastWeatherCommand(_performerCommandsService));
-                    break;
-            }
+            var isContinue = true;
 
             try
             {
-                await _invoker.RunAsync();
+                switch (pointMenu)
+                {
+                    case 0:
+                        isContinue = false;
+                        break;
+                    case 1:
+                        await GetCurrentWeatherCommand();
+                        break;
+                    case 2:
+                        await GetForecastByCityNameAsync();
+                        break;
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -95,7 +94,40 @@ namespace ConsoleApp.Services
                 _logger.LogError(ex.Message);
             }
 
-            return result;
+            return isContinue;
+        }
+
+        private async Task GetCurrentWeatherCommand()
+        {
+            Console.WriteLine("Please, enter city name:");
+            _invoker.SetCommand(new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine()));
+            var result = await _invoker.RunAsync<WeatherDTO>();
+            Console.WriteLine(result.GetStringRepresentation());
+        }
+
+        private async Task GetForecastByCityNameAsync()
+        {
+            Console.WriteLine("Please, enter city name:");
+            string cityName = Console.ReadLine();
+
+            Console.WriteLine("Please, enter count day:");
+            int countDay;
+
+            while (true)
+            {
+                if (int.TryParse(Console.ReadLine(), out var days))
+                {
+                    countDay = days;
+                    break;
+                }
+
+                Console.WriteLine(Constants.Validation.IncorrectValue);
+                _logger.LogError($"User entered incorrect value for 'countDay'.");
+            }
+
+            _invoker.SetCommand(new ForecastWeatherCommand(_weatherServiсe, cityName, countDay));
+            var result = await _invoker.RunAsync<ForecastWeatherDTO>();
+            Console.WriteLine(result.GetMultiStringRepresentation());
         }
     }
 }

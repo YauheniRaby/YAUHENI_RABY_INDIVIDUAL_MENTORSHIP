@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using ConsoleApp.Command.Abstract;
+using BusinessLayer.Command.Abstract;
 
-namespace ConsoleApp.Command
+namespace BusinessLayer.Command
 {
     public class Invoker : IInvoker
     {
@@ -12,9 +12,9 @@ namespace ConsoleApp.Command
             _command = command;
         }
 
-        public Task RunAsync()
+        public async Task<T> RunAsync<T>()
         {
-            return _command?.ExecuteAsync();
+            return (T) await _command?.ExecuteAsync();
         }
     }
 }

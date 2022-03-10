@@ -1,12 +1,12 @@
 ﻿using System.Net.Http;
 using AutoMapper;
+using BusinessLayer.Command;
+using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using BusinessLayer.Vlidators;
 using ConsoleApp.AutoMap;
-using ConsoleApp.Command;
-using ConsoleApp.Command.Abstract;
 using ConsoleApp.Configuration;
 using ConsoleApp.Services;
 using ConsoleApp.Services.Abstract;
@@ -28,7 +28,6 @@ namespace ConsoleApp.Extensions
                 .WithConstructorArgument("configurationProvider", MapperConfig.GetConfiguration());
             ninjectKernel.Bind<ILogger>().ToMethod(x => LoggerConfiguration.GetConfiguration<Program>());
             ninjectKernel.Bind<IInvoker>().To<Invoker>();
-            ninjectKernel.Bind<IPerformerCommandsService>().To<PerformerCommandsService>();
         }
 
         public static void AddValidators(this IKernel ninjectKernel)

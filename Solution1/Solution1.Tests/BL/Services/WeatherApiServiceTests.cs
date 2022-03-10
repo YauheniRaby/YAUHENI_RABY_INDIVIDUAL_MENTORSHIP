@@ -19,12 +19,15 @@ namespace Weather.Tests.BL.Services
         private readonly Mock<HttpMessageHandler> _httpMessageHandler;
         private readonly HttpClient _httpClient;
         private readonly WeatherApiService _weatherApiService;
+        private readonly JsonSerializerOptions _serializerOptions;
 
         public WeatherApiServiceTests()
         {
             _httpMessageHandler = new Mock<HttpMessageHandler>();
             _httpClient = new HttpClient(_httpMessageHandler.Object);
             _weatherApiService = new WeatherApiService(_httpClient);
+            _serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         }
 
         [Fact]
@@ -37,7 +40,7 @@ namespace Weather.Tests.BL.Services
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new { main = new { temp = 1.86 }, name = "Minsk" })),
+                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = 1.86 }, Name = "Minsk", _serializerOptions })),
             };
 
             _httpMessageHandler
@@ -66,13 +69,16 @@ namespace Weather.Tests.BL.Services
             var cityName = "Minsk";
             var lat = 53;
             var lon = 27;
+            var dataTime1 = new DateTime(2022, 03, 05, 18, 00, 00);
+            var dataTime2 = new DateTime(2022, 03, 05, 21, 00, 00);
             var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
             var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
+
 
             var responseCoordinates = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new[] { new { name = "Minsk", lat = 53, lon = 27 } })),
+                Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = "Minsk", Lat = 53, Lon = 27 }}, _serializerOptions)),
             };
             
             var responseForecast = new HttpResponseMessage
@@ -82,13 +88,14 @@ namespace Weather.Tests.BL.Services
                 (
                     JsonSerializer.Serialize(new
                     {
-                        city = new { name = "Minsk" },
-                        list = new[]
+                        City = new { Name = "Minsk" },
+                        List = new[]
                             {
-                                new { dt_txt = "2022-03-05 18:00:00", main = new { temp = 2 } },
-                                new { dt_txt = "2022-03-05 21:00:00", main = new { temp = 4 } }
+                                new { Dt_txt = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 2 } },
+                                new { Dt_txt = dataTime2.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 4 } }
                             }
-                    })
+                    },
+                    _serializerOptions)
                 ),
             };
 
@@ -125,12 +132,12 @@ namespace Weather.Tests.BL.Services
                 {
                     new WeatherInfoApiDTO()
                     {
-                        DateTime = new DateTime(2022, 03, 05, 18, 00, 00),
+                        DateTime = dataTime1,
                         Temp = new TempApiDTO() { Value = 2 }
                     },
                     new WeatherInfoApiDTO()
                     {
-                        DateTime = new DateTime(2022, 03, 05, 21, 00, 00),
+                        DateTime = dataTime2,
                         Temp = new TempApiDTO() { Value = 4 }
                     },
                 }
