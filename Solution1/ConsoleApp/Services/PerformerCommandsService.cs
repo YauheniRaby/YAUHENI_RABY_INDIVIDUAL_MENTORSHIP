@@ -79,21 +79,21 @@ namespace ConsoleApp.Services
             }
 
             var dictionaryWeatherResponsesDTO = weatherResponsesDTO.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.ToList());
-            int countSuccessRequest = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successRequest) ? successRequest.Count() : 0;
-            int countFailRequest = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failRequest) ? failRequest.Count() : 0;
+            int countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successRequest) ? successRequest.Count() : 0;
+            int countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failRequest) ? failRequest.Count() : 0;
 
             Console.WriteLine
-                ($"Successful request count: {countSuccessRequest}, " +
-                $"failed: {countFailRequest}.");
+                ($"Successful request count: {countSuccessResponse}, " +
+                $"failed: {countFailResponse}.");
 
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"]))
             {
-                if (countSuccessRequest > 0)
+                if (countSuccessResponse > 0)
                 {
                     Console.WriteLine(dictionaryWeatherResponsesDTO[true].GetRepresentationSuccessResponse());
                 }
 
-                if (countFailRequest > 0)
+                if (countFailResponse > 0)
                 {
                     Console.WriteLine(dictionaryWeatherResponsesDTO[false].GetRepresentationFailResponse());
                 }
