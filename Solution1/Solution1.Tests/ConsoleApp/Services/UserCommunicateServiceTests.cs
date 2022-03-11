@@ -11,44 +11,118 @@ using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
 using ConsoleApp.Services.Abstract;
-using Weather.Tests.Infrastructure;
 using BusinessLayer.Command.Abstract;
+using BusinessLayer.Command;
+using BusinessLayer.Services.Abstract;
+using BusinessLayer.DTOs;
+using Moq.Protected;
+using Weather.Tests.Infrastructure;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
     public class UserCommunicateServiceTests
     {
         private readonly IUserCommunicateService _userCommunicationService;
+        private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
         
-
         public UserCommunicateServiceTests()
         {
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object);
             _loggerMock = new Mock<ILogger>();
             _invokerMock = new Mock<IInvoker>();
-            
-
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object);
+            _weatherServiceMock = new Mock<IWeatherServiсe>();
         }
 
-        [Theory]
-        [InlineData(0, typeof(ExitCommand))]
-        [InlineData(1, typeof(CurrentWeatherCommand))]
-        [InlineData(2, typeof(ForecastWeatherCommand))]
-        public async Task CommunicateAsync_EnterPointMenu_InvokerSetRightCommand(int point, Type type)
+        [Fact]
+        public async Task CommunicateAsync_GetForecastWeather_ShowForecastWeather()
         {
             // Arrange
+            var cityName = "Minsk";
+            var countDays = 2;
+            var dateStartForecast = new DateTime(2022, 01, 10);
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("{0}{1}", point, Environment.NewLine)));
+            Console.SetIn(new StringReader(string.Format("2{0}{1}{0}{2}", Environment.NewLine, cityName, countDays)));
+
+            var forecastWeather = new ForecastWeatherDTO()
+            {
+                CityName = cityName,
+                WeatherForPeriod = new List<WeatherForDateDTO>
+                {
+                    new WeatherForDateDTO() { DateTime = dateStartForecast, Temp = 10, Comment= "It's fresh."},
+                    new WeatherForDateDTO() { DateTime = dateStartForecast.AddDays(1), Temp = 11, Comment= "It's fresh."}
+                }
+            };
             
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>()))
+                .ReturnsAsync(forecastWeather);
+
+            //Act
+            await _userCommunicationService.CommunicateAsync();
+
+            //Assert            
+            var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
+                "Please, enter city name:" + Environment.NewLine +
+                "Please, enter count day:" + Environment.NewLine +
+                "Minsk weather forecast: \n" +
+                "Day 0 (10 января 2022 г.): 10,0 C. It's fresh. \n" +
+                "Day 1 (11 января 2022 г.): 11,0 C. It's fresh.\r\n";
+            
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
+            Assert.Equal(expected, consoleOutput.ToString());
+        }
+
+        [Fact]
+        public async Task CommunicateAsync_GetCurrentWeather_ShowCurrentWeather()
+        {
+            // Arrange
+            var cityName = "Minsk";
+            var dateStartForecast = new DateTime(2022, 01, 10);
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}", Environment.NewLine, cityName)));
+
+            var Weather = new WeatherDTO()
+            {
+                CityName = cityName,
+                Temp = 10, 
+                Comment = "It's fresh"
+            };
+
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>()))
+                .ReturnsAsync(Weather);
+
+            //Act
+            await _userCommunicationService.CommunicateAsync();
+
+            //Assert            
+            var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
+                "Please, enter city name:\r\n" +
+                "In Minsk 10 C. It's fresh\r\n";
+
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>()));
+            Assert.Equal(expected, consoleOutput.ToString());
+        }
+
+        [Fact]
+        public async Task CloseApplication_Success()
+        {
+            // Arrange
+            var pattern = $"Сlose the application{Environment.NewLine}$";
+            
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+            Console.SetIn(new StringReader(string.Format("0{0}", Environment.NewLine)));
+
             //Act
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            _invokerMock.Verify(i => i.SetCommand(It.Is<ICommand>(x => x.GetType() == type)));
-            _invokerMock.Verify(i => i.RunAsync());
+            Assert.Matches(pattern, consoleOutput.ToString());;
         }
 
         [Theory]
@@ -58,7 +132,6 @@ namespace Weather.Tests.ConsoleApp.Services
         [InlineData("AAA", "Entered incorrect city name. Try one time yet.\r\n", HttpStatusCode.NotFound, false)]
         public async Task Communicate_EnterCityName_HandlingExceptionAndShowNoticeAsync(string cityName, string message, HttpStatusCode? statusCode, bool IsValidateEror)
         {
-
             // Arrange
             var exception = statusCode.HasValue ? new HttpRequestException(null, null, statusCode) :
                             IsValidateEror ? new ValidationException(new List<ValidationFailure>() { new ValidationFailure("CityName", message) }) : new Exception();
@@ -66,19 +139,18 @@ namespace Weather.Tests.ConsoleApp.Services
             _invokerMock
                 .Setup(invoker =>
                     invoker
-                    .RunAsync())
+                    .RunAsync(It.IsAny<CurrentWeatherCommand>()))
                 .Throws(exception);
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-
             Console.SetIn(new StringReader(string.Format("1{0}{1}{0}", Environment.NewLine, cityName)));
 
             //Act
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = $"{Menu.GetMenuRepresentation()}\r\n{message}";
+            var expected = $"{Menu.GetMenuRepresentation()}\r\nPlease, enter city name:\r\n{message}";
             if (IsValidateEror)
             {
                 expected += "\r\n";
@@ -94,7 +166,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
             Console.SetIn(new StringReader(string.Format("{0}{1}", -1, Environment.NewLine)));
-            
+
             var unacceptableValue = "Value out of range. Try one time yet.";
 
             //Act
@@ -112,7 +184,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
             Console.SetIn(new StringReader(string.Format(Environment.NewLine)));
-            
+
             var incorrectValue = "Incorrect value. Try one time yet.";
 
             //Act
@@ -122,7 +194,5 @@ namespace Weather.Tests.ConsoleApp.Services
             var expected = string.Format("{0}\r\n{1}{2}", Menu.GetMenuRepresentation(), incorrectValue, Environment.NewLine);
             Assert.Equal(expected, consoleOutput.ToString());
         }
-
-
     }
 }

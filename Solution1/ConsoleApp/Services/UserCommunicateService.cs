@@ -57,9 +57,10 @@ namespace ConsoleApp.Services
                 {
                     case 0:
                         isContinue = false;
+                        Console.WriteLine("Сlose the application");
                         break;
                     case 1:
-                        await GetCurrentWeatherCommand();
+                        await GetCurrentWeatherCommandAsync();
                         break;
                     case 2:
                         await GetForecastByCityNameAsync();
@@ -96,7 +97,7 @@ namespace ConsoleApp.Services
             return isContinue;
         }
 
-        private async Task GetCurrentWeatherCommand()
+        private async Task GetCurrentWeatherCommandAsync()
         {
             Console.WriteLine("Please, enter city name:");
             var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine());

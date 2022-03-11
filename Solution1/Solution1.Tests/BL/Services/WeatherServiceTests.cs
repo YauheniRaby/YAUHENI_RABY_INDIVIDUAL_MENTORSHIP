@@ -10,7 +10,6 @@ using KellermanSoftware.CompareNetObjects;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,7 +36,6 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var cityName = "Minsk";
             var forecast = new ForecastWeatherRequestDTO() { CityName = cityName };
-
             var temp = 11;
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
 

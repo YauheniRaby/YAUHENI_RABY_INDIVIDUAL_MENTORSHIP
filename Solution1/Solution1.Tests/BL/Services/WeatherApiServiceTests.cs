@@ -27,7 +27,6 @@ namespace Weather.Tests.BL.Services
             _httpClient = new HttpClient(_httpMessageHandler.Object);
             _weatherApiService = new WeatherApiService(_httpClient);
             _serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
         }
 
         [Fact]
@@ -69,11 +68,9 @@ namespace Weather.Tests.BL.Services
             var cityName = "Minsk";
             var lat = 53;
             var lon = 27;
-            var dataTime1 = new DateTime(2022, 03, 05, 18, 00, 00);
-            var dataTime2 = new DateTime(2022, 03, 05, 21, 00, 00);
+            var dataTime1 = new DateTime(2022, 03, 05, 03, 00, 00);
             var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
             var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
-
 
             var responseCoordinates = new HttpResponseMessage
             {
@@ -92,7 +89,7 @@ namespace Weather.Tests.BL.Services
                         List = new[]
                             {
                                 new { Dt_txt = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 2 } },
-                                new { Dt_txt = dataTime2.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 4 } }
+                                new { Dt_txt = dataTime1.AddHours(3).ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 4 } }
                             }
                     },
                     _serializerOptions)
@@ -137,7 +134,7 @@ namespace Weather.Tests.BL.Services
                     },
                     new WeatherInfoApiDTO()
                     {
-                        DateTime = dataTime2,
+                        DateTime = dataTime1.AddHours(3),
                         Temp = new TempApiDTO() { Value = 4 }
                     },
                 }
