@@ -15,7 +15,6 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.Command;
 using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
-using Moq.Protected;
 using Weather.Tests.Infrastructure;
 
 namespace Weather.Tests.ConsoleApp.Services
@@ -29,10 +28,10 @@ namespace Weather.Tests.ConsoleApp.Services
         
         public UserCommunicateServiceTests()
         {
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object);
             _loggerMock = new Mock<ILogger>();
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object);
         }
 
         [Fact]
