@@ -24,6 +24,15 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
+        
+        public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
+            new List<object[]>
+            {
+                new object[] { "Minsk", $"Unexpected error. Try one time yet.{Environment.NewLine}", null, false },
+                new object[] { default, "Validation error.", null, true },
+                new object[] { "Minsk", $"Request error. Try again later.{Environment.NewLine}", HttpStatusCode.BadRequest, false },
+                new object[] { "AAA", $"Entered incorrect city name. Try one time yet.{Environment.NewLine}", HttpStatusCode.NotFound, false },
+            };
 
         public UserCommunicateServiceTests()
         {
@@ -125,10 +134,7 @@ namespace Weather.Tests.ConsoleApp.Services
         }
 
         [Theory]
-        [InlineData("Minsk", "Unexpected error. Try one time yet.\r\n", null, false)]
-        [InlineData(default, "Validation error.", null, true)]
-        [InlineData("Minsk", "Request error. Try again later.\r\n", HttpStatusCode.BadRequest, false)]
-        [InlineData("AAA", "Entered incorrect city name. Try one time yet.\r\n", HttpStatusCode.NotFound, false)]
+        [MemberData(nameof(ParamsForExceptionHandlingTest))]
         public async Task Communicate_EnterCityName_HandlingExceptionAndShowNoticeAsync(string cityName, string message, HttpStatusCode? statusCode, bool IsValidateEror)
         {
             // Arrange
