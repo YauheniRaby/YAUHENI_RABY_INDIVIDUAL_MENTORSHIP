@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
-using ConsoleApp.Services.Abstract;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.Command;
 using BusinessLayer.Services.Abstract;
@@ -25,7 +24,7 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
-        
+
         public UserCommunicateServiceTests()
         {
             _loggerMock = new Mock<ILogger>();
@@ -43,7 +42,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var dateStartForecast = new DateTime(2022, 01, 10);
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("2{0}{1}{0}{2}", Environment.NewLine, cityName, countDays)));
+            Console.SetIn(new StringReader($"2{Environment.NewLine}{cityName}{Environment.NewLine}{countDays}"));
 
             var forecastWeather = new ForecastWeatherDTO()
             {
@@ -54,7 +53,7 @@ namespace Weather.Tests.ConsoleApp.Services
                     new WeatherForDateDTO() { DateTime = dateStartForecast.AddDays(1), Temp = 11, Comment= "It's fresh."}
                 }
             };
-            
+
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>()))
                 .ReturnsAsync(forecastWeather);
@@ -63,13 +62,14 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert            
-            var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
-                "Please, enter city name:" + Environment.NewLine +
-                "Please, enter count day:" + Environment.NewLine +
-                "Minsk weather forecast:" + Environment.NewLine +
-                "Day 0 (January 10, 2022): 10,0 C. It's fresh." + Environment.NewLine +
-                "Day 1 (January 11, 2022): 11,0 C. It's fresh." + Environment.NewLine;
-            
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
+                $"Please, enter city name:{Environment.NewLine}" +
+                $"Please, enter count day:{Environment.NewLine}" +
+                $"Minsk weather forecast:{Environment.NewLine}" +
+                $"Day 0 (January 10, 2022): 10,0 C. It's fresh.{Environment.NewLine}" +
+                $"Day 1 (January 11, 2022): 11,0 C. It's fresh.{Environment.NewLine}";
+
+
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
@@ -82,13 +82,13 @@ namespace Weather.Tests.ConsoleApp.Services
             var dateStartForecast = new DateTime(2022, 01, 10);
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}", Environment.NewLine, cityName)));
+            Console.SetIn(new StringReader($"1{Environment.NewLine}{cityName}{Environment.NewLine}"));
 
             var Weather = new WeatherDTO()
             {
                 CityName = cityName,
-                Temp = 10, 
-                Comment = "It's fresh"
+                Temp = 10,
+                Comment = "It's fresh."
             };
 
             _invokerMock
@@ -99,9 +99,9 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert            
-            var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
-                "Please, enter city name:" + Environment.NewLine +
-                "In Minsk 10 C. It's fresh" + Environment.NewLine;
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
+                $"Please, enter city name:{Environment.NewLine}" +
+                $"In Minsk 10 C. It's fresh.{Environment.NewLine}";
 
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());
@@ -115,13 +115,13 @@ namespace Weather.Tests.ConsoleApp.Services
             
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("0{0}", Environment.NewLine)));
+            Console.SetIn(new StringReader($"0{Environment.NewLine}"));
 
             //Act
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            Assert.Matches(pattern, consoleOutput.ToString());;
+            Assert.Matches(pattern, consoleOutput.ToString());
         }
 
         [Theory]
@@ -143,14 +143,14 @@ namespace Weather.Tests.ConsoleApp.Services
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("1{0}{1}{0}", Environment.NewLine, cityName)));
+            Console.SetIn(new StringReader($"1{Environment.NewLine}{cityName}{Environment.NewLine}"));
 
             //Act
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = $"{Menu.GetMenuRepresentation()}" + Environment.NewLine +
-                $"Please, enter city name:" + Environment.NewLine +
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
+                $"Please, enter city name:{Environment.NewLine}" +
                 $"{message}";
 
             if (IsValidateEror)
@@ -167,7 +167,7 @@ namespace Weather.Tests.ConsoleApp.Services
             // Arrange
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format("{0}{1}", -1, Environment.NewLine)));
+            Console.SetIn(new StringReader($"-1{Environment.NewLine}"));
 
             var unacceptableValue = "Value out of range. Try one time yet.";
 
@@ -175,7 +175,7 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = string.Format("{0}{1}{2}{1}", Menu.GetMenuRepresentation(), Environment.NewLine, unacceptableValue);
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}{unacceptableValue}{Environment.NewLine}";
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -185,7 +185,7 @@ namespace Weather.Tests.ConsoleApp.Services
             // Arrange
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader(string.Format(Environment.NewLine)));
+            Console.SetIn(new StringReader(Environment.NewLine));
 
             var incorrectValue = "Incorrect value. Try one time yet.";
 
@@ -193,7 +193,7 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = string.Format("{0}{1}{2}{1}", Menu.GetMenuRepresentation(), Environment.NewLine, incorrectValue);
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}{incorrectValue}{Environment.NewLine}";
             Assert.Equal(expected, consoleOutput.ToString());
         }
     }

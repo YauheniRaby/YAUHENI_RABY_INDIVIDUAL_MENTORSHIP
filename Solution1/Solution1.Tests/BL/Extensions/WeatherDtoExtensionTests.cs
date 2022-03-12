@@ -1,6 +1,5 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using KellermanSoftware.CompareNetObjects;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -17,7 +16,7 @@ namespace Weather.Tests.BL.Extensions
             var result = weatherDto.GetStringRepresentation();
 
             // Assert
-            var expected = $"In Minsk 10 C. It's fresh.";
+            var expected = "In Minsk 10 C. It's fresh.";
             Assert.Equal(expected, result);
         }
     }

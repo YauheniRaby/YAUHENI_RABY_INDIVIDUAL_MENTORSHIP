@@ -19,8 +19,8 @@ namespace Weather.Tests.BL.Extensions
 
             // Assert
             var expected = $"Minsk weather forecast:" +
-                Environment.NewLine + $"Day 0 (October 10, 2022): 18,0 C. It's fresh." +
-                Environment.NewLine + $"Day 1 (October 11, 2022): 25,0 C. Good weather.";
+                $"{Environment.NewLine}Day 0 (October 10, 2022): 18,0 C. It's fresh." +
+                $"{Environment.NewLine}Day 1 (October 11, 2022): 25,0 C. Good weather.";
             
             Assert.Equal(expected, result);
         }

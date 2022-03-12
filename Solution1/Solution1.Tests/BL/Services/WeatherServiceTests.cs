@@ -3,14 +3,11 @@ using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
-using BusinessLayer.Vlidators;
 using ConsoleApp.AutoMap;
 using FluentValidation;
-using FluentValidation.Internal;
 using FluentValidation.Results;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
-using Moq.Protected;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -71,23 +68,24 @@ namespace Weather.Tests.BL.Services
         {
             // Arrange
             var cityName = "Minsk";
+            var startForecast = new DateTime(2022, 10, 12, 00, 00, 00);
             var countWeatherPoint = 8*countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
                 WeatherPoints = new List<WeatherInfoApiDTO>()
             };
-            var validationResult = new ValidationResult(new List<ValidationFailure>());
+            var validationResult = new ValidationResult(new List<ValidationFailure>());            
 
-            for (int currentDayNumber = 1; currentDayNumber <= countDays; currentDayNumber++)
+            for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                for(int currentHour = 0; currentHour < 24; currentHour += 3)
+                for(int currentHours = 0; currentHours < 24; currentHours += 3)
                 {
                     forecastWeatherApiDTO.WeatherPoints
                         .Add(
                             new WeatherInfoApiDTO()
                             {
-                                DateTime = new DateTime(2022, 3, currentDayNumber, currentHour, 00, 00),
+                                DateTime = startForecast.AddDays(currentCountDays).AddHours(currentHours),
                                 Temp = new TempApiDTO() { Value = 2 }
                             });
                 }
@@ -114,10 +112,10 @@ namespace Weather.Tests.BL.Services
                 CityName = cityName,
                 WeatherForPeriod = new List<WeatherForDateDTO>()};
 
-            for (int currentDayNumber = 1; currentDayNumber <= countDays; currentDayNumber++)
+            for (int currentCountDay = 0; currentCountDay < countDays; currentCountDay++)
             {
                 expectedWeatherDto.WeatherForPeriod
-                    .Add(new WeatherForDateDTO() { DateTime = new DateTime(2022, 3, currentDayNumber), Temp = 2, Comment = "It's fresh." });                
+                    .Add(new WeatherForDateDTO() { DateTime = startForecast.AddDays(currentCountDay), Temp = 2, Comment = "It's fresh." });
             }
 
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);

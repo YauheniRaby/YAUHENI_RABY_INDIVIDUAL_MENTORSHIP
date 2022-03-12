@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Weather.Tests.Infrastructure;
 using Xunit;
 
 namespace Weather.Tests.BL.Services
@@ -39,7 +40,7 @@ namespace Weather.Tests.BL.Services
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = 1.86 }, Name = "Minsk", _serializerOptions })),
+                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = 1.86 }, Name = "Minsk" }, _serializerOptions)),
             };
 
             _httpMessageHandler
@@ -77,7 +78,7 @@ namespace Weather.Tests.BL.Services
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = "Minsk", Lat = 53, Lon = 27 }}, _serializerOptions)),
             };
-            
+
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -88,11 +89,14 @@ namespace Weather.Tests.BL.Services
                         City = new { Name = "Minsk" },
                         List = new[]
                             {
-                                new { Dt_txt = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 2 } },
-                                new { Dt_txt = dataTime1.AddHours(3).ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 4 } }
+                                new { DateTime = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 2 } },
+                                new { DateTime = dataTime1.AddHours(3).ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 4 } }
                             }
                     },
-                    _serializerOptions)
+                    new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = new CamelCaseNamingPolicy()
+                    })
                 ),
             };
 
