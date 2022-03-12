@@ -6,10 +6,14 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.Vlidators;
 using ConsoleApp.AutoMap;
 using FluentValidation;
+using FluentValidation.Internal;
+using FluentValidation.Results;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
+using Moq.Protected;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -19,15 +23,15 @@ namespace Weather.Tests.BL.Services
     {
         private readonly IMapper _mapper;
         private readonly WeatherService _weatherService;
-        private readonly IValidator<ForecastWeatherRequestDTO> _validator;
+        private readonly Mock<IValidator<ForecastWeatherRequestDTO>> _validator;
         private readonly Mock<IWeatherApiService> _weatherApiServiceMock;
 
         public WeatherServiceTests()
         {
             _weatherApiServiceMock = new Mock<IWeatherApiService>();
-            _validator = new ForecastWeatherRequestDTOValidator();
+            _validator = new Mock<IValidator<ForecastWeatherRequestDTO>>();
             _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _weatherService = new WeatherService(_mapper, _weatherApiServiceMock.Object, _validator);
+            _weatherService = new WeatherService(_mapper, _weatherApiServiceMock.Object, _validator.Object);
         }
 
         [Fact]
@@ -35,10 +39,17 @@ namespace Weather.Tests.BL.Services
         {
             // Arrange
             var cityName = "Minsk";
-            var forecast = new ForecastWeatherRequestDTO() { CityName = cityName };
+            var forecast = new ForecastWeatherRequestDTO() { CityName = cityName};
             var temp = 11;
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
+            var validationResult = new ValidationResult(new List<ValidationFailure>());
 
+            _validator
+                .Setup(validator => validator.ValidateAsync
+                    (It.IsAny<ValidationContext<ForecastWeatherRequestDTO>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(validationResult);
+            
             _weatherApiServiceMock
                 .Setup(weatherApiService => 
                     weatherApiService
@@ -56,30 +67,37 @@ namespace Weather.Tests.BL.Services
         [Theory]
         [InlineData(1)]
         [InlineData(3)]
-        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherDTO_Success(int countDay)
+        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherDTO_Success(int countDays)
         {
             // Arrange
             var cityName = "Minsk";
-            var countWeatherPoint = 8*countDay + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
+            var countWeatherPoint = 8*countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
                 WeatherPoints = new List<WeatherInfoApiDTO>()
             };
+            var validationResult = new ValidationResult(new List<ValidationFailure>());
 
-            for(int i = 1; i <= countDay; i ++)
+            for (int currentDayNumber = 1; currentDayNumber <= countDays; currentDayNumber++)
             {
-                for(int j = 0; j < 24; j += 3)
+                for(int currentHour = 0; currentHour < 24; currentHour += 3)
                 {
                     forecastWeatherApiDTO.WeatherPoints
                         .Add(
                             new WeatherInfoApiDTO()
                             {
-                                DateTime = new DateTime(2022, 3, i, j, 00, 00),
+                                DateTime = new DateTime(2022, 3, currentDayNumber, currentHour, 00, 00),
                                 Temp = new TempApiDTO() { Value = 2 }
                             });
                 }
             }
+
+            _validator
+                .Setup(validator => validator.ValidateAsync
+                    (It.IsAny<ValidationContext<ForecastWeatherRequestDTO>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(validationResult);
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
@@ -88,7 +106,7 @@ namespace Weather.Tests.BL.Services
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
-            var result = await _weatherService.GetForecastByCityNameAsync(cityName, countDay);
+            var result = await _weatherService.GetForecastByCityNameAsync(cityName, countDays);
 
             //Assert
             var expectedWeatherDto = new ForecastWeatherDTO()
@@ -96,10 +114,10 @@ namespace Weather.Tests.BL.Services
                 CityName = cityName,
                 WeatherForPeriod = new List<WeatherForDateDTO>()};
 
-            for (int i = 1; i <= countDay; i++)
+            for (int currentDayNumber = 1; currentDayNumber <= countDays; currentDayNumber++)
             {
                 expectedWeatherDto.WeatherForPeriod
-                    .Add(new WeatherForDateDTO() { DateTime = new DateTime(2022, 3, i), Temp = 2, Comment = "It's fresh." });                
+                    .Add(new WeatherForDateDTO() { DateTime = new DateTime(2022, 3, currentDayNumber), Temp = 2, Comment = "It's fresh." });                
             }
 
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);

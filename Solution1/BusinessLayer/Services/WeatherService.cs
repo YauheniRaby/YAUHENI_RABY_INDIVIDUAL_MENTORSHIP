@@ -44,12 +44,11 @@ namespace BusinessLayer.Services
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
             var countWeatherPoint = countDay * Constants.WeatherAPI.WeatherPointsInDay + countPointForCurrentDay;
 
-            var validationResult = await _validator.ValidateAsync(new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay });
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
+            var validationResult = await _validator
+                                            .ValidateAsync(
+                                                new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
+                                                options => options.IncludeAllRuleSets());
+            
             var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint);
             forecast.City.Name = cityName;
 

@@ -88,8 +88,8 @@ namespace Weather.Tests.BL.Services
                         City = new { Name = "Minsk" },
                         List = new[]
                             {
-                                new { Dt_txt = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 2 } },
-                                new { Dt_txt = dataTime1.AddHours(3).ToString("dd-MM-yyyy hh:mm:ss"), Main = new { temp = 4 } }
+                                new { Dt_txt = dataTime1.ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 2 } },
+                                new { Dt_txt = dataTime1.AddHours(3).ToString("dd-MM-yyyy hh:mm:ss"), Main = new { Temp = 4 } }
                             }
                     },
                     _serializerOptions)

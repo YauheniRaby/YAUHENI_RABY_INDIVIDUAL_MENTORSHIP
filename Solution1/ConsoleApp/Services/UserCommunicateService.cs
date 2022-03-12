@@ -33,7 +33,7 @@ namespace ConsoleApp.Services
             Console.WriteLine("1 - Get currently weather");
             Console.WriteLine("2 - Get weather for a period of time");
 
-            bool isGoodParse = int.TryParse(Console.ReadLine(), out var pointMenu);
+            var isGoodParse = int.TryParse(Console.ReadLine(), out var pointMenu);
 
             if (!isGoodParse)
             {
@@ -69,15 +69,21 @@ namespace ConsoleApp.Services
             }
             catch (HttpRequestException ex)
             {
+                var statusCodeRepresentation = "No Code";
+                if (ex.StatusCode.HasValue)
+                {
+                    statusCodeRepresentation = ex.StatusCode.Value.GetStringRepresentation();
+                }
+
                 if (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     Console.WriteLine(Constants.Errors.BadCityName);
-                    _logger.LogError($"Status code: {ex.StatusCode.GetStringRepresentation()} User entered incorrect city name.");
+                    _logger.LogError($"Status code: {statusCodeRepresentation} User entered incorrect city name.");
                 }
                 else
                 {
                     Console.WriteLine(Constants.Errors.RequestError);
-                    _logger.LogError($"Status code: {ex.StatusCode.GetStringRepresentation()}");
+                    _logger.LogError($"Status code: {statusCodeRepresentation}");
                 }
             }
             catch (ValidationException ex)

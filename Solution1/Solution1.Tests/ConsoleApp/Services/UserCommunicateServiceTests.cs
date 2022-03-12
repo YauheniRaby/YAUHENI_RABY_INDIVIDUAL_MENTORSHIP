@@ -21,7 +21,7 @@ namespace Weather.Tests.ConsoleApp.Services
 {
     public class UserCommunicateServiceTests
     {
-        private readonly IUserCommunicateService _userCommunicationService;
+        private readonly UserCommunicateService _userCommunicationService;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
@@ -66,9 +66,9 @@ namespace Weather.Tests.ConsoleApp.Services
             var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
                 "Please, enter city name:" + Environment.NewLine +
                 "Please, enter count day:" + Environment.NewLine +
-                "Minsk weather forecast: \n" +
-                "Day 0 (10 января 2022 г.): 10,0 C. It's fresh. \n" +
-                "Day 1 (11 января 2022 г.): 11,0 C. It's fresh.\r\n";
+                "Minsk weather forecast:" + Environment.NewLine +
+                "Day 0 (January 10, 2022): 10,0 C. It's fresh." + Environment.NewLine +
+                "Day 1 (January 11, 2022): 11,0 C. It's fresh." + Environment.NewLine;
             
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());
@@ -100,8 +100,8 @@ namespace Weather.Tests.ConsoleApp.Services
 
             //Assert            
             var expected = Menu.GetMenuRepresentation() + Environment.NewLine +
-                "Please, enter city name:\r\n" +
-                "In Minsk 10 C. It's fresh\r\n";
+                "Please, enter city name:" + Environment.NewLine +
+                "In Minsk 10 C. It's fresh" + Environment.NewLine;
 
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());
@@ -149,10 +149,13 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = $"{Menu.GetMenuRepresentation()}\r\nPlease, enter city name:\r\n{message}";
+            var expected = $"{Menu.GetMenuRepresentation()}" + Environment.NewLine +
+                $"Please, enter city name:" + Environment.NewLine +
+                $"{message}";
+
             if (IsValidateEror)
             {
-                expected += "\r\n";
+                expected += Environment.NewLine;
             }
 
             Assert.Equal(expected, consoleOutput.ToString());
@@ -172,7 +175,7 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = string.Format("{0}\r\n{1}{2}", Menu.GetMenuRepresentation(), unacceptableValue, Environment.NewLine);
+            var expected = string.Format("{0}{1}{2}{1}", Menu.GetMenuRepresentation(), Environment.NewLine, unacceptableValue);
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -190,7 +193,7 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert
-            var expected = string.Format("{0}\r\n{1}{2}", Menu.GetMenuRepresentation(), incorrectValue, Environment.NewLine);
+            var expected = string.Format("{0}{1}{2}{1}", Menu.GetMenuRepresentation(), Environment.NewLine, incorrectValue);
             Assert.Equal(expected, consoleOutput.ToString());
         }
     }

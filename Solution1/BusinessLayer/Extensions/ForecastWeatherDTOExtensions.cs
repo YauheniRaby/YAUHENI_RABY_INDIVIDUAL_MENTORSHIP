@@ -1,4 +1,6 @@
 ﻿using BusinessLayer.DTOs;
+using System;
+using System.Globalization;
 using System.Linq;
 
 namespace BusinessLayer.Extensions
@@ -9,9 +11,9 @@ namespace BusinessLayer.Extensions
         {
             int i = 0;
             return weatherDTO.WeatherForPeriod
-                    .Aggregate($"{weatherDTO.CityName} weather forecast:", 
-                        (result, next) => $"{result} \nDay {i++} ({next.DateTime:D}): {next.Temp:f1} C. {next.Comment}");    
-        }
+                    .Aggregate($"{weatherDTO.CityName} weather forecast:",
+                        (result, next) => $"{result}{Environment.NewLine}Day {i++} ({next.DateTime.ToString("MMMM dd, yyyy", new CultureInfo("en-US"))}): {next.Temp:f1} C. {next.Comment}");    
+        }        
 
         public static ForecastWeatherDTO FillCommentByTemp(this ForecastWeatherDTO weatherDTO)
         {

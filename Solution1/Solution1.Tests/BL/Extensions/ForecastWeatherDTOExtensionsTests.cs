@@ -18,9 +18,9 @@ namespace Weather.Tests.BL.Extensions
             var result = forecastWeatherDTO.GetMultiStringRepresentation();
 
             // Assert
-            var expected = $"Minsk weather forecast: " +
-                $"\nDay 0 (10 октября 2022 г.): 18,0 C. It's fresh. " +
-                $"\nDay 1 (11 октября 2022 г.): 25,0 C. Good weather.";
+            var expected = $"Minsk weather forecast:" +
+                Environment.NewLine + $"Day 0 (October 10, 2022): 18,0 C. It's fresh." +
+                Environment.NewLine + $"Day 1 (October 11, 2022): 25,0 C. Good weather.";
             
             Assert.Equal(expected, result);
         }

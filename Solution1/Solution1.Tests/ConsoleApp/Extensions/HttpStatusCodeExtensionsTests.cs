@@ -11,7 +11,7 @@ namespace Weather.Tests.ConsoleApp.Extensions
         public void GetStringRepresentation_GetStringRepresentationFromHttpStatusCode_Success()
         {
             // Arrange
-            HttpStatusCode? httpStatusCode = HttpStatusCode.BadRequest;
+            var httpStatusCode = HttpStatusCode.BadRequest;
 
             // Act
             var result = httpStatusCode.GetStringRepresentation();

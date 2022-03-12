@@ -1,9 +1,6 @@
 ﻿using ConsoleApp;
-using ConsoleApp.Services.Abstract;
-using Moq;
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
 using Xunit;
@@ -21,7 +18,10 @@ namespace Weather.Tests.Integration
             var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
             var menu = Menu.GetMenuRepresentation();
             var commentRegex = GetCommentsPattern();
-            var pattern = $"^{menu}\r\nIn {cityName} {temperaturePattern} C. {commentRegex}\r\n{menu}\r\nСlose the application\r\n$";
+            var pattern = $"^{menu}{Environment.NewLine}" +
+                $"In {cityName} {temperaturePattern} C. {commentRegex}{Environment.NewLine}" +
+                $"{menu}{Environment.NewLine}" +
+                $"Сlose the application{Environment.NewLine}$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
@@ -32,7 +32,7 @@ namespace Weather.Tests.Integration
             await Program.Main();
 
             //Assert
-            var result = consoleOutput.ToString().Replace("Please, enter city name:\r\n", string.Empty);
+            var result = consoleOutput.ToString().Replace($"Please, enter city name:{Environment.NewLine}", string.Empty);
             Assert.Matches(pattern, result);
         }
 
@@ -45,8 +45,13 @@ namespace Weather.Tests.Integration
             var menu = Menu.GetMenuRepresentation();
 
             var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
-            var forecastPattern = $@"(\nDay [0-5]{{1}} \(\d{{1,2}} \w+ \d{{4}} г.\): {temperaturePattern} C. {GetCommentsPattern()}\s{{0,1}}){{{countDays},{countDays + 1}}}";
-            var pattern = $"^{menu}\r\nPlease, enter city name:\r\nPlease, enter count day:\r\n{cityName} weather forecast: {forecastPattern}\r\n{menu}\r\nСlose the application\r\n$";
+            var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {temperaturePattern} C. {GetCommentsPattern()}\s{{0,1}}){{{countDays},{countDays + 1}}}";
+            var pattern = $"^{menu}{Environment.NewLine}" +
+                $"Please, enter city name:{Environment.NewLine}" +
+                $"Please, enter count day:{Environment.NewLine}" +
+                $"{cityName} weather forecast:{forecastPattern}{Environment.NewLine}" +
+                $"{menu}{Environment.NewLine}" +
+                $"Сlose the application{Environment.NewLine}$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);

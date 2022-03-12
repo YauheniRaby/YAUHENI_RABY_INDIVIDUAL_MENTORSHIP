@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Weather.Tests.Infrastructure
 {
@@ -11,9 +7,9 @@ namespace Weather.Tests.Infrastructure
         public static string GetMenuRepresentation()
         {
             return "Select menu item:" +
-                "\r\n0 - Exit" +
-                "\r\n1 - Get currently weather" +
-                "\r\n2 - Get weather for a period of time";
+                Environment.NewLine + "0 - Exit" +
+                Environment.NewLine + "1 - Get currently weather" +
+                Environment.NewLine + "2 - Get weather for a period of time";
         }
     }
 }

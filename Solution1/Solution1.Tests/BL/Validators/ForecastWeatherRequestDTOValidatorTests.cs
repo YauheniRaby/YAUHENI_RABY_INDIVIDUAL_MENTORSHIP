@@ -38,7 +38,7 @@ namespace Weather.Tests.BL.Validators
             else
             {
                 Assert.False(result.IsValid);
-                Assert.True(result.Errors.Count == countErrorMessages);
+                Assert.Equal(countErrorMessages, result.Errors.Count);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Weather.Tests.BL.Validators
             else
             {
                 Assert.False(result.IsValid);
-                Assert.True(result.Errors.Count == 1);
+                Assert.Single(result.Errors);
             }
         }
     }
