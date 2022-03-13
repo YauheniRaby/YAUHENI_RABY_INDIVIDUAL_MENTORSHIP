@@ -21,13 +21,13 @@ namespace Weather.Tests.BL.Extensions
                 new object[] { new WeatherDTO() { Temp = 30 }, WeatherComments.GoToBeach.GetString() },
                 new object[] { new WeatherForDateDTO() { Temp = 50 }, WeatherComments.GoToBeach.GetString() }
             };
-            
+
         [Theory]
         [MemberData(nameof(ParamsForFillsCommentTest))]
         public void FillCommentByTemp_FillsComment_Success(BaseWeatherDTO baseWeatherDTO, string comment)
         {
             // Arrange
-            
+
             // Act
             baseWeatherDTO.FillCommentByTemp();
 
