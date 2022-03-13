@@ -84,7 +84,7 @@ namespace Weather.Tests.BL.Services
 
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                for(int currentHours = 0; currentHours < 24; currentHours += 2)
+                for(int currentHours = 0; currentHours < 24; currentHours += weatherPointPeriod)
                 {
                     forecastWeatherApiDTO.WeatherPoints
                         .Add(
