@@ -2,25 +2,34 @@
 using BusinessLayer.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
 {
     public class ForecastWeatherDTOExtensionsTests
     {
+        private readonly string cityName = "Minsk";
+        private readonly DateTime date = new(2022, 10, 10);
+        private readonly double temperature1 = 18;
+        private readonly string comment1 = "It's fresh.";        
+        private readonly double temperature2 = 25;
+        private readonly string comment2 = "Good weather.";
+
         [Fact]
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
         {
             // Arrange
-            var forecastWeatherDTO = GetForecastWeatherDTO().FillCommentByTemp();
+            var forecastWeatherDTO = GetForecastWeatherDTO(comment1, comment2);
+            var culture = new CultureInfo("en-US");
 
             // Act
             var result = forecastWeatherDTO.GetMultiStringRepresentation();
 
             // Assert
-            var expected = $"Minsk weather forecast:" +
-                $"{Environment.NewLine}Day 0 (October 10, 2022): 18,0 C. It's fresh." +
-                $"{Environment.NewLine}Day 1 (October 11, 2022): 25,0 C. Good weather.";
+            var expected = $"{cityName} weather forecast:" +
+                $"{Environment.NewLine}Day 0 ({date.ToString("MMMM dd, yyyy", culture)}): {temperature1:f1} C. {comment1}" +
+                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString("MMMM dd, yyyy", culture)}): {temperature2:f1} C. {comment2}";
             
             Assert.Equal(expected, result);
         }
@@ -29,24 +38,24 @@ namespace Weather.Tests.BL.Extensions
         public void FillCommentByTemp_FillsComment_Success()
         {
             // Arrange
-            var forecastWeatherDTO = GetForecastWeatherDTO();
+            var forecastWeatherDTO = GetForecastWeatherDTO(null, null);
 
             // Act
             forecastWeatherDTO.FillCommentByTemp();
 
             // Assert            
-            Assert.Equal("It's fresh.", forecastWeatherDTO.WeatherForPeriod[0].Comment);
-            Assert.Equal("Good weather.", forecastWeatherDTO.WeatherForPeriod[1].Comment);
+            Assert.Equal(comment1, forecastWeatherDTO.WeatherForPeriod[0].Comment);
+            Assert.Equal(comment2, forecastWeatherDTO.WeatherForPeriod[1].Comment);
         }
 
-        private ForecastWeatherDTO GetForecastWeatherDTO()
+        private ForecastWeatherDTO GetForecastWeatherDTO(string comment1, string comment2)
         {
             var weatherForPeriod = new List<WeatherForDateDTO>()
             {
-                new WeatherForDateDTO(){ DateTime = new DateTime(2022, 10, 10), Temp = 18 },
-                new WeatherForDateDTO(){ DateTime = new DateTime(2022, 10, 11), Temp = 25 }
+                new WeatherForDateDTO(){ DateTime = date, Temp = temperature1, Comment = comment1 },
+                new WeatherForDateDTO(){ DateTime = date.AddDays(1), Temp = temperature2, Comment = comment2 }
             };
-            return new ForecastWeatherDTO() { CityName = "Minsk", WeatherForPeriod = weatherForPeriod };
+            return new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
         }
     }
 }

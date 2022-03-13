@@ -6,7 +6,7 @@ namespace ConsoleApp.Extensions
     {
         public static string GetStringRepresentation(this HttpStatusCode httpStatusCode)
         {
-            return $"{(int)httpStatusCode} {httpStatusCode}.";
+            return $"{(int)httpStatusCode} {httpStatusCode}";
         }
     }
 }

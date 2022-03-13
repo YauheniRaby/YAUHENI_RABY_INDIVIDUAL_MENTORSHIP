@@ -1,43 +1,36 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
 {
     public class BaseWeatherDTOExtensionsTests
     {
-        [Theory]
-        [InlineData(-1, "Dress warmly.")]
-        [InlineData(10, "It's fresh.")]
-        [InlineData(25, "Good weather.")]
-        [InlineData(40, "It's time to go to the beach.")]
-        public void FillCommentByTemp_FillsCommentForWeatherDTO_Success(double temp, string comment)
-        {
-            // Arrange
-            var weatherDto = new WeatherDTO() { Temp = temp };
-
-            // Act
-            weatherDto.FillCommentByTemp();
-
-            // Assert
-            Assert.Equal(comment, weatherDto.Comment);
-        }
+        public static IEnumerable<object[]> ParamsForFillsCommentTest =>
+            new List<object[]>
+            {
+                new object[] { new WeatherDTO() { Temp = -10 }, "Dress warmly." },
+                new object[] { new WeatherForDateDTO() { Temp = -1 }, "Dress warmly." },
+                new object[] { new WeatherDTO() { Temp = 0 }, "It's fresh." },
+                new object[] { new WeatherForDateDTO() { Temp = 19 }, "It's fresh." },
+                new object[] { new WeatherDTO() { Temp = 20 }, "Good weather." },
+                new object[] { new WeatherForDateDTO() { Temp = 29 }, "Good weather." },
+                new object[] { new WeatherDTO() { Temp = 30 }, "It's time to go to the beach." },
+                new object[] { new WeatherForDateDTO() { Temp = 50 }, "It's time to go to the beach." }
+            };
 
         [Theory]
-        [InlineData(-5, "Dress warmly.")]
-        [InlineData(15, "It's fresh.")]
-        [InlineData(27, "Good weather.")]
-        [InlineData(50, "It's time to go to the beach.")]
-        public void FillCommentByTemp_FillsCommentForWeatherForDateDTO_Success(double temp, string comment)
+        [MemberData(nameof(ParamsForFillsCommentTest))]
+        public void FillCommentByTemp_FillsComment_Success(BaseWeatherDTO baseWeatherDTO, string comment)
         {
             // Arrange
-            var weatherForDateDTO = new WeatherForDateDTO() { Temp = temp };
 
             // Act
-            weatherForDateDTO.FillCommentByTemp();
+            baseWeatherDTO.FillCommentByTemp();
 
             // Assert
-            Assert.Equal(comment, weatherForDateDTO.Comment);
-        }
+            Assert.Equal(comment, baseWeatherDTO.Comment);
+        }        
     }
 }

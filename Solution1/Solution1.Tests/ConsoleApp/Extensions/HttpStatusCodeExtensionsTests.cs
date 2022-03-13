@@ -17,7 +17,7 @@ namespace Weather.Tests.ConsoleApp.Extensions
             var result = httpStatusCode.GetStringRepresentation();
             
             // Assert
-            var expected = "400 BadRequest.";
+            var expected = "400 BadRequest";
             Assert.Equal(expected, result);
         }
     }

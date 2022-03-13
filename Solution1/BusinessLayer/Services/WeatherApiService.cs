@@ -34,9 +34,9 @@ namespace BusinessLayer.Services
             var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates);
             var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync();
             var cityCoordinates = JsonSerializer.Deserialize<List<CityCoordinatesDTO>>(coordinatesResponceBody).FirstOrDefault();
-
+            
             var urlResultForForecast = string.Format(Constants.WeatherAPI.ForecastByCoordinates, cityCoordinates.Latitude, cityCoordinates.Longitude, countWeatherPoint, Constants.WeatherAPI.KeyApi);
-
+            
             var forecastResponse = await _httpClient.GetAsync(urlResultForForecast);
             var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync();
 

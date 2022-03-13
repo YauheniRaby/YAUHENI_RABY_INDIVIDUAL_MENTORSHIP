@@ -38,6 +38,7 @@ namespace Weather.Tests.BL.Services
             var cityName = "Minsk";
             var forecast = new ForecastWeatherRequestDTO() { CityName = cityName};
             var temp = 11;
+            var comment = "It's fresh.";
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
             var validationResult = new ValidationResult(new List<ValidationFailure>());
 
@@ -57,7 +58,7 @@ namespace Weather.Tests.BL.Services
             var result = await _weatherService.GetByCityNameAsync(cityName);
 
             // Assert
-            var expectedWeatherDto = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = "It's fresh." };
+            var expectedWeatherDto = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = comment };
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }
 
@@ -69,7 +70,11 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var cityName = "Minsk";
             var startForecast = new DateTime(2022, 10, 12, 00, 00, 00);
-            var countWeatherPoint = 8*countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / 3;
+            var temp = 2;
+            var weatherPointPeriod = 3;
+            var countWeatherPointsinDay = 24/ weatherPointPeriod;
+            var comment = "It's fresh.";
+            var countWeatherPoint = countWeatherPointsinDay * countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / weatherPointPeriod;
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
@@ -79,14 +84,14 @@ namespace Weather.Tests.BL.Services
 
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                for(int currentHours = 0; currentHours < 24; currentHours += 3)
+                for(int currentHours = 0; currentHours < 24; currentHours += 2)
                 {
                     forecastWeatherApiDTO.WeatherPoints
                         .Add(
                             new WeatherInfoApiDTO()
                             {
                                 DateTime = startForecast.AddDays(currentCountDays).AddHours(currentHours),
-                                Temp = new TempApiDTO() { Value = 2 }
+                                Temp = new TempApiDTO() { Value = temp }
                             });
                 }
             }
@@ -115,7 +120,7 @@ namespace Weather.Tests.BL.Services
             for (int currentCountDay = 0; currentCountDay < countDays; currentCountDay++)
             {
                 expectedWeatherDto.WeatherForPeriod
-                    .Add(new WeatherForDateDTO() { DateTime = startForecast.AddDays(currentCountDay), Temp = 2, Comment = "It's fresh." });
+                    .Add(new WeatherForDateDTO() { DateTime = startForecast.AddDays(currentCountDay), Temp = temp, Comment = comment});
             }
 
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);

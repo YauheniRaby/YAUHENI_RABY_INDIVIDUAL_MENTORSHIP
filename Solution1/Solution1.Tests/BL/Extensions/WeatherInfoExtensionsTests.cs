@@ -15,24 +15,39 @@ namespace Weather.Tests.BL.Extensions
         public void GetMeanValueWeather_GetMeanValueWeatherFromWeatherInfoApiDTO_Success()
         {
             // Arrange
-            var weatherInfoApiDTO = new List<WeatherInfoApiDTO>()
+            var dateTime = new DateTime(2022, 10, 11);
+            var temp = 15;
+            var riseTempForNextDay = 2;
+            var countdays = 10;
+            var countPountInDay = 8;
+
+            var weatherInfoApiDTO = new List<WeatherInfoApiDTO>();
+            for (int currentCountDays = 0; currentCountDays < countdays; currentCountDays++)
             {
-                new WeatherInfoApiDTO() { DateTime = new DateTime(2022, 10, 10, 09,00,00), Temp = new TempApiDTO() { Value = 10 } },
-                new WeatherInfoApiDTO() { DateTime = new DateTime(2022, 10, 10, 12,00,00), Temp = new TempApiDTO() { Value = 16 } },
-                new WeatherInfoApiDTO() { DateTime = new DateTime(2022, 10, 11, 15,00,00), Temp = new TempApiDTO() { Value = 12 } },
-                new WeatherInfoApiDTO() { DateTime = new DateTime(2022, 10, 11, 18,00,00), Temp = new TempApiDTO() { Value = 16 } }
-            };
+                var currentTemp = temp + currentCountDays * riseTempForNextDay;
+                for (int currentCountPoints = 0; currentCountPoints < countPountInDay; currentCountPoints++)
+                {
+                    weatherInfoApiDTO
+                        .Add(
+                            new WeatherInfoApiDTO() 
+                            { 
+                                DateTime = dateTime.AddDays(currentCountDays).AddHours(currentCountPoints*3), 
+                                Temp = new TempApiDTO() { Value = currentTemp++ } 
+                            });
+                };                 
+            }
 
             // Act
             var result = weatherInfoApiDTO.GetMeanValueWeather().ToList();
 
             // Assert
-            var expected = new List<WeatherForDateDTO>()
+            var expected = new List<WeatherForDateDTO>();
+            for (int currentCountDays = 0; currentCountDays < countdays; currentCountDays++)
             {
-                new WeatherForDateDTO() { DateTime = new DateTime(2022, 10, 10), Temp = 13 },
-                new WeatherForDateDTO() { DateTime = new DateTime(2022, 10, 11), Temp = 14 }
-            }; 
-            
+                var currentTemp = currentCountDays * 2 + (countPountInDay - 1) / 2.0 + temp;
+                expected.Add(new WeatherForDateDTO() { DateTime = dateTime.AddDays(currentCountDays), Temp = currentTemp });
+            }           
+                
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
     }
