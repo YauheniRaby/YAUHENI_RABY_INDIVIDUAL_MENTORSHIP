@@ -3,23 +3,29 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
+using Weather.Tests.Infrastructure.Enums;
+using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.Integration
 {
     public class ConsoleAppTests
     {
+        private readonly string cityName = "Minsk";
+        private readonly string menu = Menu.GetMenuRepresentation();
+        private readonly string temperaturePattern = @"-*\d{1,2}.\d{1,2}";
+        private readonly string commentPattern =
+            $"({WeatherComments.DressWarmly.GetString()}" +
+            $"|{WeatherComments.Fresh.GetString()}" +
+            $"|{WeatherComments.GoodWeather.GetString()}" +
+            $"|{WeatherComments.GoToBeach.GetString()})";
+
         [Fact]
         public async Task Main_GetCurrentWeather_Seccess()
         {
             // Arrange
-            var cityName = "Minsk";
-            
-            var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
-            var menu = Menu.GetMenuRepresentation();
-            var commentRegex = GetCommentsPattern();
             var pattern = $"^{menu}{Environment.NewLine}" +
-                $"In {cityName} {temperaturePattern} C. {commentRegex}{Environment.NewLine}" +
+                $"In {cityName} {temperaturePattern} C. {commentPattern}{Environment.NewLine}" +
                 $"{menu}{Environment.NewLine}" +
                 $"Сlose the application{Environment.NewLine}$";
 
@@ -40,12 +46,8 @@ namespace Weather.Tests.Integration
         public async Task Main_GetForecastWeather_Seccess()
         {
             // Arrange
-            var cityName = "Minsk";
             var countDays = 2;
-            var menu = Menu.GetMenuRepresentation();
-
-            var temperaturePattern = @"-*\d{1,2}.\d{1,2}";
-            var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {temperaturePattern} C. {GetCommentsPattern()}\s{{0,1}}){{{countDays},{countDays + 1}}}";
+            var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {temperaturePattern} C. {commentPattern}\s{{0,1}}){{{countDays},{countDays + 1}}}";
             var pattern = $"^{menu}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"Please, enter count day:{Environment.NewLine}" +
@@ -62,15 +64,6 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.Matches(pattern, consoleOutput.ToString());
-        }
-
-        private string GetCommentsPattern()
-        {
-            var comment1 = "Dress warmly.";
-            var comment2 = "It's fresh.";
-            var comment3 = "Good weather.";
-            var comment4 = "It's time to go to the beach.";
-            return $"({comment1}|{comment2}|{comment3}|{comment4})";
-        }
+        }        
     }
 }

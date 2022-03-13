@@ -3,6 +3,8 @@ using BusinessLayer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Weather.Tests.Infrastructure.Enums;
+using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -12,9 +14,9 @@ namespace Weather.Tests.BL.Extensions
         private readonly string cityName = "Minsk";
         private readonly DateTime date = new(2022, 10, 10);
         private readonly double temperature1 = 18;
-        private readonly string comment1 = "It's fresh.";        
+        private readonly string comment1 = WeatherComments.Fresh.GetString();        
         private readonly double temperature2 = 25;
-        private readonly string comment2 = "Good weather.";
+        private readonly string comment2 = WeatherComments.GoodWeather.GetString();
 
         [Fact]
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
@@ -47,7 +49,6 @@ namespace Weather.Tests.BL.Extensions
             Assert.Equal(comment1, forecastWeatherDTO.WeatherForPeriod[0].Comment);
             Assert.Equal(comment2, forecastWeatherDTO.WeatherForPeriod[1].Comment);
         }
-
         private ForecastWeatherDTO GetForecastWeatherDTO(string comment1, string comment2)
         {
             var weatherForPeriod = new List<WeatherForDateDTO>()

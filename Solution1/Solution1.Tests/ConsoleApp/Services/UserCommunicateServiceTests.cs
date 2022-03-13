@@ -16,6 +16,8 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
+using Weather.Tests.Infrastructure.Enums;
+using Weather.Tests.Infrastructure.Extensions;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -25,7 +27,11 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
-        
+        private readonly string cityName = "Minsk";
+        private readonly double temp = 5;
+        private readonly string comment = WeatherComments.Fresh.GetString();
+        private readonly DateTime dateStartForecast = new DateTime(2022, 01, 10);
+
         public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
             new List<object[]>
             {
@@ -47,25 +53,18 @@ namespace Weather.Tests.ConsoleApp.Services
         public async Task CommunicateAsync_GetForecastWeather_ShowForecastWeather()
         {
             // Arrange
-            var cityName = "Minsk";
-            var countDays = 2;
-            var temp = 5;
-            var comment = "It's fresh.";
-            var dateStartForecast = new DateTime(2022, 01, 10);
+            var countDays = 3;
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
             Console.SetIn(new StringReader($"2{Environment.NewLine}{cityName}{Environment.NewLine}{countDays}"));
             var culture = new CultureInfo("en_US");
 
-            var forecastWeather = new ForecastWeatherDTO()
+            var weatherForPeriod = new List<WeatherForDateDTO>();
+            for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                CityName = cityName,
-                WeatherForPeriod = new List<WeatherForDateDTO>
-                {
-                    new WeatherForDateDTO() { DateTime = dateStartForecast, Temp = temp, Comment= comment},
-                    new WeatherForDateDTO() { DateTime = dateStartForecast.AddDays(1), Temp = temp+1, Comment= comment}
-                }
-            };
+                weatherForPeriod.Add(new WeatherForDateDTO() { DateTime = dateStartForecast.AddDays(currentCountDays), Temp = temp + currentCountDays, Comment = comment });
+            }
+            var forecastWeather = new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
 
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>()))
@@ -75,12 +74,14 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert            
+            var ferecastRepresentation = $"{cityName} weather forecast:{Environment.NewLine}";
+            for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
+            {
+                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString("MMMM dd, yyyy", culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
+            }
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
-                $"Please, enter count day:{Environment.NewLine}" +
-                $"{cityName} weather forecast:{Environment.NewLine}" +
-                $"Day 0 ({dateStartForecast.ToString("MMMM dd, yyyy", culture)}): {temp:f1} C. {comment}{Environment.NewLine}" +
-                $"Day 1 ({dateStartForecast.AddDays(1).ToString("MMMM dd, yyyy", culture)}): {temp+1:f1} C. {comment}{Environment.NewLine}";
+                $"Please, enter count day:{Environment.NewLine}{ferecastRepresentation}";                
 
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());
@@ -90,10 +91,6 @@ namespace Weather.Tests.ConsoleApp.Services
         public async Task CommunicateAsync_GetCurrentWeather_ShowCurrentWeather()
         {
             // Arrange
-            var cityName = "Minsk";
-            var temp = 10;
-            var comment = "It's fresh.";
-            var dateStartForecast = new DateTime(2022, 01, 10);
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
             Console.SetIn(new StringReader($"1{Environment.NewLine}{cityName}{Environment.NewLine}"));

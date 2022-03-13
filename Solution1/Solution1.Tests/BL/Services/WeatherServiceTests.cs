@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Weather.Tests.Infrastructure.Enums;
+using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Services
@@ -22,7 +24,9 @@ namespace Weather.Tests.BL.Services
         private readonly WeatherService _weatherService;
         private readonly Mock<IValidator<ForecastWeatherRequestDTO>> _validator;
         private readonly Mock<IWeatherApiService> _weatherApiServiceMock;
-
+        private readonly string cityName = "Minsk";
+        private readonly int temp = 11;
+        private readonly string comment = WeatherComments.Fresh.GetString();
         public WeatherServiceTests()
         {
             _weatherApiServiceMock = new Mock<IWeatherApiService>();
@@ -35,10 +39,7 @@ namespace Weather.Tests.BL.Services
         public async Task GetByCityNameAsync_ReturnedWeatherDTO_Success()
         {
             // Arrange
-            var cityName = "Minsk";
             var forecast = new ForecastWeatherRequestDTO() { CityName = cityName};
-            var temp = 11;
-            var comment = "It's fresh.";
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
             var validationResult = new ValidationResult(new List<ValidationFailure>());
 
@@ -68,12 +69,9 @@ namespace Weather.Tests.BL.Services
         public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherDTO_Success(int countDays)
         {
             // Arrange
-            var cityName = "Minsk";
             var startForecast = new DateTime(2022, 10, 12, 00, 00, 00);
-            var temp = 2;
             var weatherPointPeriod = 3;
             var countWeatherPointsinDay = 24/ weatherPointPeriod;
-            var comment = "It's fresh.";
             var countWeatherPoint = countWeatherPointsinDay * countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / weatherPointPeriod;
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
