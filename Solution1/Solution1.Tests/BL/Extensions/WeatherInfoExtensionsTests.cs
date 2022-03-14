@@ -17,7 +17,6 @@ namespace Weather.Tests.BL.Extensions
         {
             // Arrange
             var startForecast = new DateTime(2022, 10, 11);
-            var comment = Constants.WeatherComments.Fresh;
             
             var weatherInfoApiDTO = new List<WeatherInfoApiDTO>()
                 {
@@ -33,8 +32,8 @@ namespace Weather.Tests.BL.Extensions
             // Assert
             var expected = new List<WeatherForDateDTO>()
                 {
-                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12, Comment = comment },
-                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15, Comment = comment }
+                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12 },
+                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15 }
                 };
 
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);

@@ -29,8 +29,8 @@ namespace Weather.Tests.BL.Extensions
             
             // Assert
             var expected = $"{cityName} weather forecast:" +
-                $"{Environment.NewLine}Day 0 ({date.ToString(Constants.Patterns.Date, culture)}): {temperature1:f1} C. {comment1}" +
-                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString(Constants.Patterns.Date, culture)}): {temperature2:f1} C. {comment2}";
+                $"{Environment.NewLine}Day 0 ({date.ToString(Constants.DateTimeFormats.Date, culture)}): {temperature1:f1} C. {comment1}" +
+                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString(Constants.DateTimeFormats.Date, culture)}): {temperature2:f1} C. {comment2}";
             
             Assert.Equal(expected, result);
         }
