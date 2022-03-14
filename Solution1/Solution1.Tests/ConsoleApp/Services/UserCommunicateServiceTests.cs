@@ -76,7 +76,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var ferecastRepresentation = $"{cityName} weather forecast:{Environment.NewLine}";
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString(Constants.Patterns.Date, culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
+                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString(Constants.DateTimeFormats.Date, culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
             }
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +

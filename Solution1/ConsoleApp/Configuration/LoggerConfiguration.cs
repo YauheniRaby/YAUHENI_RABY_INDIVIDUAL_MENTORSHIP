@@ -11,7 +11,7 @@ namespace ConsoleApp.Configuration
                 builder
                     .AddConsole(option =>
                     {
-                        option.TimestampFormat = BusinessLayer.Constants.Patterns.DateTime;
+                        option.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
                     });
             });
             return loggerFactory.CreateLogger<T>();

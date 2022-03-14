@@ -2,10 +2,9 @@
 {
     public static partial class Constants
     {
-        public static partial class Patterns
+        public static partial class DateTimeFormats
         {
             public const string Date = "MMMM dd, yyyy";
-            public const string DateTime = "dd.MM.yyyy HH:mm:ss";
         }
     }
 }

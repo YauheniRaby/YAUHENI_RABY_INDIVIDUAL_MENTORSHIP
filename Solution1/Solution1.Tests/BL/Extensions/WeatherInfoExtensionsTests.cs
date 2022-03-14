@@ -1,4 +1,5 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer;
+using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Extensions;
 using KellermanSoftware.CompareNetObjects;
@@ -15,39 +16,27 @@ namespace Weather.Tests.BL.Extensions
         public void GetMeanValueWeather_GetMeanValueWeatherFromWeatherInfoApiDTO_Success()
         {
             // Arrange
-            var dateTime = new DateTime(2022, 10, 11);
-            var temp = 15;
-            var riseTempForNextDay = 2;
-            var countdays = 10;
-            var countPountInDay = 8;
-
-            var weatherInfoApiDTO = new List<WeatherInfoApiDTO>();
-            for (int currentCountDays = 0; currentCountDays < countdays; currentCountDays++)
-            {
-                var currentTemp = temp + currentCountDays * riseTempForNextDay;
-                for (int currentCountPoints = 0; currentCountPoints < countPountInDay; currentCountPoints++)
+            var startForecast = new DateTime(2022, 10, 11);
+            var comment = Constants.WeatherComments.Fresh;
+            
+            var weatherInfoApiDTO = new List<WeatherInfoApiDTO>()
                 {
-                    weatherInfoApiDTO
-                        .Add(
-                            new WeatherInfoApiDTO() 
-                            { 
-                                DateTime = dateTime.AddDays(currentCountDays).AddHours(currentCountPoints*3), 
-                                Temp = new TempApiDTO() { Value = currentTemp++ } 
-                            });
-                };                 
-            }
+                    new WeatherInfoApiDTO() { DateTime = startForecast, Temp = new TempApiDTO { Value = 11 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddHours(3), Temp = new TempApiDTO { Value = 13 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddDays(1), Temp = new TempApiDTO { Value = 14 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddDays(1).AddHours(3), Temp = new TempApiDTO { Value = 16 }},
+                };
 
             // Act
             var result = weatherInfoApiDTO.GetMeanValueWeather().ToList();
 
             // Assert
-            var expected = new List<WeatherForDateDTO>();
-            for (int currentCountDays = 0; currentCountDays < countdays; currentCountDays++)
-            {
-                var currentTemp = currentCountDays * 2 + (countPountInDay - 1) / 2.0 + temp;
-                expected.Add(new WeatherForDateDTO() { DateTime = dateTime.AddDays(currentCountDays), Temp = currentTemp });
-            }           
-                
+            var expected = new List<WeatherForDateDTO>()
+                {
+                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12, Comment = comment },
+                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15, Comment = comment }
+                };
+
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
     }

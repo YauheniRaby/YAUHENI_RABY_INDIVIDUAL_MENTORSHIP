@@ -12,7 +12,7 @@ namespace BusinessLayer.Extensions
             int i = 0;
             return weatherDTO.WeatherForPeriod
                     .Aggregate($"{weatherDTO.CityName} weather forecast:",
-                        (result, next) => $"{result}{Environment.NewLine}Day {i++} ({next.DateTime.ToString(Constants.Patterns.Date, new CultureInfo("en-US"))}): {next.Temp:f1} C. {next.Comment}");    
+                        (result, next) => $"{result}{Environment.NewLine}Day {i++} ({next.DateTime.ToString(Constants.DateTimeFormats.Date, new CultureInfo("en-US"))}): {next.Temp:f1} C. {next.Comment}");    
         }        
 
         public static ForecastWeatherDTO FillCommentByTemp(this ForecastWeatherDTO weatherDTO)
