@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Services.Abstract;
@@ -45,7 +47,7 @@ namespace ConsoleApp.Services
                 }
 
                 Console.WriteLine(Constants.Validation.IncorrectValue);
-                _logger.LogError($"User entered incorrect value for 'countDay'.");
+                _logger.LogError($"User entered incorrect value for 'PeriodOfDays'.");
             }
 
             var weather = await _weatherServiсe.GetForecastByCityNameAsync(cityName, countDay);
@@ -65,38 +67,54 @@ namespace ConsoleApp.Services
             if (string.IsNullOrEmpty(stringCityNames))
             {
                 Console.WriteLine(Constants.Validation.IncorrectValue);
-                _logger.LogError($"User entered incorrect value for 'countDay'.");
+                _logger.LogError($"User entered incorrect value for 'PeriodOfDays'.");
                 return;
             }
 
             var listCityNames = stringCityNames.Split(',').Select(cityName => cityName.Trim());
             var weatherResponsesDTO = await _weatherServiсe.GetWeatherByArrayCityNameAsync(listCityNames);
-            var bestWeather = weatherResponsesDTO.Where(w => w.IsSuccessfulRequest).OrderByDescending(w => w.Temp).FirstOrDefault();
-
-            if (bestWeather != null)
-            {
-                Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}.");
-            }
-
             var dictionaryWeatherResponsesDTO = weatherResponsesDTO.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.ToList());
-            int countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successRequest) ? successRequest.Count() : 0;
-            int countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failRequest) ? failRequest.Count() : 0;
 
-            Console.WriteLine
-                ($"Successful request count: {countSuccessResponse}, " +
-                $"failed: {countFailResponse}.");
+            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successfulWeatherResponses) ? successfulWeatherResponses.Count : 0;
+            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failedWeatherResponses) ? failedWeatherResponses.Count : 0;
+
+            if (countSuccessResponse > 0)
+            {
+                var bestWeather = successfulWeatherResponses.OrderByDescending(w => w.Temp).FirstOrDefault();
+                Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}." +
+                    $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}.");
+            }
+            else
+            {
+                Console.WriteLine($"Error, no successful requests. Failed requests count: {countFailResponse}");
+            }
 
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"]))
             {
-                if (countSuccessResponse > 0)
-                {
-                    Console.WriteLine(dictionaryWeatherResponsesDTO[true].GetRepresentationSuccessResponse());
-                }
+                ShowDebugInformation(successfulWeatherResponses, failedWeatherResponses);
+            }
 
-                if (countFailResponse > 0)
-                {
-                    Console.WriteLine(dictionaryWeatherResponsesDTO[false].GetRepresentationFailResponse());
-                }
+            return;
+        }
+
+        public void ShowDebugInformation(IEnumerable<WeatherResponseDTO> successfulWeatherResponses, IEnumerable<WeatherResponseDTO> failedWeatherResponses)
+        {
+            if (successfulWeatherResponses != null)
+            {
+                Console.WriteLine(
+                    successfulWeatherResponses
+                    .Aggregate(
+                        $"Success case:",
+                        (result, next) => $"{result}{Environment.NewLine}{next.GetRepresentationSuccessResponse()}"));
+            }
+
+            if (failedWeatherResponses != null)
+            {
+                Console.WriteLine(
+                    failedWeatherResponses
+                    .Aggregate(
+                        $"On fail:",
+                        (result, next) => $"{result}{Environment.NewLine}{next.GetRepresentationFailResponse()}"));
             }
         }
     }

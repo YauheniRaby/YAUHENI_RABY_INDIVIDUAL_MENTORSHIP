@@ -27,13 +27,11 @@ namespace ConsoleApp.Services
 
         public async Task<bool> CommunicateAsync()
         {
-            var startNumberPoint = 0;
-
             Console.WriteLine("Select menu item:");
-            Console.WriteLine($"{startNumberPoint++} - Exit");
-            Console.WriteLine($"{startNumberPoint++} - Get currently weather");
-            Console.WriteLine($"{startNumberPoint++} - Get weather for a period of time");
-            Console.WriteLine($"{startNumberPoint} - Get best weather for array cities");
+            Console.WriteLine($"0 - Exit");
+            Console.WriteLine($"1 - Get currently weather");
+            Console.WriteLine($"2 - Get weather for a period of time");
+            Console.WriteLine($"3 - Get best weather for array cities");
 
             bool isGoodParse = int.TryParse(Console.ReadLine(), out var pointMenu);
 
@@ -44,7 +42,7 @@ namespace ConsoleApp.Services
                 return true;
             }
 
-            if (pointMenu < 0 || pointMenu > startNumberPoint)
+            if (pointMenu < 0 || pointMenu > 3)
             {
                 Console.WriteLine(Constants.Errors.UnacceptableValue);
                 _logger.LogError($"User entered value out of range.");

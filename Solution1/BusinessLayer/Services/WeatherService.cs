@@ -5,7 +5,6 @@ using BusinessLayer.Extensions;
 using System.Threading.Tasks;
 using System;
 using FluentValidation;
-using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
@@ -59,8 +58,8 @@ namespace BusinessLayer.Services
         {
             var timer = new Stopwatch();
             timer.Start();
-
-            var t = cityNames.Select(async cityName => 
+            
+            var listTasksRequest = cityNames.Select(async cityName => 
             {
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
@@ -81,9 +80,10 @@ namespace BusinessLayer.Services
                 }
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
                 return weatherResponseDTO;
-            }).ToList();
+            });
 
-            return await Task.WhenAll(t);            
+            var result = await Task.WhenAll(listTasksRequest);
+            return result;            
         }
 
         private void ValidationCityName(string cityName)
