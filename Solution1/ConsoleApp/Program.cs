@@ -11,6 +11,7 @@ namespace ConsoleApp
         {
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
+            ninjectKernel.AddValidators();
 
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
 

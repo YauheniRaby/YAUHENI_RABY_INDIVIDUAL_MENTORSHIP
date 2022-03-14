@@ -1,4 +1,5 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs.WeatherAPI;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services.Abstract
@@ -6,5 +7,7 @@ namespace BusinessLayer.Services.Abstract
     public interface IWeatherApiService
     {
         Task<WeatherApiDTO> GetByCityNameAsync(string cityName);
+
+        Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countDay);
     }
 }

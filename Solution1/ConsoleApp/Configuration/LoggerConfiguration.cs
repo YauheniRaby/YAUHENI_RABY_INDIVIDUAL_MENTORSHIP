@@ -9,7 +9,10 @@ namespace ConsoleApp.Configuration
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
-                    .AddConsole();
+                    .AddConsole(option =>
+                    {
+                        option.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
+                    });
             });
             return loggerFactory.CreateLogger<T>();
         }
