@@ -2,15 +2,16 @@
 using BusinessLayer.Services;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
+using Moq.Protected;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
-using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Services
@@ -44,8 +45,8 @@ namespace Weather.Tests.BL.Services
                 Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = temp }, Name = cityName }, _serializerOptions)),
             };
 
-            _httpMessageHandler.GetSettings(response, urlString);
-            
+            SetHttpHandlerSettings(_httpMessageHandler, response, urlString);
+
             // Act
             var result = await _weatherApiService.GetByCityNameAsync(cityName);
 
@@ -60,12 +61,13 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var lat = 53;
             var lon = 27;
-            var dataTime = new DateTime(2022, 03, 05, 9, 0, 0);
-            var countWeatherPoints = 2;
-            var pointsPeriod = 3;
-
             var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
             var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
+            var listDataForTest = new[]
+            {
+                new { DateTime = new DateTime(2022, 10 ,11, 09, 00, 00), Temp = temp },
+                new { DateTime = new DateTime(2022, 10 ,11, 12, 00, 00), Temp = temp },
+            };
 
             var responseCoordinates = new HttpResponseMessage
             {
@@ -73,53 +75,53 @@ namespace Weather.Tests.BL.Services
                 Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
             };
 
-            var listWeatherAnonymousObject = Enumerable.Range(0, 0)
-                .Select(a => new { DateTime = default(string), Main = new { Temp = default(double) } }).ToList();
-
-            for (int currentCountTempPoints = 0; currentCountTempPoints < countWeatherPoints; currentCountTempPoints++)
-            {
-                listWeatherAnonymousObject
-                    .Add(
-                    new 
-                    { 
-                        DateTime = dataTime.AddHours(currentCountTempPoints * pointsPeriod).ToString("dd-MM-yyyy hh:mm:ss"), 
-                        Main = new { Temp = temp + currentCountTempPoints }
-                    });
-            }
+            var listWeatherAnonymousObject = listDataForTest
+                .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = temp } })
+                .ToArray();
 
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(
                     JsonSerializer.Serialize(
-                        new { City = new { Name = cityName }, List = listWeatherAnonymousObject.ToArray()},
+                        new { City = new { Name = cityName }, List = listWeatherAnonymousObject},
                         new JsonSerializerOptions{ PropertyNamingPolicy = new CamelCaseNamingPolicy()})),
             };
 
-            _httpMessageHandler.GetSettings(responseCoordinates, urlCoordinates);
-            _httpMessageHandler.GetSettings(responseForecast, urlForecast);        
+            SetHttpHandlerSettings(_httpMessageHandler, responseCoordinates, urlCoordinates);
+            SetHttpHandlerSettings(_httpMessageHandler, responseForecast, urlForecast);      
             
             // Act
-            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoints);
+            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count());
 
-            // Assert
+            // Assert            
             var expected = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
-                WeatherPoints = new List<WeatherInfoApiDTO>()
+                WeatherPoints = listDataForTest
+                    .Select(w => new WeatherInfoApiDTO()
+                    {
+                        DateTime = w.DateTime,
+                        Temp = new TempApiDTO() { Value = w.Temp }
+                    })
+                    .ToList()
             };
-            for (int currentCountTempPoints = 0; currentCountTempPoints < countWeatherPoints; currentCountTempPoints++)
-            {
-                expected.WeatherPoints
-                    .Add(
-                    new WeatherInfoApiDTO() 
-                    { 
-                        DateTime = dataTime.AddHours(currentCountTempPoints * pointsPeriod), 
-                        Temp = new TempApiDTO() { Value = temp + currentCountTempPoints}
-                    });
-            }
-
+            
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
+        }
+
+        private void SetHttpHandlerSettings(Mock<HttpMessageHandler> httpMessageHandler, HttpResponseMessage response, string uri)
+        {
+            httpMessageHandler
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.Is<HttpRequestMessage>(
+                      request =>
+                      request.Method == HttpMethod.Get
+                      && request.RequestUri.ToString() == uri),
+                  ItExpr.IsAny<CancellationToken>())
+               .ReturnsAsync(response);
         }
     }
 }

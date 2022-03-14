@@ -1,10 +1,9 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer;
+using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Weather.Tests.Infrastructure.Enums;
-using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -14,9 +13,9 @@ namespace Weather.Tests.BL.Extensions
         private readonly string cityName = "Minsk";
         private readonly DateTime date = new(2022, 10, 10);
         private readonly double temperature1 = 18;
-        private readonly string comment1 = WeatherComments.Fresh.GetString();        
+        private readonly string comment1 = Constants.WeatherComments.Fresh;        
         private readonly double temperature2 = 25;
-        private readonly string comment2 = WeatherComments.GoodWeather.GetString();
+        private readonly string comment2 = Constants.WeatherComments.GoodWeather;
 
         [Fact]
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
@@ -27,11 +26,11 @@ namespace Weather.Tests.BL.Extensions
 
             // Act
             var result = forecastWeatherDTO.GetMultiStringRepresentation();
-
+            
             // Assert
             var expected = $"{cityName} weather forecast:" +
-                $"{Environment.NewLine}Day 0 ({date.ToString("MMMM dd, yyyy", culture)}): {temperature1:f1} C. {comment1}" +
-                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString("MMMM dd, yyyy", culture)}): {temperature2:f1} C. {comment2}";
+                $"{Environment.NewLine}Day 0 ({date.ToString(Constants.Patterns.Date, culture)}): {temperature1:f1} C. {comment1}" +
+                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString(Constants.Patterns.Date, culture)}): {temperature2:f1} C. {comment2}";
             
             Assert.Equal(expected, result);
         }

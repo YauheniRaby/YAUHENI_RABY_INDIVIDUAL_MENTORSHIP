@@ -1,7 +1,6 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer;
+using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
-using Weather.Tests.Infrastructure.Enums;
-using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Extensions
@@ -14,7 +13,7 @@ namespace Weather.Tests.BL.Extensions
             // Arrange
             var cityName = "Minsk";
             var temp = 10;
-            var comment = WeatherComments.Fresh.GetString();
+            var comment = Constants.WeatherComments.Fresh;
             var weatherDto = new WeatherDTO() { CityName = cityName , Temp = temp, Comment = comment};
 
             // Act

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLayer;
 using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Services;
@@ -12,8 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Weather.Tests.Infrastructure.Enums;
-using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.BL.Services
@@ -25,8 +24,8 @@ namespace Weather.Tests.BL.Services
         private readonly Mock<IValidator<ForecastWeatherRequestDTO>> _validator;
         private readonly Mock<IWeatherApiService> _weatherApiServiceMock;
         private readonly string cityName = "Minsk";
-        private readonly int temp = 11;
-        private readonly string comment = WeatherComments.Fresh.GetString();
+        private readonly string comment = Constants.WeatherComments.Fresh;
+        
         public WeatherServiceTests()
         {
             _weatherApiServiceMock = new Mock<IWeatherApiService>();
@@ -39,16 +38,17 @@ namespace Weather.Tests.BL.Services
         public async Task GetByCityNameAsync_ReturnedWeatherDTO_Success()
         {
             // Arrange
+            var temp = 11;
             var forecast = new ForecastWeatherRequestDTO() { CityName = cityName};
             var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
             var validationResult = new ValidationResult(new List<ValidationFailure>());
 
-            _validator
+           _validator
                 .Setup(validator => validator.ValidateAsync
-                    (It.IsAny<ValidationContext<ForecastWeatherRequestDTO>>(),
+                    (It.Is<ValidationContext<ForecastWeatherRequestDTO>>(context => context.InstanceToValidate.CityName == cityName),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(validationResult);
-            
+
             _weatherApiServiceMock
                 .Setup(weatherApiService => 
                     weatherApiService
@@ -70,40 +70,37 @@ namespace Weather.Tests.BL.Services
         {
             // Arrange
             var startForecast = new DateTime(2022, 10, 12, 00, 00, 00);
-            var weatherPointPeriod = 3;
-            var countWeatherPointsinDay = 24/ weatherPointPeriod;
-            var countWeatherPoint = countWeatherPointsinDay * countDays + (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours / weatherPointPeriod;
+            var countPointForCurrentDay =
+                (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
+                (24 / Constants.WeatherAPI.WeatherPointsInDay);
+            var countWeatherPoints = countDays * Constants.WeatherAPI.WeatherPointsInDay + countPointForCurrentDay;
+            
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
                 City = new CityApiDTO() { Name = cityName },
                 WeatherPoints = new List<WeatherInfoApiDTO>()
+                {
+                    new WeatherInfoApiDTO() { DateTime = startForecast, Temp = new TempApiDTO { Value = 11 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddHours(3), Temp = new TempApiDTO { Value = 13 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddDays(1), Temp = new TempApiDTO { Value = 14 }},
+                    new WeatherInfoApiDTO() { DateTime = startForecast.AddDays(1).AddHours(3), Temp = new TempApiDTO { Value = 16 }},
+                }
             };
             var validationResult = new ValidationResult(new List<ValidationFailure>());            
 
-            for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
-            {
-                for(int currentHours = 0; currentHours < 24; currentHours += weatherPointPeriod)
-                {
-                    forecastWeatherApiDTO.WeatherPoints
-                        .Add(
-                            new WeatherInfoApiDTO()
-                            {
-                                DateTime = startForecast.AddDays(currentCountDays).AddHours(currentHours),
-                                Temp = new TempApiDTO() { Value = temp }
-                            });
-                }
-            }
-
             _validator
                 .Setup(validator => validator.ValidateAsync
-                    (It.IsAny<ValidationContext<ForecastWeatherRequestDTO>>(),
+                    (It.Is<ValidationContext<ForecastWeatherRequestDTO>>
+                        (context => 
+                            context.InstanceToValidate.CityName == cityName
+                            && context.InstanceToValidate.PeriodOfDays == countDays),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(validationResult);
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService
-                    .GetForecastByCityNameAsync(cityName, countWeatherPoint))
+                    .GetForecastByCityNameAsync(cityName, countWeatherPoints))
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
@@ -113,13 +110,12 @@ namespace Weather.Tests.BL.Services
             var expectedWeatherDto = new ForecastWeatherDTO()
             {
                 CityName = cityName,
-                WeatherForPeriod = new List<WeatherForDateDTO>()};
-
-            for (int currentCountDay = 0; currentCountDay < countDays; currentCountDay++)
-            {
-                expectedWeatherDto.WeatherForPeriod
-                    .Add(new WeatherForDateDTO() { DateTime = startForecast.AddDays(currentCountDay), Temp = temp, Comment = comment});
-            }
+                WeatherForPeriod = new List<WeatherForDateDTO>()
+                {
+                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12, Comment = comment },
+                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15, Comment = comment }
+                }
+            };
 
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }

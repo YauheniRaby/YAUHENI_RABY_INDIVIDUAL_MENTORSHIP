@@ -3,8 +3,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
-using Weather.Tests.Infrastructure.Enums;
-using Weather.Tests.Infrastructure.Extensions;
 using Xunit;
 
 namespace Weather.Tests.Integration
@@ -15,10 +13,10 @@ namespace Weather.Tests.Integration
         private readonly string menu = Menu.GetMenuRepresentation();
         private readonly string temperaturePattern = @"-*\d{1,2}.\d{1,2}";
         private readonly string commentPattern =
-            $"({WeatherComments.DressWarmly.GetString()}" +
-            $"|{WeatherComments.Fresh.GetString()}" +
-            $"|{WeatherComments.GoodWeather.GetString()}" +
-            $"|{WeatherComments.GoToBeach.GetString()})";
+            $"({BusinessLayer.Constants.WeatherComments.DressWarmly}" +
+            $"|{BusinessLayer.Constants.WeatherComments.Fresh}" +
+            $"|{BusinessLayer.Constants.WeatherComments.GoodWeather}" +
+            $"|{BusinessLayer.Constants.WeatherComments.GoToBeach})";
 
         [Fact]
         public async Task Main_GetCurrentWeather_Seccess()

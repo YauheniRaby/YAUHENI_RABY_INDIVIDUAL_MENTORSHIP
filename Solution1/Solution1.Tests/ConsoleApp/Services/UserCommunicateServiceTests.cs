@@ -10,14 +10,13 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
+using BusinessLayer;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.Command;
 using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
-using Weather.Tests.Infrastructure.Enums;
-using Weather.Tests.Infrastructure.Extensions;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -29,7 +28,7 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IInvoker> _invokerMock;
         private readonly string cityName = "Minsk";
         private readonly double temp = 5;
-        private readonly string comment = WeatherComments.Fresh.GetString();
+        private readonly string comment = Constants.WeatherComments.Fresh;
         private readonly DateTime dateStartForecast = new DateTime(2022, 01, 10);
 
         public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
@@ -77,7 +76,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var ferecastRepresentation = $"{cityName} weather forecast:{Environment.NewLine}";
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString("MMMM dd, yyyy", culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
+                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString(Constants.Patterns.Date, culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
             }
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
