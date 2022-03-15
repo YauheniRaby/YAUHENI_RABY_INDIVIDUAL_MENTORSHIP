@@ -70,12 +70,10 @@ namespace BusinessLayer.Services
                 }
                 catch (ValidationException ex)
                 {
-                    weatherResponseDTO.IsSuccessfulRequest = false;
                     weatherResponseDTO.ErrorMessage = ex.Errors.FirstOrDefault().ErrorMessage;
                 }
                 catch (Exception ex)
                 {
-                    weatherResponseDTO.IsSuccessfulRequest = false;
                     weatherResponseDTO.ErrorMessage = ex.Message;
                 }
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
@@ -83,7 +81,11 @@ namespace BusinessLayer.Services
             });
 
             var weatherResponses = await Task.WhenAll(listTasksRequest);
-            return weatherResponses.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.AsEnumerable());
+            var result = weatherResponses
+                            .GroupBy(w => w.IsSuccessfulRequest)
+                            .Select(group => KeyValuePair.Create(group.Key, group.Select(response=>response)))
+                            .ToDictionary(k => k.Key, v => v.Value);
+            return result;
         }
 
         private async Task ValidationCityName(string cityName)
