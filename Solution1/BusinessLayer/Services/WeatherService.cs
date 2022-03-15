@@ -26,15 +26,7 @@ namespace BusinessLayer.Services
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
-            var validationResult = await _validator
-                                            .ValidateAsync(
-                                                new ForecastWeatherRequestDTO() { CityName = cityName}, 
-                                                options => options.IncludeRuleSets("CityName"));
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
+            await ValidationCityName(cityName);
             var weather = await _weatherApiService.GetByCityNameAsync(cityName);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
             return result;
@@ -68,7 +60,7 @@ namespace BusinessLayer.Services
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
                 {
-                    ValidationCityName(cityName);
+                    await ValidationCityName(cityName);
                     var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
                     if (temp.HasValue)
                     {
@@ -94,10 +86,10 @@ namespace BusinessLayer.Services
             return weatherResponses.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.AsEnumerable());
         }
 
-        private void ValidationCityName(string cityName)
+        private async Task ValidationCityName(string cityName)
         {
-            var validationResult = _validator
-                                            .Validate(
+            var validationResult = await _validator
+                                            .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
                                                 options => options.IncludeRuleSets("CityName"));
             if (!validationResult.IsValid)

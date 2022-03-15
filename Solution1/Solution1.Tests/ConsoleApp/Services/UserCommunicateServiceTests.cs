@@ -186,5 +186,66 @@ namespace Weather.Tests.ConsoleApp.Services
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}{message}{Environment.NewLine}";
             Assert.Equal(expected, consoleOutput.ToString());
         }
+
+        [Fact]
+        public async Task CommunicateAsync_GetBestWeatherByArrayCityNameAsync_ShowBestWeather()
+        {
+            // Arrange
+            var leadTime = 472;
+
+            var cityName2 = "Moscow";
+            var temp2 = 12;
+            var leadTime2 = 476;
+
+            var cityName3 = "AAA";
+            var leadTime3 = 475;
+            var testError = "Test error message";
+
+            var dictionaryWeatherResponsesDTO = new Dictionary<bool, IEnumerable<WeatherResponseDTO>>
+            {
+                { true, new List<WeatherResponseDTO>
+                            {
+                                new WeatherResponseDTO() { CityName = cityName, IsSuccessfulRequest = true, Temp = temp, LeadTime = leadTime },
+                                new WeatherResponseDTO() { CityName = cityName2, IsSuccessfulRequest = true, Temp = temp2, LeadTime = leadTime2 }
+                            }
+                },
+                { false, new List<WeatherResponseDTO>
+                            {
+                                new WeatherResponseDTO() { CityName = cityName3, IsSuccessfulRequest = false, ErrorMessage=testError, LeadTime = leadTime3 }
+                            }
+                }
+            };
+
+            var consoleOutput = new StringWriter();
+
+            Console.SetOut(consoleOutput);
+            Console.SetIn(new StringReader($"3{Environment.NewLine}{cityName}, {cityName3}, {cityName2}{Environment.NewLine}"));
+
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>()))
+                .ReturnsAsync(dictionaryWeatherResponsesDTO);
+
+            //Act
+            await _userCommunicationService.CommunicateAsync();
+
+            //Assert            
+            var bestWeatherRepresentation = $"City with the highest temperature {temp2} C: {cityName2}. " +
+                $"Successful request count: 2, failed: 1.";
+            
+            var successfulResponsesRepresentation = "Success case:" +
+                $"{Environment.NewLine}City: '{cityName}', Temp: {temp}, Timer: {leadTime} ms." +
+                $"{Environment.NewLine}City: '{cityName2}', Temp: {temp2}, Timer: {leadTime2} ms.";
+            var failResponsesRepresentation = "On fail:" +
+                $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError}, Timer: {leadTime3} ms.";
+
+            var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
+                $"Please, enter array city name (separator symbal - ',') :{Environment.NewLine}" +
+                $"{bestWeatherRepresentation}{Environment.NewLine}" +
+                $"{successfulResponsesRepresentation}{Environment.NewLine}" +
+                $"{failResponsesRepresentation}{Environment.NewLine}";
+
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>()));
+            Assert.Equal(expected, consoleOutput.ToString());
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ConsoleApp;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
@@ -62,6 +63,45 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.Matches(pattern, consoleOutput.ToString());
-        }        
+        }
+
+        [Fact]
+        public async Task Main_GetBestWeatherForArrayCities_Seccess()
+        {
+            // Arrange
+            var arrayCityNames = $"{cityName}, ААА, {string.Empty}, Paris";
+            string cityPattern = arrayCityNames.Replace(" ", "").Replace(',', '|');
+
+            var resultRequestPattern = $@"\(City with the highest temperature {temperaturePattern} C: {cityPattern}. " +
+                $@"Successful request count: \d, failed: \d.|" +
+                $@"Error, no successful requests. Failed requests count: \d\)";
+            
+            var seccessResponsePattern = $"Success case:" +
+                $@"\({Environment.NewLine}City: '{cityPattern}', Temp: {temperaturePattern}, Timer: \d{{1,}} ms.\)+";
+            var failResponsePattern = $"On fail:" +
+                $@"\({Environment.NewLine}City: '{cityPattern}', ErrorMessage: \w+, Timer: \d{{1,}} ms.\)+";
+
+            var debugInfoPattern = Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"])
+                ? $@"\({seccessResponsePattern}{Environment.NewLine}|" +
+                $@"{seccessResponsePattern}{Environment.NewLine}{failResponsePattern}{Environment.NewLine}|" +
+                $@"{failResponsePattern}{Environment.NewLine}\)" 
+                : string.Empty;
+
+            var pattern = $@"^{menu}{Environment.NewLine}" +
+                $@"Please, enter array city name \(separator symbal - ','\) :" +
+                $"{resultRequestPattern}{Environment.NewLine}{debugInfoPattern}" +
+                $"{menu}{Environment.NewLine}" +
+                $"Сlose the application{Environment.NewLine}$";
+
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+            Console.SetIn(new StringReader($"3{Environment.NewLine}{arrayCityNames}{Environment.NewLine}0{Environment.NewLine}"));
+
+            //Act
+            await Program.Main();
+            
+            //Assert
+            Assert.Matches(pattern, consoleOutput.ToString());
+        }
     }
 }
