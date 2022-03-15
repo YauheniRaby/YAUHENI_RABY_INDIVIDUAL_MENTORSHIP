@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services.Abstract
@@ -8,5 +9,7 @@ namespace BusinessLayer.Services.Abstract
         Task<WeatherDTO> GetByCityNameAsync(string cityName);
 
         Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay);
+
+        Task<Dictionary<bool, List<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(string arrayCityNames);
     }
 }
