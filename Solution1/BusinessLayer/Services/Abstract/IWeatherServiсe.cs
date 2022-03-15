@@ -10,6 +10,6 @@ namespace BusinessLayer.Services.Abstract
 
         Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay);
 
-        Task<Dictionary<bool, List<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(string arrayCityNames);
+        Task<Dictionary<bool, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames);
     }
 }

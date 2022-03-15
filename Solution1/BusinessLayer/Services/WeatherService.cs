@@ -58,10 +58,8 @@ namespace BusinessLayer.Services
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }
 
-        public async Task<Dictionary<bool, List<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(string arrayCityNames)
+        public async Task<Dictionary<bool, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
         {
-            var cityNames = arrayCityNames.Split(',').Select(cityName => cityName.Trim());
-            
             var timer = new Stopwatch();
             timer.Start();
 
@@ -71,8 +69,12 @@ namespace BusinessLayer.Services
                 try
                 {
                     ValidationCityName(cityName);
-                    weatherResponseDTO.Temp = (await _weatherApiService.GetByCityNameAsync(cityName)).TemperatureValues.Temp;
-                    weatherResponseDTO.IsSuccessfulRequest = true;
+                    var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
+                    if (temp.HasValue)
+                    {
+                        weatherResponseDTO.Temp = temp.Value;
+                        weatherResponseDTO.IsSuccessfulRequest = true;
+                    }
                 }
                 catch (ValidationException ex)
                 {
@@ -89,7 +91,7 @@ namespace BusinessLayer.Services
             });
 
             var weatherResponses = await Task.WhenAll(listTasksRequest);
-            return weatherResponses.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.ToList());
+            return weatherResponses.GroupBy(w => w.IsSuccessfulRequest).ToDictionary(k => k.Key, v => v.AsEnumerable());
         }
 
         private void ValidationCityName(string cityName)

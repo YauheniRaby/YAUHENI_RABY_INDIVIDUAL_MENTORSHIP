@@ -155,15 +155,15 @@ namespace ConsoleApp.Services
                 return;
             }
 
-            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames);
+            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command);
 
-            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successfulWeatherResponses) ? successfulWeatherResponses.Count : 0;
-            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failedWeatherResponses) ? failedWeatherResponses.Count : 0;
+            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
+            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
 
             if (countSuccessResponse > 0)
             {
-                var bestWeather = successfulWeatherResponses.OrderByDescending(w => w.Temp).FirstOrDefault();
+                var bestWeather = successfulWeatherResponses.OrderByDescending(w => w.Temp).First();
                 Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}. " +
                     $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}.");
             }
@@ -174,31 +174,27 @@ namespace ConsoleApp.Services
 
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"]))
             {
-                ShowDebugInformation(successfulWeatherResponses, failedWeatherResponses);
+                ShowDebugInformation(successfulWeatherResponses, "Success case:", nameof(WeatherResponseDTO.Temp));
+                ShowDebugInformation(failedWeatherResponses, "On fail:", nameof(WeatherResponseDTO.ErrorMessage));
             }
 
             return;
         }
 
-        private void ShowDebugInformation(IEnumerable<WeatherResponseDTO> successfulWeatherResponses, IEnumerable<WeatherResponseDTO> failedWeatherResponses)
+        private void ShowDebugInformation(IEnumerable<WeatherResponseDTO> responses, string header, string propertyName)
         {
-            if (successfulWeatherResponses != null)
-            {
-                Console.WriteLine(
-                    successfulWeatherResponses
-                    .Aggregate(
-                        $"Success case:",
-                        (result, next) => $"{result}{Environment.NewLine}{next.GetRepresentationSuccessResponse()}"));
-            }
+            Console.WriteLine(
+                responses
+                    ?.Aggregate(
+                        $"{header}",
+                        (result, next) => $"{result}{Environment.NewLine}{GetRepresentationResponse(next, propertyName)}"));
+        }
 
-            if (failedWeatherResponses != null)
-            {
-                Console.WriteLine(
-                    failedWeatherResponses
-                    .Aggregate(
-                        $"On fail:",
-                        (result, next) => $"{result}{Environment.NewLine}{next.GetRepresentationFailResponse()}"));
-            }
+        private string GetRepresentationResponse(WeatherResponseDTO weatherResponse, string propertyName)
+        {
+            var propertyValue = typeof(WeatherResponseDTO).GetProperty(propertyName).GetValue(weatherResponse);
+
+            return $"City: '{weatherResponse.CityName}', {propertyName}: {propertyValue}, Timer: {weatherResponse.LeadTime} ms.";
         }
     }
 }

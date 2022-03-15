@@ -4,7 +4,7 @@
     {
         public string CityName { get; set; }
 
-        public double? Temp { get; set; }
+        public double Temp { get; set; }
 
         public bool IsSuccessfulRequest { get; set; }
 

@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Command
 {
-    public class BestWeatherCommand : ICommand<Dictionary<bool, List<WeatherResponseDTO>>>
+    public class BestWeatherCommand : ICommand<Dictionary<bool, IEnumerable<WeatherResponseDTO>>>
     {
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly string _arrayCityNames;
+        private readonly IEnumerable<string> _cityNames;
 
-        public BestWeatherCommand(IWeatherServiсe weatherServiсe, string arrayCityNames)
+        public BestWeatherCommand(IWeatherServiсe weatherServiсe, IEnumerable<string> cityNames)
         {
             _weatherServiсe = weatherServiсe;
-            _arrayCityNames = arrayCityNames;
+            _cityNames = cityNames;
         }
 
-        public Task<Dictionary<bool, List<WeatherResponseDTO>>> ExecuteAsync()
+        public Task<Dictionary<bool, IEnumerable<WeatherResponseDTO>>> ExecuteAsync()
         {
-            return _weatherServiсe.GetWeatherByArrayCityNameAsync(_arrayCityNames);
+            return _weatherServiсe.GetWeatherByArrayCityNameAsync(_cityNames);
         }
     }
 }
