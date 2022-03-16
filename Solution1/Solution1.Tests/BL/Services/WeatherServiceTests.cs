@@ -148,8 +148,8 @@ namespace Weather.Tests.BL.Services
                  .ReturnsAsync(notValidResult);
             
             _validator
-                 .Setup(validator => validator.ValidateAsync
-                     (It.Is<ValidationContext<ForecastWeatherRequestDTO>>(
+                 .Setup(validator => validator.ValidateAsync(
+                     It.Is<ValidationContext<ForecastWeatherRequestDTO>>(
                          context => 
                             context.InstanceToValidate.CityName == cityName
                             || context.InstanceToValidate.CityName == cityName2
@@ -161,23 +161,15 @@ namespace Weather.Tests.BL.Services
             var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName);
 
             // Assert
-            var isKeyTrue = result.Keys.Contains(true);
-            Assert.True(isKeyTrue);
-            if (isKeyTrue)
-            {
-                Assert.Equal(2, result[true].Count());
-                Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName);
-                Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName2);
-            }
-            
-            var isKeyFalse = result.Keys.Contains(false);
-            Assert.True(isKeyFalse);
-            if (isKeyFalse)
-            {
-                Assert.Equal(2, result[false].Count());
-                Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3);
-                Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName4);
-            }
+            Assert.Contains(result.Keys, k => k == true);
+            Assert.Contains(result.Keys, k => k == false);
+
+            Assert.Equal(2, result[true].Count());
+            Assert.Equal(2, result[false].Count());
+
+            Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName);
+            Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName2);
+            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3);            
         }
 
         private void SetWeatherApiServiceSettings(WeatherApiDTO weatherApiDto)

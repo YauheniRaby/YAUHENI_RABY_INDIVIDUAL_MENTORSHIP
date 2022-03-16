@@ -26,7 +26,15 @@ namespace BusinessLayer.Services
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
-            await ValidationCityName(cityName);
+            var validationResult = await _validator
+                                            .ValidateAsync(
+                                                new ForecastWeatherRequestDTO() { CityName = cityName },
+                                                options => options.IncludeRuleSets("CityName"));
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+           
             var weather = await _weatherApiService.GetByCityNameAsync(cityName);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
             return result;
@@ -60,17 +68,21 @@ namespace BusinessLayer.Services
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
                 {
-                    await ValidationCityName(cityName);
+                    var validationResult = await _validator
+                                            .ValidateAsync(
+                                                new ForecastWeatherRequestDTO() { CityName = cityName },
+                                                options => options.IncludeRuleSets("CityName"));
+                    
+                    if (!validationResult.IsValid)
+                    {
+                        weatherResponseDTO.ErrorMessage = validationResult.Errors.First().ErrorMessage;
+                    }
                     var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
                     if (temp.HasValue)
                     {
                         weatherResponseDTO.Temp = temp.Value;
                         weatherResponseDTO.IsSuccessfulRequest = true;
                     }
-                }
-                catch (ValidationException ex)
-                {
-                    weatherResponseDTO.ErrorMessage = ex.Errors.FirstOrDefault().ErrorMessage;
                 }
                 catch (Exception ex)
                 {
@@ -85,18 +97,6 @@ namespace BusinessLayer.Services
                             .GroupBy(w => w.IsSuccessfulRequest)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
-        }
-
-        private async Task ValidationCityName(string cityName)
-        {
-            var validationResult = await _validator
-                                            .ValidateAsync(
-                                                new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"));
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-        }
+        }        
     }
 }
