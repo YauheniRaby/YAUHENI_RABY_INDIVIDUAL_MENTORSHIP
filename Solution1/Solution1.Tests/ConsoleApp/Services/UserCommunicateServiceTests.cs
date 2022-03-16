@@ -17,6 +17,7 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
+using System.Configuration;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -187,10 +188,16 @@ namespace Weather.Tests.ConsoleApp.Services
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
-        [Fact]
-        public async Task CommunicateAsync_GetBestWeatherByArrayCityNameAsync_ShowBestWeather()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task CommunicateAsync_GetBestWeatherByArrayCityNameAsync_ShowBestWeather(bool isDebugMode)
         {
             // Arrange
+            var currentConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            currentConfig.AppSettings.Settings["isDebugMode"].Value = isDebugMode.ToString();
+            currentConfig.Save(ConfigurationSaveMode.Minimal);
+
             var leadTime = 472;
 
             var cityName2 = "Moscow";
@@ -238,11 +245,14 @@ namespace Weather.Tests.ConsoleApp.Services
             var failResponsesRepresentation = "On fail:" +
                 $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError}, Timer: {leadTime3} ms.";
 
+            var debugInfoRepresentation = Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"])
+                ? $"{successfulResponsesRepresentation}{Environment.NewLine}" +
+                $"{failResponsesRepresentation}{Environment.NewLine}"
+                : string.Empty;
+
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter array city name (separator symbal - ',') :{Environment.NewLine}" +
-                $"{bestWeatherRepresentation}{Environment.NewLine}" +
-                $"{successfulResponsesRepresentation}{Environment.NewLine}" +
-                $"{failResponsesRepresentation}{Environment.NewLine}";
+                $"{bestWeatherRepresentation}{Environment.NewLine}{debugInfoRepresentation}";
 
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>()));
             Assert.Equal(expected, consoleOutput.ToString());

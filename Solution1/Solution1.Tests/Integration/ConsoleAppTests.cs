@@ -65,10 +65,16 @@ namespace Weather.Tests.Integration
             Assert.Matches(pattern, consoleOutput.ToString());
         }
 
-        [Fact]
-        public async Task Main_GetBestWeatherForArrayCities_Seccess()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]        
+        public async Task Main_GetBestWeatherForArrayCities_Seccess(bool isDebugMode)
         {
             // Arrange
+            var currentConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            currentConfig.AppSettings.Settings["isDebugMode"].Value = isDebugMode.ToString();
+            currentConfig.Save(ConfigurationSaveMode.Minimal);
+
             var arrayCityNames = $"{cityName}, ААА, {string.Empty}, Paris";
             string cityPattern = arrayCityNames.Replace(" ", "").Replace(',', '|');
 

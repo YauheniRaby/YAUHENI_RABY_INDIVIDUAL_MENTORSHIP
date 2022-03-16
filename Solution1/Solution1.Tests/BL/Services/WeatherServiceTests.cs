@@ -134,12 +134,12 @@ namespace Weather.Tests.BL.Services
             
             var validationFailure = new List<ValidationFailure>() { new ValidationFailure("CityName", "Test validation error")};
             var notValidResult = new ValidationResult(validationFailure);
-            var ValidResult = new ValidationResult(new List<ValidationFailure>());
+            var validResult = new ValidationResult(new List<ValidationFailure>());
 
-            SetWeatherApiServiceSettings(_weatherApiServiceMock, weatherApiDto1);
-            SetWeatherApiServiceSettings(_weatherApiServiceMock, weatherApiDto2);
-            SetWeatherApiServiceExceptionSettings(_weatherApiServiceMock, cityName3, new Exception());
-            SetWeatherApiServiceExceptionSettings(_weatherApiServiceMock, cityName4, new  ValidationException(validationFailure));
+            SetWeatherApiServiceSettings(weatherApiDto1);
+            SetWeatherApiServiceSettings(weatherApiDto2);
+            SetWeatherApiServiceExceptionSettings(cityName3, new Exception());
+            SetWeatherApiServiceExceptionSettings(cityName4, new  ValidationException(validationFailure));
 
             _validator
                  .Setup(validator => validator.ValidateAsync
@@ -155,31 +155,43 @@ namespace Weather.Tests.BL.Services
                             || context.InstanceToValidate.CityName == cityName2
                             || context.InstanceToValidate.CityName == cityName3),
                      It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(ValidResult);
+                 .ReturnsAsync(validResult);
 
             // Act
             var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName);
 
             // Assert
-            Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName);
-            Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName2);
-            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3);
-            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName4);
-            Assert.True(result[true].Count() == 2 && result[false].Count() == 2);
+            var isKeyTrue = result.Keys.Contains(true);
+            Assert.True(isKeyTrue);
+            if (isKeyTrue)
+            {
+                Assert.Equal(2, result[true].Count());
+                Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName);
+                Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName2);
+            }
+            
+            var isKeyFalse = result.Keys.Contains(false);
+            Assert.True(isKeyFalse);
+            if (isKeyFalse)
+            {
+                Assert.Equal(2, result[false].Count());
+                Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3);
+                Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName4);
+            }
         }
 
-        private void SetWeatherApiServiceSettings(Mock<IWeatherApiService> weatherApiService, WeatherApiDTO weatherApiDto)
+        private void SetWeatherApiServiceSettings(WeatherApiDTO weatherApiDto)
         {
-            weatherApiService
+            _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService
                     .GetByCityNameAsync(weatherApiDto.CityName))
                 .ReturnsAsync(weatherApiDto);
         }
 
-        private void SetWeatherApiServiceExceptionSettings(Mock<IWeatherApiService> weatherApiService, string cityName, Exception exception)
+        private void SetWeatherApiServiceExceptionSettings(string cityName, Exception exception)
         {
-            weatherApiService
+            _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService
                     .GetByCityNameAsync(cityName))

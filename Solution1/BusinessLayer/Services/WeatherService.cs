@@ -83,8 +83,7 @@ namespace BusinessLayer.Services
             var weatherResponses = await Task.WhenAll(listTasksRequest);
             var result = weatherResponses
                             .GroupBy(w => w.IsSuccessfulRequest)
-                            .Select(group => KeyValuePair.Create(group.Key, group.Select(response=>response)))
-                            .ToDictionary(k => k.Key, v => v.Value);
+                            .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
         }
 
