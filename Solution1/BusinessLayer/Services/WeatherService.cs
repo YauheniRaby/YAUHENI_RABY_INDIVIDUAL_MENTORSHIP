@@ -77,6 +77,10 @@ namespace BusinessLayer.Services
                     {
                         weatherResponseDTO.ErrorMessage = validationResult.Errors.First().ErrorMessage;
                     }
+                    else
+                    {
+                        return weatherResponseDTO;
+                    }
                     var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
                     if (temp.HasValue)
                     {
