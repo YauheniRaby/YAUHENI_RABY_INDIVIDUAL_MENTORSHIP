@@ -18,6 +18,7 @@ using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
 using System.Configuration;
+using BusinessLayer.Configuration.Abstract;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -27,6 +28,7 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
+        private readonly Mock<IConfig> _congig;
         private readonly string cityName = "Minsk";
         private readonly double temp = 5;
         private readonly string comment = Constants.WeatherComments.Fresh;
@@ -46,7 +48,9 @@ namespace Weather.Tests.ConsoleApp.Services
             _loggerMock = new Mock<ILogger>();
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object);
+            _congig = new Mock<IConfig>();
+
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object, _congig.Object);
         }
 
         [Fact]

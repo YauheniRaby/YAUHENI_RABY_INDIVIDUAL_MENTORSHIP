@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
+using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
@@ -22,12 +23,14 @@ namespace ConsoleApp.Services
         private readonly ILogger _logger;
         private readonly IInvoker _invoker;
         private readonly IWeatherServiсe _weatherServiсe;
+        private readonly IConfig _config;
 
-        public UserCommunicateService(ILogger logger, IInvoker invoker, IWeatherServiсe weatherServiсe)
+        public UserCommunicateService(ILogger logger, IInvoker invoker, IWeatherServiсe weatherServiсe, IConfig config)
         {
             _logger = logger;
             _invoker = invoker;
             _weatherServiсe = weatherServiсe;
+            _config = config;
         }
 
         public async Task<bool> CommunicateAsync()
@@ -172,7 +175,7 @@ namespace ConsoleApp.Services
                 Console.WriteLine($"Error, no successful requests. Failed requests count: {countFailResponse}");
             }
 
-            if (Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"]))
+            if (_config.IsDebugMode)
             {
                 ShowDebugInformation(successfulWeatherResponses, "Success case:", nameof(WeatherResponseDTO.Temp));
                 ShowDebugInformation(failedWeatherResponses, "On fail:", nameof(WeatherResponseDTO.ErrorMessage));

@@ -73,20 +73,23 @@ namespace BusinessLayer.Services
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
                                                 options => options.IncludeRuleSets("CityName"));
                     
-                    if (!validationResult.IsValid)
+                    if (validationResult.IsValid)
                     {
-                        weatherResponseDTO.ErrorMessage = validationResult.Errors.First().ErrorMessage;
+                        var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
+                        if (temp.HasValue)
+                        {
+                            weatherResponseDTO.Temp = temp.Value;
+                            weatherResponseDTO.IsSuccessfulRequest = true;
+                        }
+                        else
+                        {
+                            weatherResponseDTO.ErrorMessage = "Unknown error";
+                        }
                     }
                     else
                     {
-                        return weatherResponseDTO;
-                    }
-                    var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
-                    if (temp.HasValue)
-                    {
-                        weatherResponseDTO.Temp = temp.Value;
-                        weatherResponseDTO.IsSuccessfulRequest = true;
-                    }
+                        weatherResponseDTO.ErrorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
+                    }                    
                 }
                 catch (Exception ex)
                 {
