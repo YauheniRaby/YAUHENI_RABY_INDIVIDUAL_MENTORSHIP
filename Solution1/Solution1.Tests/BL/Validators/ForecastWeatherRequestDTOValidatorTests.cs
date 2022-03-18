@@ -1,7 +1,6 @@
 ﻿using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Vlidators;
-using ConsoleApp.Configuration;
 using FluentValidation;
 using Moq;
 using System.Threading.Tasks;

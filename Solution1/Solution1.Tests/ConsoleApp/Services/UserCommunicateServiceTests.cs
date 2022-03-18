@@ -17,7 +17,6 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
-using System.Configuration;
 using BusinessLayer.Configuration.Abstract;
 
 namespace Weather.Tests.ConsoleApp.Services
@@ -28,7 +27,7 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
-        private readonly Mock<IConfig> _congig;
+        private readonly Mock<IConfig> _config;
         private readonly string cityName = "Minsk";
         private readonly double temp = 5;
         private readonly string comment = Constants.WeatherComments.Fresh;
@@ -48,9 +47,9 @@ namespace Weather.Tests.ConsoleApp.Services
             _loggerMock = new Mock<ILogger>();
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _congig = new Mock<IConfig>();
+            _config = new Mock<IConfig>();
 
-            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object, _congig.Object);
+            _userCommunicationService = new UserCommunicateService(_loggerMock.Object, _invokerMock.Object, _weatherServiceMock.Object, _config.Object);
         }
 
         [Fact]
@@ -198,10 +197,6 @@ namespace Weather.Tests.ConsoleApp.Services
         public async Task CommunicateAsync_GetBestWeatherByArrayCityNameAsync_ShowBestWeather(bool isDebugMode)
         {
             // Arrange
-            var currentConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            currentConfig.AppSettings.Settings["isDebugMode"].Value = isDebugMode.ToString();
-            currentConfig.Save(ConfigurationSaveMode.Minimal);
-
             var leadTime = 472;
 
             var cityName2 = "Moscow";
@@ -236,6 +231,10 @@ namespace Weather.Tests.ConsoleApp.Services
                 .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>()))
                 .ReturnsAsync(dictionaryWeatherResponsesDTO);
 
+            _config
+                .Setup(config => config.IsDebugMode)
+                .Returns(isDebugMode);
+
             //Act
             await _userCommunicationService.CommunicateAsync();
 
@@ -248,8 +247,8 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"{Environment.NewLine}City: '{cityName2}', Temp: {temp2}, Timer: {leadTime2} ms.";
             var failResponsesRepresentation = "On fail:" +
                 $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError}, Timer: {leadTime3} ms.";
-
-            var debugInfoRepresentation = Convert.ToBoolean(ConfigurationManager.AppSettings["isDebugMode"])
+            
+            var debugInfoRepresentation = isDebugMode
                 ? $"{successfulResponsesRepresentation}{Environment.NewLine}" +
                 $"{failResponsesRepresentation}{Environment.NewLine}"
                 : string.Empty;

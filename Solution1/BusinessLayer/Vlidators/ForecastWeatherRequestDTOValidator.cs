@@ -1,8 +1,6 @@
 ﻿using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
 using FluentValidation;
-using System;
-using System.Configuration;
 
 namespace BusinessLayer.Vlidators
 {
