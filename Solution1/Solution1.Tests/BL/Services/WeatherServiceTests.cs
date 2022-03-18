@@ -127,10 +127,16 @@ namespace Weather.Tests.BL.Services
             var cityName2 = "Paris";
             var cityName3 = "AАА";
             var cityName4 = string.Empty;
+            var cityName5 = "return null";
+
+            var errorMessage3 = "404 (Not Found)";
+            var errorMessage4 = "Test validation error";
+            var errorMessage5 = "Unknown error";
+            
             var weatherApiDto1 = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() };
             var weatherApiDto2 = new WeatherApiDTO() { CityName = cityName2, TemperatureValues = new WeatherApiTempDTO() };
             
-            var listCityName = new List<string>() { cityName, cityName2, cityName3, cityName4 };
+            var listCityName = new List<string>() { cityName, cityName2, cityName3, cityName4, cityName5 };
             
             var validationFailure = new List<ValidationFailure>() { new ValidationFailure("CityName", "Test validation error")};
             var notValidResult = new ValidationResult(validationFailure);
@@ -138,7 +144,7 @@ namespace Weather.Tests.BL.Services
 
             SetWeatherApiServiceSettings(weatherApiDto1);
             SetWeatherApiServiceSettings(weatherApiDto2);
-            SetWeatherApiServiceExceptionSettings(cityName3, new Exception());
+            SetWeatherApiServiceExceptionSettings(cityName3, new Exception(errorMessage3));
             SetWeatherApiServiceExceptionSettings(cityName4, new  ValidationException(validationFailure));
 
             _validator
@@ -153,7 +159,8 @@ namespace Weather.Tests.BL.Services
                          context => 
                             context.InstanceToValidate.CityName == cityName
                             || context.InstanceToValidate.CityName == cityName2
-                            || context.InstanceToValidate.CityName == cityName3),
+                            || context.InstanceToValidate.CityName == cityName3
+                            || context.InstanceToValidate.CityName == cityName5),
                      It.IsAny<CancellationToken>()))
                  .ReturnsAsync(validResult);
 
@@ -165,20 +172,25 @@ namespace Weather.Tests.BL.Services
             Assert.Contains(result.Keys, k => k == false);
 
             Assert.Equal(2, result[true].Count());
-            Assert.Equal(2, result[false].Count());
+            Assert.Equal(3, result[false].Count());
 
             Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName);
             Assert.Contains(result[true], weatherResponse => weatherResponse.CityName == cityName2);
-            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3);            
+            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName3 
+                                                              && weatherResponse.ErrorMessage == errorMessage3); 
+            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName4 
+                                                              && weatherResponse.ErrorMessage == errorMessage4);
+            Assert.Contains(result[false], weatherResponse => weatherResponse.CityName == cityName5 
+                                                              && weatherResponse.ErrorMessage == errorMessage5);
         }
 
-        private void SetWeatherApiServiceSettings(WeatherApiDTO weatherApiDto)
+        private void SetWeatherApiServiceSettings(WeatherApiDTO weatherApiDTO)
         {
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService
-                    .GetByCityNameAsync(weatherApiDto.CityName))
-                .ReturnsAsync(weatherApiDto);
+                    .GetByCityNameAsync(weatherApiDTO.CityName))
+                .ReturnsAsync(weatherApiDTO);
         }
 
         private void SetWeatherApiServiceExceptionSettings(string cityName, Exception exception)
