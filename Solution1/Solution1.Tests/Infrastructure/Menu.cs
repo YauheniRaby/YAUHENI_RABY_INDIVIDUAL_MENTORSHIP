@@ -9,7 +9,8 @@ namespace Weather.Tests.Infrastructure
             return "Select menu item:" +
                  $"{Environment.NewLine}0 - Exit" +
                  $"{Environment.NewLine}1 - Get currently weather" +
-                 $"{Environment.NewLine}2 - Get weather for a period of time";
+                 $"{Environment.NewLine}2 - Get weather for a period of time" +
+                 $"{Environment.NewLine}3 - Get best weather for array cities";            
         }
     }
 }

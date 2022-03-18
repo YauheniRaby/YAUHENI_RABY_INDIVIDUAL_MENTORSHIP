@@ -1,4 +1,6 @@
-﻿using ConsoleApp;
+﻿using BusinessLayer.Configuration.Abstract;
+using ConsoleApp;
+using Moq;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,6 +11,8 @@ namespace Weather.Tests.Integration
 {
     public class ConsoleAppTests
     {
+        private readonly Mock<IConfig> _config;
+
         private readonly string cityName = "Minsk";
         private readonly string menu = Menu.GetMenuRepresentation();
         private readonly string temperaturePattern = @"-*\d{1,2}.\d{1,2}";
@@ -17,6 +21,11 @@ namespace Weather.Tests.Integration
             $"|{BusinessLayer.Constants.WeatherComments.Fresh}" +
             $"|{BusinessLayer.Constants.WeatherComments.GoodWeather}" +
             $"|{BusinessLayer.Constants.WeatherComments.GoToBeach})";
+
+        public ConsoleAppTests()
+        {
+            _config = new Mock<IConfig>();
+        }
 
         [Fact]
         public async Task Main_GetCurrentWeather_Seccess()
@@ -62,6 +71,52 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.Matches(pattern, consoleOutput.ToString());
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]        
+        public async Task Main_GetBestWeatherForArrayCities_Seccess(bool isDebugMode)
+        {
+            _config
+                .Setup(config => config.IsDebugMode)
+                .Returns(isDebugMode);
+
+            var ninjectKernel = Program.GetRegistrarDependencies(_config.Object);
+
+            var arrayCityNames = $"{cityName}, ААА, {string.Empty}, Paris";
+            string cityPattern = arrayCityNames.Replace(" ", "").Replace(',', '|');
+
+            var resultRequestPattern = $@"\(City with the highest temperature {temperaturePattern} C: {cityPattern}. " +
+                $@"Successful request count: \d, failed: \d.|" +
+                $@"Error, no successful requests. Failed requests count: \d\)";
+
+            var seccessResponsePattern = $"Success case:" +
+                $@"\({Environment.NewLine}City: '{cityPattern}', Temp: {temperaturePattern}, Timer: \d{{1,}} ms.\)+";
+            var failResponsePattern = $"On fail:" +
+                $@"\({Environment.NewLine}City: '{cityPattern}', ErrorMessage: \w+, Timer: \d{{1,}} ms.\)+";
+
+            var debugInfoPattern = isDebugMode
+                ? $@"\({seccessResponsePattern}{Environment.NewLine}|" +
+                $@"{seccessResponsePattern}{Environment.NewLine}{failResponsePattern}{Environment.NewLine}|" +
+                $@"{failResponsePattern}{Environment.NewLine}\)"
+                : string.Empty;
+
+            var pattern = $@"^{menu}{Environment.NewLine}" +
+                $@"Please, enter array city name \(separator symbal - ','\) :" +
+                $"{resultRequestPattern}{Environment.NewLine}{debugInfoPattern}" +
+                $"{menu}{Environment.NewLine}" +
+                $"Сlose the application{Environment.NewLine}$";
+
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+            Console.SetIn(new StringReader($"3{Environment.NewLine}{arrayCityNames}{Environment.NewLine}0{Environment.NewLine}"));
+
+            //Act
+            await Program.StartUserCommunication(ninjectKernel);
+
+            //Assert
+            Assert.Matches(pattern, consoleOutput.ToString());            
         }        
     }
 }
