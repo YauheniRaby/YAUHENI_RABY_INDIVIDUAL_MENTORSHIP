@@ -119,10 +119,7 @@ namespace Weather.Tests.Integration
                 await Program.StartUserCommunication(ninjectKernel);
 
                 //Assert
-                Assert.Matches(pattern, consoleOutput.ToString());
-            
-        }
-
-        
+                Assert.Matches(pattern, consoleOutput.ToString());            
+        }        
     }
 }
