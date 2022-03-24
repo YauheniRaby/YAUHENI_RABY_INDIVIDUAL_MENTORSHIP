@@ -188,20 +188,26 @@ namespace ConsoleApp.Services
 
         private void ShowDebugInformation(IEnumerable<WeatherResponseDTO> responses, string header, string propertyName)
         {
-            Console.WriteLine(
+            if (responses != null)
+            {
+                Console.WriteLine(
                 responses
                     ?.Aggregate(
                         $"{header}",
                         (result, next) => $"{result}{Environment.NewLine}{GetRepresentationResponse(next, propertyName)}"));
+            }
         }
 
         private void ShowDebugInformationForCanceledRequests(IEnumerable<WeatherResponseDTO> responses, string header)
         {
-            Console.WriteLine(
+            if (responses != null)
+            {
+                Console.WriteLine(
                 responses
                     ?.Aggregate(
                         $"{header}",
                         (result, next) => $"{result}{Environment.NewLine}Weather request for '{next.CityName}' was canceled due to a timeout."));
+            }
         }
 
         private string GetRepresentationResponse(WeatherResponseDTO weatherResponse, string propertyName)

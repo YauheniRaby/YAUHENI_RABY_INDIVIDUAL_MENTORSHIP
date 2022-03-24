@@ -208,15 +208,15 @@ namespace Weather.Tests.ConsoleApp.Services
             var leadTime3 = 475;
             var testError = "Test error message";
 
-            var dictionaryWeatherResponsesDTO = new Dictionary<bool, IEnumerable<WeatherResponseDTO>>
+            var dictionaryWeatherResponsesDTO = new Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>
             {
-                { true, new List<WeatherResponseDTO>
+                { ResponseStatus.Successful, new List<WeatherResponseDTO>
                             {
                                 new WeatherResponseDTO() { CityName = cityName, ResponseStatus = ResponseStatus.Successful, Temp = temp, LeadTime = leadTime },
                                 new WeatherResponseDTO() { CityName = cityName2, ResponseStatus = ResponseStatus.Successful, Temp = temp2, LeadTime = leadTime2 }
                             }
                 },
-                { false, new List<WeatherResponseDTO>
+                { ResponseStatus.Fail, new List<WeatherResponseDTO>
                             {
                                 new WeatherResponseDTO() { CityName = cityName3, ResponseStatus = ResponseStatus.Fail, ErrorMessage=testError, LeadTime = leadTime3 }
                             }
@@ -241,7 +241,7 @@ namespace Weather.Tests.ConsoleApp.Services
 
             //Assert            
             var bestWeatherRepresentation = $"City with the highest temperature {temp2} C: {cityName2}. " +
-                $"Successful request count: 2, failed: 1.";
+                $"Successful request count: 2, failed: 1, canceled: 0.";
             
             var successfulResponsesRepresentation = "Success case:" +
                 $"{Environment.NewLine}City: '{cityName}', Temp: {temp}, Timer: {leadTime} ms." +
