@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using BusinessLayer.Enum;
+using BusinessLayer.DTOs.Enum;
 using BusinessLayer.Configuration.Abstract;
 
 namespace BusinessLayer.Services
@@ -65,7 +65,7 @@ namespace BusinessLayer.Services
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }
 
-        public async Task<Dictionary<RequestStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
+        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
         {
             var timer = new Stopwatch();
             timer.Start();
@@ -87,26 +87,29 @@ namespace BusinessLayer.Services
                         if (temp.HasValue)
                         {
                             weatherResponseDTO.Temp = temp.Value;
-                            weatherResponseDTO.RequestStatus = RequestStatus.Successful;
+                            weatherResponseDTO.ResponseStatus = ResponseStatus.Successful;
                         }
                         else
                         {
+                            weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
                             weatherResponseDTO.ErrorMessage = "Unknown error";
                         }
                     }
                     else
                     {
+                        weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
                         weatherResponseDTO.ErrorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
                     }
                 }
                 catch (TaskCanceledException)
                 {
                     weatherResponseDTO.ErrorMessage = "Timeout exceeded";
-                    weatherResponseDTO.RequestStatus = RequestStatus.Canceled;
+                    weatherResponseDTO.ResponseStatus = ResponseStatus.Canceled;
                 }
                 catch (Exception ex)
                 {
                     weatherResponseDTO.ErrorMessage = ex.Message;
+                    weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
                 }
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
                 return weatherResponseDTO;
@@ -114,7 +117,7 @@ namespace BusinessLayer.Services
 
             var weatherResponses = await Task.WhenAll(listTasksRequest);
             var result = weatherResponses
-                            .GroupBy(w => w.RequestStatus)
+                            .GroupBy(w => w.ResponseStatus)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
         }

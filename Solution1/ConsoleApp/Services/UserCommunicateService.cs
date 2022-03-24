@@ -8,7 +8,7 @@ using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
-using BusinessLayer.Enum;
+using BusinessLayer.DTOs.Enum;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Extensions;
@@ -161,9 +161,9 @@ namespace ConsoleApp.Services
             var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command);
 
-            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
-            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
-            var countCanceledResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Canceled, out var canceledWeatherResponses) ? canceledWeatherResponses.Count() : 0;
+            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
+            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
+            var countCanceledResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Canceled, out var canceledWeatherResponses) ? canceledWeatherResponses.Count() : 0;
 
             if (countSuccessResponse > 0)
             {

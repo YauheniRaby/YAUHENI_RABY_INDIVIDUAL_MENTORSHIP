@@ -1,5 +1,5 @@
 ﻿using BusinessLayer.DTOs;
-using BusinessLayer.Enum;
+using BusinessLayer.DTOs.Enum;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,6 +11,6 @@ namespace BusinessLayer.Services.Abstract
 
         Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay);
 
-        Task<Dictionary<RequestStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames);
+        Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames);
     }
 }

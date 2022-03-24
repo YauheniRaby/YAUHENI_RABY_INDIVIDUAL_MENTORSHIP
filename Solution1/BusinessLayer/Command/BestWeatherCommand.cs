@@ -1,16 +1,13 @@
 ﻿using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
-using BusinessLayer.Enum;
+using BusinessLayer.DTOs.Enum;
 using BusinessLayer.Services.Abstract;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Command
 {
-    public class BestWeatherCommand : ICommand<Dictionary<RequestStatus, IEnumerable<WeatherResponseDTO>>>
+    public class BestWeatherCommand : ICommand<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>>
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IEnumerable<string> _cityNames;
@@ -21,7 +18,7 @@ namespace BusinessLayer.Command
             _cityNames = cityNames;
         }
 
-        public Task<Dictionary<RequestStatus, IEnumerable<WeatherResponseDTO>>> ExecuteAsync()
+        public Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> ExecuteAsync()
         {
             return _weatherServiсe.GetWeatherByArrayCityNameAsync(_cityNames);
         }

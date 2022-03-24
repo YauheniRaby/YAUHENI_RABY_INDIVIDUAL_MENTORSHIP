@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Enum;
+﻿using BusinessLayer.DTOs.Enum;
 
 namespace BusinessLayer.DTOs
 {
@@ -8,7 +8,7 @@ namespace BusinessLayer.DTOs
 
         public double Temp { get; set; }
 
-        public RequestStatus RequestStatus { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
 
         public long LeadTime { get; set; }
 
