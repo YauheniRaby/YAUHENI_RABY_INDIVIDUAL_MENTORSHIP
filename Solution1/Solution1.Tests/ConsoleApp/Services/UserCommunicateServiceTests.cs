@@ -206,7 +206,10 @@ namespace Weather.Tests.ConsoleApp.Services
 
             var cityName3 = "AAA";
             var leadTime3 = 475;
-            var testError = "Test error message";
+            var testError3 = "Test error message";
+
+            var cityName4 = "Paris";
+            var testError4 = "Timeout exceeded";
 
             var dictionaryWeatherResponsesDTO = new Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>
             {
@@ -218,7 +221,12 @@ namespace Weather.Tests.ConsoleApp.Services
                 },
                 { ResponseStatus.Fail, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName3, ResponseStatus = ResponseStatus.Fail, ErrorMessage=testError, LeadTime = leadTime3 }
+                                new WeatherResponseDTO() { CityName = cityName3, ResponseStatus = ResponseStatus.Fail, ErrorMessage=testError3, LeadTime = leadTime3 }
+                            }
+                },
+                { ResponseStatus.Canceled, new List<WeatherResponseDTO>
+                            {
+                                new WeatherResponseDTO() { CityName = cityName4, ResponseStatus = ResponseStatus.Canceled, ErrorMessage = testError4 }
                             }
                 }
             };
@@ -241,17 +249,20 @@ namespace Weather.Tests.ConsoleApp.Services
 
             //Assert            
             var bestWeatherRepresentation = $"City with the highest temperature {temp2} C: {cityName2}. " +
-                $"Successful request count: 2, failed: 1, canceled: 0.";
+                $"Successful request count: 2, failed: 1, canceled: 1.";
             
             var successfulResponsesRepresentation = "Success case:" +
                 $"{Environment.NewLine}City: '{cityName}', Temp: {temp}, Timer: {leadTime} ms." +
                 $"{Environment.NewLine}City: '{cityName2}', Temp: {temp2}, Timer: {leadTime2} ms.";
             var failResponsesRepresentation = "On fail:" +
-                $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError}, Timer: {leadTime3} ms.";
-            
+                $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError3}, Timer: {leadTime3} ms.";
+            var canceledResponsesRepresentation = "On canceled:" +
+                $"{Environment.NewLine}Weather request for '{cityName4}' was canceled due to a timeout.";
+
             var debugInfoRepresentation = isDebugMode
                 ? $"{successfulResponsesRepresentation}{Environment.NewLine}" +
-                $"{failResponsesRepresentation}{Environment.NewLine}"
+                $"{failResponsesRepresentation}{Environment.NewLine}" +
+                $"{canceledResponsesRepresentation}{Environment.NewLine}"
                 : string.Empty;
 
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +

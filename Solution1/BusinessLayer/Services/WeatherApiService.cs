@@ -33,13 +33,13 @@ namespace BusinessLayer.Services
             var urlResultForCoordinates = string.Format(Constants.WeatherAPI.CoordinatesByCityName, cityName, Constants.WeatherAPI.KeyApi);
 
             var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates, cancellationToken);
-            var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync();
+            var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync(cancellationToken);
             var cityCoordinates = JsonSerializer.Deserialize<List<CityCoordinatesDTO>>(coordinatesResponceBody).FirstOrDefault();
 
             var urlResultForForecast = string.Format(Constants.WeatherAPI.ForecastByCoordinates, cityCoordinates.Latitude, cityCoordinates.Longitude, countWeatherPoint, Constants.WeatherAPI.KeyApi);
 
             var forecastResponse = await _httpClient.GetAsync(urlResultForForecast, cancellationToken);
-            var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync();
+            var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync(cancellationToken);
 
             JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
