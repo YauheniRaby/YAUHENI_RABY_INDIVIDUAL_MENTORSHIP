@@ -87,7 +87,7 @@ namespace BusinessLayer.Services
                         if (temp.HasValue)
                         {
                             weatherResponseDTO.Temp = temp.Value;
-                            weatherResponseDTO.RequestStatus = Enum.RequestStatus.Successful;
+                            weatherResponseDTO.RequestStatus = RequestStatus.Successful;
                         }
                         else
                         {
@@ -107,7 +107,7 @@ namespace BusinessLayer.Services
                 catch (Exception ex)
                 {
                     weatherResponseDTO.ErrorMessage = ex.Message;
-                }               
+                }
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
                 return weatherResponseDTO;
             });

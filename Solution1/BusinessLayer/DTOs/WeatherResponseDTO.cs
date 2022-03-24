@@ -9,7 +9,7 @@ namespace BusinessLayer.DTOs
         public double Temp { get; set; }
 
         public RequestStatus RequestStatus { get; set; }
-        
+
         public long LeadTime { get; set; }
 
         public string ErrorMessage { get; set; }

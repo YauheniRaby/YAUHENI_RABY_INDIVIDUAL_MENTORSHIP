@@ -169,11 +169,11 @@ namespace ConsoleApp.Services
             {
                 var bestWeather = successfulWeatherResponses.OrderByDescending(w => w.Temp).First();
                 Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}. " +
-                    $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}, canceled {countCanceledResponse}.");
+                    $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}, canceled: {countCanceledResponse}.");
             }
             else
             {
-                Console.WriteLine($"No successful requests. Failed requests count: {countFailResponse}, canceled {countCanceledResponse}");
+                Console.WriteLine($"No successful requests. Failed requests count: {countFailResponse}, canceled: {countCanceledResponse}.");
             }
 
             if (_config.IsDebugMode)
