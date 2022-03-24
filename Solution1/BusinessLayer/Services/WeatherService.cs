@@ -31,6 +31,7 @@ namespace BusinessLayer.Services
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
         {
+            var cancellationToken = GetCancellationToken();
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
@@ -40,13 +41,14 @@ namespace BusinessLayer.Services
                 throw new ValidationException(validationResult.Errors);
             }
            
-            var weather = await _weatherApiService.GetByCityNameAsync(cityName, new CancellationToken());
+            var weather = await _weatherApiService.GetByCityNameAsync(cityName, cancellationToken);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
             return result;
         }
         
         public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay)
         {
+            var cancellationToken = GetCancellationToken();
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
@@ -57,7 +59,7 @@ namespace BusinessLayer.Services
                                                 new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
                                                 options => options.IncludeAllRuleSets());
             
-            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint);
+            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, cancellationToken);
             forecast.City.Name = cityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
@@ -68,21 +70,10 @@ namespace BusinessLayer.Services
             var timer = new Stopwatch();
             timer.Start();
 
-            var cancellationTokenSource = new CancellationTokenSource();
-            if (_config.RequestTimeout.HasValue)
-            {
-                cancellationTokenSource.CancelAfter(_config.RequestTimeout.Value);
-            }
-            var cancellationToken = cancellationTokenSource.Token;
-
+            var cancellationToken = GetCancellationToken();
             var listTasksRequest = cityNames.Select(async cityName =>
             {
-                if (cityName == "Paris")
-                {
-                    Thread.Sleep(5000);
-                }
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
-                
                 try
                 {
                     var validationResult = await _validator
@@ -126,6 +117,16 @@ namespace BusinessLayer.Services
                             .GroupBy(w => w.RequestStatus)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
-        }        
+        }
+        
+        private CancellationToken GetCancellationToken()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            if (_config.RequestTimeout.HasValue)
+            {
+                cancellationTokenSource.CancelAfter(_config.RequestTimeout.Value);
+            }
+            return cancellationTokenSource.Token;
+        }
     }
 }

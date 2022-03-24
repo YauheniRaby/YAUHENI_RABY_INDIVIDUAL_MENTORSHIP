@@ -28,17 +28,17 @@ namespace BusinessLayer.Services
             return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult, cancellationToken);            
         }
 
-        public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint)
+        public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint, CancellationToken cancellationToken)
         {
             var urlResultForCoordinates = string.Format(Constants.WeatherAPI.CoordinatesByCityName, cityName, Constants.WeatherAPI.KeyApi);
 
-            var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates);
+            var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates, cancellationToken);
             var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync();
             var cityCoordinates = JsonSerializer.Deserialize<List<CityCoordinatesDTO>>(coordinatesResponceBody).FirstOrDefault();
 
             var urlResultForForecast = string.Format(Constants.WeatherAPI.ForecastByCoordinates, cityCoordinates.Latitude, cityCoordinates.Longitude, countWeatherPoint, Constants.WeatherAPI.KeyApi);
 
-            var forecastResponse = await _httpClient.GetAsync(urlResultForForecast);
+            var forecastResponse = await _httpClient.GetAsync(urlResultForForecast, cancellationToken);
             var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync();
 
             JsonSerializerOptions options = new();

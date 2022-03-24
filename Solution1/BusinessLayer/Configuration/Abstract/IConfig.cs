@@ -9,6 +9,5 @@
         bool IsDebugMode { get; }
 
         int? RequestTimeout {get;}
-
     }
 }

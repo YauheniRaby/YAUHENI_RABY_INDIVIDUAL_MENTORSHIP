@@ -8,6 +8,6 @@ namespace BusinessLayer.Services.Abstract
     {
         Task<WeatherApiDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken);
 
-        Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countDay);
+        Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countDay, CancellationToken cancellationToken);
     }
 }
