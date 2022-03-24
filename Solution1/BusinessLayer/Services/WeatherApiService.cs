@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -20,11 +21,11 @@ namespace BusinessLayer.Services
             _httpClient=httpClient;
         }
 
-        public Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
+        public Task<WeatherApiDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
             var urlResult = string.Format(Constants.WeatherAPI.WeatherByCityName, cityName, Constants.WeatherAPI.KeyApi);
             
-            return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
+            return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult, cancellationToken);            
         }
 
         public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint)

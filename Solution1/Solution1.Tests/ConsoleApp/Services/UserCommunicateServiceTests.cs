@@ -18,6 +18,7 @@ using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
 using BusinessLayer.Configuration.Abstract;
+using BusinessLayer.Enum;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -211,13 +212,13 @@ namespace Weather.Tests.ConsoleApp.Services
             {
                 { true, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName, IsSuccessfulRequest = true, Temp = temp, LeadTime = leadTime },
-                                new WeatherResponseDTO() { CityName = cityName2, IsSuccessfulRequest = true, Temp = temp2, LeadTime = leadTime2 }
+                                new WeatherResponseDTO() { CityName = cityName, RequestStatus = RequestStatus.Successful, Temp = temp, LeadTime = leadTime },
+                                new WeatherResponseDTO() { CityName = cityName2, RequestStatus = RequestStatus.Successful, Temp = temp2, LeadTime = leadTime2 }
                             }
                 },
                 { false, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName3, IsSuccessfulRequest = false, ErrorMessage=testError, LeadTime = leadTime3 }
+                                new WeatherResponseDTO() { CityName = cityName3, RequestStatus = RequestStatus.Fail, ErrorMessage=testError, LeadTime = leadTime3 }
                             }
                 }
             };

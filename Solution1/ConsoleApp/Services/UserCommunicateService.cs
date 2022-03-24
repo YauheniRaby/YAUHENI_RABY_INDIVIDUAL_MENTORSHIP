@@ -8,6 +8,7 @@ using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
+using BusinessLayer.Enum;
 using BusinessLayer.Extensions;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Extensions;
@@ -160,24 +161,26 @@ namespace ConsoleApp.Services
             var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command);
 
-            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(true, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
-            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(false, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
+            var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
+            var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
+            var countCanceledResponse = dictionaryWeatherResponsesDTO.TryGetValue(RequestStatus.Canceled, out var canceledWeatherResponses) ? canceledWeatherResponses.Count() : 0;
 
             if (countSuccessResponse > 0)
             {
                 var bestWeather = successfulWeatherResponses.OrderByDescending(w => w.Temp).First();
                 Console.WriteLine($"City with the highest temperature {bestWeather.Temp} C: {bestWeather.CityName}. " +
-                    $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}.");
+                    $"Successful request count: {countSuccessResponse}, failed: {countFailResponse}, canceled {countCanceledResponse}.");
             }
             else
             {
-                Console.WriteLine($"Error, no successful requests. Failed requests count: {countFailResponse}");
+                Console.WriteLine($"No successful requests. Failed requests count: {countFailResponse}, canceled {countCanceledResponse}");
             }
 
             if (_config.IsDebugMode)
             {
                 ShowDebugInformation(successfulWeatherResponses, "Success case:", nameof(WeatherResponseDTO.Temp));
                 ShowDebugInformation(failedWeatherResponses, "On fail:", nameof(WeatherResponseDTO.ErrorMessage));
+                ShowDebugInformationForCanceledRequests(canceledWeatherResponses, "On canceled:");
             }
 
             return;
@@ -190,6 +193,15 @@ namespace ConsoleApp.Services
                     ?.Aggregate(
                         $"{header}",
                         (result, next) => $"{result}{Environment.NewLine}{GetRepresentationResponse(next, propertyName)}"));
+        }
+
+        private void ShowDebugInformationForCanceledRequests(IEnumerable<WeatherResponseDTO> responses, string header)
+        {
+            Console.WriteLine(
+                responses
+                    ?.Aggregate(
+                        $"{header}",
+                        (result, next) => $"{result}{Environment.NewLine}Weather request for '{next.CityName}' was canceled due to a timeout."));
         }
 
         private string GetRepresentationResponse(WeatherResponseDTO weatherResponse, string propertyName)
