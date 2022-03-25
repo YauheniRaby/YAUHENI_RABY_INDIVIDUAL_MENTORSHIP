@@ -117,8 +117,6 @@ namespace Weather.Tests.BL.Services
             cancellationTokenSource.Cancel();
             SetHttpHandlerSettingsForTaskCanceledException();
 
-            // Act
-            
             // Assert
             await Assert.ThrowsAsync<TaskCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, cancellationTokenSource.Token));
         }

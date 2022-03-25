@@ -19,6 +19,7 @@ using Weather.Tests.Infrastructure;
 using System.Globalization;
 using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs.Enums;
+using System.Threading;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -71,7 +72,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var forecastWeather = new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeather);
 
             //Act
@@ -87,7 +88,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"Please, enter count day:{Environment.NewLine}{ferecastRepresentation}";                
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -107,7 +108,7 @@ namespace Weather.Tests.ConsoleApp.Services
             };
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Weather);
 
             //Act
@@ -118,7 +119,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"In {cityName} {temp} C. {comment}{Environment.NewLine}";
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -150,7 +151,7 @@ namespace Weather.Tests.ConsoleApp.Services
             _invokerMock
                 .Setup(invoker =>
                     invoker
-                    .RunAsync(It.IsAny<CurrentWeatherCommand>()))
+                    .RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .Throws(exception);
 
             var consoleOutput = new StringWriter();
@@ -237,7 +238,7 @@ namespace Weather.Tests.ConsoleApp.Services
             Console.SetIn(new StringReader($"3{Environment.NewLine}{cityName}, {cityName3}, {cityName2}{Environment.NewLine}"));
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dictionaryWeatherResponsesDTO);
 
             _config
@@ -269,7 +270,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Please, enter array city name (separator symbal - ',') :{Environment.NewLine}" +
                 $"{bestWeatherRepresentation}{Environment.NewLine}{debugInfoRepresentation}";
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
     }
