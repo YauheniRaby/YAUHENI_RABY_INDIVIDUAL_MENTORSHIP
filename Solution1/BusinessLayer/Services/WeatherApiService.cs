@@ -23,6 +23,7 @@ namespace BusinessLayer.Services
 
         public Task<WeatherApiDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var urlResult = string.Format(Constants.WeatherAPI.WeatherByCityName, cityName, Constants.WeatherAPI.KeyApi);
             
             return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult, cancellationToken);            
@@ -30,6 +31,7 @@ namespace BusinessLayer.Services
 
         public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var urlResultForCoordinates = string.Format(Constants.WeatherAPI.CoordinatesByCityName, cityName, Constants.WeatherAPI.KeyApi);
 
             var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates, cancellationToken);

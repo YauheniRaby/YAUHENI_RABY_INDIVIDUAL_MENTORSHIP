@@ -110,29 +110,25 @@ namespace Weather.Tests.BL.Services
         }
 
         [Fact]
-        public async Task GetByCityNameAsync_GenerateTaskCanceledException_Success()
+        public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
             // Arrange
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
-            SetHttpHandlerSettingsForTaskCanceledException();
-
+            
             // Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, cancellationTokenSource.Token));
+            await Assert.ThrowsAsync<OperationCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, cancellationTokenSource.Token));
         }
 
         [Fact]
-        public async Task GetForecastByCityNameAsync_GenerateTaskCanceledException_Success()
+        public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
         {
             // Arrange
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
-            SetHttpHandlerSettingsForTaskCanceledException();
-
-            // Act
-
+            
             // Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, cancellationTokenSource.Token));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, cancellationTokenSource.Token));
         }
 
         private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)
@@ -147,17 +143,6 @@ namespace Weather.Tests.BL.Services
                       && request.RequestUri.ToString() == uri),
                   ItExpr.IsAny<CancellationToken>())
                .ReturnsAsync(response);
-        }
-
-        private void SetHttpHandlerSettingsForTaskCanceledException()
-        {
-            _httpMessageHandler
-               .Protected()
-               .Setup<Task<HttpResponseMessage>>(
-                  "SendAsync",
-                  ItExpr.IsAny<HttpRequestMessage>(),
-                  ItExpr.Is<CancellationToken>(x => x.IsCancellationRequested))
-               .ThrowsAsync(new TaskCanceledException());
-        }
+        }        
     }
 }

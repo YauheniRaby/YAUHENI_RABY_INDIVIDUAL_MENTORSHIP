@@ -28,6 +28,7 @@ namespace BusinessLayer.Services
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
@@ -44,6 +45,7 @@ namespace BusinessLayer.Services
         
         public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
@@ -67,6 +69,7 @@ namespace BusinessLayer.Services
 
             var listTasksRequest = cityNames.Select(async cityName =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
                 {
@@ -95,7 +98,7 @@ namespace BusinessLayer.Services
                         weatherResponseDTO.ErrorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
                     }
                 }
-                catch (TaskCanceledException)
+                catch (OperationCanceledException)
                 {
                     weatherResponseDTO.ErrorMessage = "Timeout exceeded";
                     weatherResponseDTO.ResponseStatus = ResponseStatus.Canceled;
@@ -108,6 +111,8 @@ namespace BusinessLayer.Services
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
                 return weatherResponseDTO;
             });
+
+            timer.Stop();
 
             var weatherResponses = await Task.WhenAll(listTasksRequest);
             var result = weatherResponses
