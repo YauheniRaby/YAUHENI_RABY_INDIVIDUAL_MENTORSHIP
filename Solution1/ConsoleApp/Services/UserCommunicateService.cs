@@ -120,7 +120,7 @@ namespace ConsoleApp.Services
         {
             Console.WriteLine("Please, enter city name:");
             var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine());
-            var result = await _invoker.RunAsync(command);
+            var result = await _invoker.RunAsync(command, CancellationToken.None);
             Console.WriteLine(result.GetStringRepresentation());
         }
 
@@ -145,7 +145,7 @@ namespace ConsoleApp.Services
             }
 
             var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDay);
-            var result = await _invoker.RunAsync(command);
+            var result = await _invoker.RunAsync(command, CancellationToken.None);
             Console.WriteLine(result.GetMultiStringRepresentation());
         }
 
@@ -160,18 +160,10 @@ namespace ConsoleApp.Services
                 return;
             }
 
-            CancellationToken cancellationToken;
-            if (_config.RequestTimeout.HasValue)
-            {
-                cancellationToken = TokenProvider.GetCancellationToken(_config.RequestTimeout.Value);
-            }
-            else
-            {
-                cancellationToken = new ();
-            }
+            CancellationToken cancellationToken = _config.RequestTimeout.HasValue ? TokenProvider.GetCancellationToken(_config.RequestTimeout.Value) : CancellationToken.None;
 
-            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()), cancellationToken);
-            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command);
+            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
+            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, cancellationToken);
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
             var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;

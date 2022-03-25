@@ -12,18 +12,16 @@ namespace BusinessLayer.Command
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IEnumerable<string> _cityNames;
-        private readonly CancellationToken _cancellationToken;
 
-        public BestWeatherCommand(IWeatherServiсe weatherServiсe, IEnumerable<string> cityNames, CancellationToken cancellationToken = new CancellationToken())
+        public BestWeatherCommand(IWeatherServiсe weatherServiсe, IEnumerable<string> cityNames)
         {
             _weatherServiсe = weatherServiсe;
-            _cityNames = cityNames;
-            _cancellationToken = cancellationToken;
+            _cityNames = cityNames;            
         }
 
-        public Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> ExecuteAsync()
+        public Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return _weatherServiсe.GetWeatherByArrayCityNameAsync(_cityNames, _cancellationToken);
+            return _weatherServiсe.GetWeatherByArrayCityNameAsync(_cityNames, cancellationToken);
         }
     }
 }

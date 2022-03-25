@@ -11,19 +11,17 @@ namespace BusinessLayer.Command
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly string _cityName;
         private readonly int _countDay;
-        private readonly CancellationToken _cancellationToken;
 
-        public ForecastWeatherCommand(IWeatherServiсe weatherServiсe, string cityName, int countDay, CancellationToken cancellationToken = new CancellationToken())
+        public ForecastWeatherCommand(IWeatherServiсe weatherServiсe, string cityName, int countDay)
         {
             _weatherServiсe = weatherServiсe;
             _cityName = cityName;
             _countDay = countDay;
-            _cancellationToken = cancellationToken;
         }
 
-        public Task<ForecastWeatherDTO> ExecuteAsync()
+        public Task<ForecastWeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay, _cancellationToken);
+            return _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay, cancellationToken);
         }
     }
 }

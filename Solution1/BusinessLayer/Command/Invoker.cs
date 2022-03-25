@@ -1,13 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BusinessLayer.Command.Abstract;
 
 namespace BusinessLayer.Command
 {
     public class Invoker : IInvoker
     {
-        public Task<T> RunAsync<T>(ICommand<T> command)
+        public Task<T> RunAsync<T>(ICommand<T> command, CancellationToken cancellationToken)
         {
-            return command.ExecuteAsync();
+            return command.ExecuteAsync(cancellationToken);
         }
     }
 }
