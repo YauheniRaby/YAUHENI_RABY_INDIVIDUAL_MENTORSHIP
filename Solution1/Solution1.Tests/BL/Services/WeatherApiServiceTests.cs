@@ -91,7 +91,7 @@ namespace Weather.Tests.BL.Services
             SetHttpHandlerSettings(responseForecast, urlForecast);      
             
             // Act
-            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count(), new CancellationToken());
+            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count(), CancellationToken.None);
 
             // Assert            
             var expected = new ForecastWeatherApiDTO()
