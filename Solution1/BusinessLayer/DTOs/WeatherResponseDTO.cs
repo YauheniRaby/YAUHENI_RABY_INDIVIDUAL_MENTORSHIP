@@ -1,4 +1,4 @@
-﻿using BusinessLayer.DTOs.Enum;
+﻿using BusinessLayer.DTOs.Enums;
 
 namespace BusinessLayer.DTOs
 {

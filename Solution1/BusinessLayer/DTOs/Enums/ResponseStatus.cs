@@ -1,4 +1,4 @@
-﻿namespace BusinessLayer.DTOs.Enum
+﻿namespace BusinessLayer.DTOs.Enums
 {
     public enum ResponseStatus
     {

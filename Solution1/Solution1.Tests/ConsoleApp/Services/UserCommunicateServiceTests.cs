@@ -18,7 +18,7 @@ using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
 using BusinessLayer.Configuration.Abstract;
-using BusinessLayer.DTOs.Enum;
+using BusinessLayer.DTOs.Enums;
 
 namespace Weather.Tests.ConsoleApp.Services
 {

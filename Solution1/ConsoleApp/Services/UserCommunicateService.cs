@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
-using BusinessLayer.DTOs.Enum;
+using BusinessLayer.DTOs.Enums;
 using BusinessLayer.Extensions;
+using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
@@ -158,7 +160,17 @@ namespace ConsoleApp.Services
                 return;
             }
 
-            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
+            CancellationToken cancellationToken;
+            if (_config.RequestTimeout.HasValue)
+            {
+                cancellationToken = TokenProvider.GetCancellationToken(_config.RequestTimeout.Value);
+            }
+            else
+            {
+                cancellationToken = new ();
+            }
+
+            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()), cancellationToken);
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command);
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;

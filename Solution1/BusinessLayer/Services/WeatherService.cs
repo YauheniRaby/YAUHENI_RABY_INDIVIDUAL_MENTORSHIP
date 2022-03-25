@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using BusinessLayer.DTOs.Enum;
+using BusinessLayer.DTOs.Enums;
 using BusinessLayer.Configuration.Abstract;
 
 namespace BusinessLayer.Services
@@ -29,9 +29,8 @@ namespace BusinessLayer.Services
             _config = config;
         }
 
-        public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
+        public async Task<WeatherDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
-            var cancellationToken = GetCancellationToken();
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
@@ -46,9 +45,8 @@ namespace BusinessLayer.Services
             return result;
         }
         
-        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay)
+        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, CancellationToken cancellationToken)
         {
-            var cancellationToken = GetCancellationToken();
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
@@ -65,12 +63,11 @@ namespace BusinessLayer.Services
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }
 
-        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
+        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, CancellationToken cancellationToken)
         {
             var timer = new Stopwatch();
             timer.Start();
 
-            var cancellationToken = GetCancellationToken();
             var listTasksRequest = cityNames.Select(async cityName =>
             {
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
@@ -120,16 +117,6 @@ namespace BusinessLayer.Services
                             .GroupBy(w => w.ResponseStatus)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
-        }
-        
-        private CancellationToken GetCancellationToken()
-        {
-            var cancellationTokenSource = new CancellationTokenSource();
-            if (_config.RequestTimeout.HasValue)
-            {
-                cancellationTokenSource.CancelAfter(_config.RequestTimeout.Value);
-            }
-            return cancellationTokenSource.Token;
         }
     }
 }
