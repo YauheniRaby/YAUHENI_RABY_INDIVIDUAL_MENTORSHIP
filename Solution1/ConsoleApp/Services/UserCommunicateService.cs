@@ -160,9 +160,9 @@ namespace ConsoleApp.Services
                 return;
             }
 
-            CancellationToken cancellationToken = _config.RequestTimeout.HasValue ? TokenProvider.GetCancellationToken(_config.RequestTimeout.Value) : CancellationToken.None;
-
             var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
+
+            var cancellationToken = _config.RequestTimeout.HasValue ? new CancellationTokenSource(_config.RequestTimeout.Value).Token : CancellationToken.None;
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, cancellationToken);
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
