@@ -120,7 +120,7 @@ namespace ConsoleApp.Services
         {
             Console.WriteLine("Please, enter city name:");
             var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine());
-            var result = await _invoker.RunAsync(command, CancellationToken.None);
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.RequestTimeout));
             Console.WriteLine(result.GetStringRepresentation());
         }
 
@@ -145,7 +145,7 @@ namespace ConsoleApp.Services
             }
 
             var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDay);
-            var result = await _invoker.RunAsync(command, CancellationToken.None);
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.RequestTimeout));
             Console.WriteLine(result.GetMultiStringRepresentation());
         }
 
@@ -162,8 +162,7 @@ namespace ConsoleApp.Services
 
             var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()));
 
-            var cancellationToken = _config.RequestTimeout.HasValue ? new CancellationTokenSource(_config.RequestTimeout.Value).Token : CancellationToken.None;
-            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, cancellationToken);
+            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.RequestTimeout));
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
             var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
@@ -196,7 +195,7 @@ namespace ConsoleApp.Services
             {
                 Console.WriteLine(
                 responses
-                    ?.Aggregate(
+                    .Aggregate(
                         $"{header}",
                         (result, next) => $"{result}{Environment.NewLine}{GetRepresentationResponse(next, propertyName)}"));
             }
@@ -208,7 +207,7 @@ namespace ConsoleApp.Services
             {
                 Console.WriteLine(
                 responses
-                    ?.Aggregate(
+                    .Aggregate(
                         $"{header}",
                         (result, next) => $"{result}{Environment.NewLine}Weather request for '{next.CityName}' was canceled due to a timeout."));
             }
