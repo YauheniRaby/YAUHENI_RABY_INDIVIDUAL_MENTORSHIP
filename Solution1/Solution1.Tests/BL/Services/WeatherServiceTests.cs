@@ -108,8 +108,8 @@ namespace Weather.Tests.BL.Services
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService.GetForecastByCityNameAsync
-                    (It.IsAny<string>(),
-                     It.Is<int>(x => x == countWeatherPoints),
+                    (It.Is<string>(x => x == cityName),
+                     countWeatherPoints,
                      It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeatherApiDTO);
 
