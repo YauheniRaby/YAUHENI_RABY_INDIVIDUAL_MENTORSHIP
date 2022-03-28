@@ -4,7 +4,6 @@ using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Moq.Protected;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -45,10 +44,10 @@ namespace Weather.Tests.BL.Services
                 Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = temp }, Name = cityName }, _serializerOptions)),
             };
 
-            SetHttpHandlerSettings(_httpMessageHandler, response, urlString);
+            SetHttpHandlerSettings(response, urlString);
 
             // Act
-            var result = await _weatherApiService.GetByCityNameAsync(cityName);
+            var result = await _weatherApiService.GetByCityNameAsync(cityName, CancellationToken.None);
 
             // Assert
             var expectedWeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
@@ -88,11 +87,11 @@ namespace Weather.Tests.BL.Services
                         new JsonSerializerOptions{ PropertyNamingPolicy = new CamelCaseNamingPolicy()})),
             };
 
-            SetHttpHandlerSettings(_httpMessageHandler, responseCoordinates, urlCoordinates);
-            SetHttpHandlerSettings(_httpMessageHandler, responseForecast, urlForecast);      
+            SetHttpHandlerSettings(responseCoordinates, urlCoordinates);
+            SetHttpHandlerSettings(responseForecast, urlForecast);      
             
             // Act
-            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count());
+            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count(), CancellationToken.None);
 
             // Assert            
             var expected = new ForecastWeatherApiDTO()
@@ -110,9 +109,21 @@ namespace Weather.Tests.BL.Services
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
 
-        private void SetHttpHandlerSettings(Mock<HttpMessageHandler> httpMessageHandler, HttpResponseMessage response, string uri)
+        [Fact]
+        public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            httpMessageHandler
+            await Assert.ThrowsAsync<OperationCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, new CancellationToken(true)));
+        }
+
+        [Fact]
+        public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, new CancellationToken(true)));
+        }
+
+        private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)
+        {
+            _httpMessageHandler
                .Protected()
                .Setup<Task<HttpResponseMessage>>(
                   "SendAsync",
@@ -122,6 +133,6 @@ namespace Weather.Tests.BL.Services
                       && request.RequestUri.ToString() == uri),
                   ItExpr.IsAny<CancellationToken>())
                .ReturnsAsync(response);
-        }
+        }        
     }
 }

@@ -18,6 +18,8 @@ using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
 using BusinessLayer.Configuration.Abstract;
+using BusinessLayer.DTOs.Enums;
+using System.Threading;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
@@ -70,7 +72,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var forecastWeather = new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeather);
 
             //Act
@@ -86,7 +88,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"Please, enter count day:{Environment.NewLine}{ferecastRepresentation}";                
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -106,7 +108,7 @@ namespace Weather.Tests.ConsoleApp.Services
             };
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Weather);
 
             //Act
@@ -117,7 +119,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"In {cityName} {temp} C. {comment}{Environment.NewLine}";
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
@@ -149,7 +151,7 @@ namespace Weather.Tests.ConsoleApp.Services
             _invokerMock
                 .Setup(invoker =>
                     invoker
-                    .RunAsync(It.IsAny<CurrentWeatherCommand>()))
+                    .RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .Throws(exception);
 
             var consoleOutput = new StringWriter();
@@ -205,19 +207,27 @@ namespace Weather.Tests.ConsoleApp.Services
 
             var cityName3 = "AAA";
             var leadTime3 = 475;
-            var testError = "Test error message";
+            var testError3 = "Test error message";
 
-            var dictionaryWeatherResponsesDTO = new Dictionary<bool, IEnumerable<WeatherResponseDTO>>
+            var cityName4 = "Paris";
+            var testError4 = "Timeout exceeded";
+
+            var dictionaryWeatherResponsesDTO = new Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>
             {
-                { true, new List<WeatherResponseDTO>
+                { ResponseStatus.Successful, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName, IsSuccessfulRequest = true, Temp = temp, LeadTime = leadTime },
-                                new WeatherResponseDTO() { CityName = cityName2, IsSuccessfulRequest = true, Temp = temp2, LeadTime = leadTime2 }
+                                new WeatherResponseDTO() { CityName = cityName, ResponseStatus = ResponseStatus.Successful, Temp = temp, LeadTime = leadTime },
+                                new WeatherResponseDTO() { CityName = cityName2, ResponseStatus = ResponseStatus.Successful, Temp = temp2, LeadTime = leadTime2 }
                             }
                 },
-                { false, new List<WeatherResponseDTO>
+                { ResponseStatus.Fail, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName3, IsSuccessfulRequest = false, ErrorMessage=testError, LeadTime = leadTime3 }
+                                new WeatherResponseDTO() { CityName = cityName3, ResponseStatus = ResponseStatus.Fail, ErrorMessage=testError3, LeadTime = leadTime3 }
+                            }
+                },
+                { ResponseStatus.Canceled, new List<WeatherResponseDTO>
+                            {
+                                new WeatherResponseDTO() { CityName = cityName4, ResponseStatus = ResponseStatus.Canceled, ErrorMessage = testError4 }
                             }
                 }
             };
@@ -228,7 +238,7 @@ namespace Weather.Tests.ConsoleApp.Services
             Console.SetIn(new StringReader($"3{Environment.NewLine}{cityName}, {cityName3}, {cityName2}{Environment.NewLine}"));
 
             _invokerMock
-                .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>()))
+                .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dictionaryWeatherResponsesDTO);
 
             _config
@@ -240,24 +250,27 @@ namespace Weather.Tests.ConsoleApp.Services
 
             //Assert            
             var bestWeatherRepresentation = $"City with the highest temperature {temp2} C: {cityName2}. " +
-                $"Successful request count: 2, failed: 1.";
+                $"Successful request count: 2, failed: 1, canceled: 1.";
             
             var successfulResponsesRepresentation = "Success case:" +
                 $"{Environment.NewLine}City: '{cityName}', Temp: {temp}, Timer: {leadTime} ms." +
                 $"{Environment.NewLine}City: '{cityName2}', Temp: {temp2}, Timer: {leadTime2} ms.";
             var failResponsesRepresentation = "On fail:" +
-                $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError}, Timer: {leadTime3} ms.";
-            
+                $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError3}, Timer: {leadTime3} ms.";
+            var canceledResponsesRepresentation = "On canceled:" +
+                $"{Environment.NewLine}Weather request for '{cityName4}' was canceled due to a timeout.";
+
             var debugInfoRepresentation = isDebugMode
                 ? $"{successfulResponsesRepresentation}{Environment.NewLine}" +
-                $"{failResponsesRepresentation}{Environment.NewLine}"
+                $"{failResponsesRepresentation}{Environment.NewLine}" +
+                $"{canceledResponsesRepresentation}{Environment.NewLine}"
                 : string.Empty;
 
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter array city name (separator symbal - ',') :{Environment.NewLine}" +
                 $"{bestWeatherRepresentation}{Environment.NewLine}{debugInfoRepresentation}";
 
-            _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
         }
     }

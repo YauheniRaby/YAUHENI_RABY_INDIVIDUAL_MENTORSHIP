@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
@@ -18,9 +19,9 @@ namespace BusinessLayer.Command
             _countDay = countDay;
         }
 
-        public Task<ForecastWeatherDTO> ExecuteAsync()
+        public Task<ForecastWeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay);
+            return _weatherServiсe.GetForecastByCityNameAsync(_cityName, _countDay, cancellationToken);
         }
     }
 }
