@@ -47,7 +47,7 @@ namespace Weather.Tests.BL.Services
             SetHttpHandlerSettings(response, urlString);
 
             // Act
-            var result = await _weatherApiService.GetByCityNameAsync(cityName, new CancellationToken());
+            var result = await _weatherApiService.GetByCityNameAsync(cityName, CancellationToken.None);
 
             // Assert
             var expectedWeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
