@@ -107,10 +107,7 @@ namespace Weather.Tests.BL.Services
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetForecastByCityNameAsync
-                    (It.Is<string>(x => x == cityName),
-                     countWeatherPoints,
-                     It.IsAny<CancellationToken>()))
+                    weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoints, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
@@ -226,9 +223,7 @@ namespace Weather.Tests.BL.Services
         {
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetByCityNameAsync
-                    (It.Is<string>(x => x == weatherApiDTO.CityName),
-                     It.IsAny<CancellationToken>()))
+                    weatherApiService.GetByCityNameAsync(weatherApiDTO.CityName, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(weatherApiDTO);
         }
 
@@ -236,9 +231,7 @@ namespace Weather.Tests.BL.Services
         {
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetByCityNameAsync
-                    (It.Is<string>(x => x == cityName),
-                     It.IsAny<CancellationToken>()))
+                    weatherApiService.GetByCityNameAsync(cityName, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
         }
     }
