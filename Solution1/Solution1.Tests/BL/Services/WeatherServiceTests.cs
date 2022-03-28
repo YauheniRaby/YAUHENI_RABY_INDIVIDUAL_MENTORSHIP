@@ -129,21 +129,20 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetWeatherByArrayCityNameAsync_ReturnedDictionaryForWeatherResponseDTO_Success()
         {
+            // Arrange
             var cityName2 = "Paris";
             var cityName3 = "AАА";
             var cityName4 = string.Empty;
             var cityName5 = "return null";
-            var cityName6 = "Kiev";
 
             var errorMessage3 = "404 (Not Found)";
             var errorMessage4 = "Test validation error";
             var errorMessage5 = "Unknown error";
-            var errorMessage6 = "Timeout exceeded";
 
             var weatherApiDto1 = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() };
             var weatherApiDto2 = new WeatherApiDTO() { CityName = cityName2, TemperatureValues = new WeatherApiTempDTO() };
 
-            var listCityName = new List<string>() { cityName, cityName2, cityName3, cityName4, cityName5, cityName6 };
+            var listCityName = new List<string>() { cityName, cityName2, cityName3, cityName4, cityName5};
 
             var validationFailure = new List<ValidationFailure>() { new ValidationFailure("CityName", "Test validation error")};
             var notValidResult = new ValidationResult(validationFailure);
@@ -153,7 +152,6 @@ namespace Weather.Tests.BL.Services
             SetWeatherApiServiceSettings(weatherApiDto2);
             SetWeatherApiServiceExceptionSettings(cityName3, new Exception(errorMessage3));
             SetWeatherApiServiceExceptionSettings(cityName4, new ValidationException(validationFailure));
-            SetWeatherApiServiceExceptionSettings(cityName6, new TaskCanceledException());
 
             _validator
                  .Setup(validator => validator.ValidateAsync
@@ -168,8 +166,7 @@ namespace Weather.Tests.BL.Services
                             context.InstanceToValidate.CityName == cityName
                             || context.InstanceToValidate.CityName == cityName2
                             || context.InstanceToValidate.CityName == cityName3
-                            || context.InstanceToValidate.CityName == cityName5
-                            || context.InstanceToValidate.CityName == cityName6),
+                            || context.InstanceToValidate.CityName == cityName5),
                      It.IsAny<CancellationToken>()))
                  .ReturnsAsync(validResult);
 
@@ -179,11 +176,9 @@ namespace Weather.Tests.BL.Services
             // Assert
             Assert.Contains(result.Keys, k => k == ResponseStatus.Successful);
             Assert.Contains(result.Keys, k => k == ResponseStatus.Fail);
-            Assert.Contains(result.Keys, k => k == ResponseStatus.Canceled);
 
             Assert.Equal(2, result[ResponseStatus.Successful].Count());
             Assert.Equal(3, result[ResponseStatus.Fail].Count());
-            Assert.Single(result[ResponseStatus.Canceled]);
 
             Assert.Contains(result[ResponseStatus.Successful], weatherResponse => weatherResponse.CityName == cityName);
             Assert.Contains(result[ResponseStatus.Successful], weatherResponse => weatherResponse.CityName == cityName2);
@@ -193,9 +188,27 @@ namespace Weather.Tests.BL.Services
                                                               && weatherResponse.ErrorMessage == errorMessage4);
             Assert.Contains(result[ResponseStatus.Fail], weatherResponse => weatherResponse.CityName == cityName5
                                                               && weatherResponse.ErrorMessage == errorMessage5);
-            Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == cityName6
-                                                              && weatherResponse.ErrorMessage == errorMessage6);
-        }        
+        }
+
+        [Fact]
+        public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
+        {
+            // Arrange
+            var cityName2 = "Paris";
+            var errorMessage = "Timeout exceeded";
+            var listCityName = new List<string>() { cityName, cityName2 };
+            
+            //Act
+            var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, new CancellationToken(true));
+
+            // Assert
+            Assert.Contains(result.Keys, k => k == ResponseStatus.Canceled);
+            Assert.Equal(2, result[ResponseStatus.Canceled].Count());
+            Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == cityName
+                                                              && weatherResponse.ErrorMessage == errorMessage);
+            Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == cityName2
+                                                              && weatherResponse.ErrorMessage == errorMessage);
+        }
 
         private void SetWeatherApiServiceSettings(WeatherApiDTO weatherApiDTO)
         {

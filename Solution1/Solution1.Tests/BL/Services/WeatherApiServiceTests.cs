@@ -112,23 +112,13 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            // Arrange
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.Cancel();
-            
-            // Assert
-            await Assert.ThrowsAsync<OperationCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, cancellationTokenSource.Token));
+            await Assert.ThrowsAsync<OperationCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, new CancellationToken(true)));
         }
 
         [Fact]
         public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            // Arrange
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.Cancel();
-            
-            // Assert
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, cancellationTokenSource.Token));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, new CancellationToken(true)));
         }
 
         private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)

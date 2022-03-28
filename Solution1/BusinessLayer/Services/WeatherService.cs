@@ -69,10 +69,10 @@ namespace BusinessLayer.Services
 
             var listTasksRequest = cityNames.Select(async cityName =>
             {
-                cancellationToken.ThrowIfCancellationRequested();
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
