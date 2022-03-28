@@ -89,7 +89,7 @@ namespace BusinessLayer.Services
                         else
                         {
                             weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
-                            weatherResponseDTO.ErrorMessage = "Unknown error";
+                            weatherResponseDTO.ErrorMessage = Constants.Errors.UnknownError;
                         }
                     }
                     else
@@ -100,7 +100,7 @@ namespace BusinessLayer.Services
                 }
                 catch (OperationCanceledException)
                 {
-                    weatherResponseDTO.ErrorMessage = "Timeout exceeded";
+                    weatherResponseDTO.ErrorMessage = Constants.Errors.TimeoutExpired;
                     weatherResponseDTO.ResponseStatus = ResponseStatus.Canceled;
                 }
                 catch (Exception ex)
