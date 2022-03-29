@@ -20,7 +20,7 @@ namespace WeatherApi.Controllers
         [HttpGet("CurrentWeather/{cityName}")]
         public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityName([FromRoute] string cityName)
         {
-            var result = await _weatherServiсe.GetByCityNameAsync(cityName, CancellationToken.None);
+            var result = await _weatherServiсe.GetByCityNameAsync(cityName, new CancellationToken(true));
             return Ok(result);
         }
         

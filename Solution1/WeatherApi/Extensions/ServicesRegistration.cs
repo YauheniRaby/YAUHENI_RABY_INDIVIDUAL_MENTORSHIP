@@ -4,8 +4,10 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using WeatherApi.AutoMap;
+using WeatherApi.Configuration;
 
 namespace WeatherApi.Extensions
 {
@@ -17,6 +19,7 @@ namespace WeatherApi.Extensions
             services.AddSingleton<IInvoker, Invoker>();
             services.AddSingleton<IWeatherApiService>(service => new WeatherApiService(new HttpClient()));
             services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));
+            services.AddSingleton<ILogger>(services => LoggerConfiguration.GetConfiguration<Program>());
         }
     }
 }
