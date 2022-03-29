@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
     <ProjectReference Include="..\ConsoleApp\ConsoleApp.csproj" />
+    <ProjectReference Include="..\WeatherApi\WeatherApi.csproj" />
   </ItemGroup>
 
 </Project>
