@@ -1,5 +1,5 @@
-﻿using BusinessLayer.Configuration.Abstract;
-using System.Configuration;
+﻿using System.Configuration;
+using BusinessLayer.Configuration.Abstract;
 
 namespace WeatherApi.Configuration
 {
@@ -10,5 +10,7 @@ namespace WeatherApi.Configuration
         public int MaxCountDaysForecast => int.TryParse(ConfigurationManager.AppSettings["maxCountDays"], out var value) ? value : default;
 
         public bool IsDebugMode => bool.TryParse(ConfigurationManager.AppSettings["isDebugMode"], out var value) ? value : default;
+
+        public int? RequestTimeout => int.TryParse(ConfigurationManager.AppSettings["requestTimeout"], out var value) ? value : null;
     }
 }
