@@ -7,5 +7,7 @@
         int MaxCountDaysForecast { get; }
 
         bool IsDebugMode { get; }
+
+        int? RequestTimeout {get;}
     }
 }

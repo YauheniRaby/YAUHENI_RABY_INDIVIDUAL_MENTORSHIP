@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
@@ -16,9 +17,9 @@ namespace BusinessLayer.Command
             _cityName = cityName;
         }
 
-        public Task<WeatherDTO> ExecuteAsync()
+        public Task<WeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return _weatherServiсe.GetByCityNameAsync(_cityName);
+            return _weatherServiсe.GetByCityNameAsync(_cityName, cancellationToken);
         }
     }
 }

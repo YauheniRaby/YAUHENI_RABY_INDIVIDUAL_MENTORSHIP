@@ -8,6 +8,8 @@ using FluentValidation;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using BusinessLayer.DTOs.Enums;
 
 namespace BusinessLayer.Services
 {
@@ -15,7 +17,7 @@ namespace BusinessLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IWeatherApiService _weatherApiService;
-        private readonly IValidator<ForecastWeatherRequestDTO> _validator;
+        private readonly IValidator<ForecastWeatherRequestDTO> _validator;        
 
         public WeatherService(IMapper mapper, IWeatherApiService weatherApiService, IValidator<ForecastWeatherRequestDTO> validator) 
         { 
@@ -24,8 +26,9 @@ namespace BusinessLayer.Services
             _validator = validator;
         }
 
-        public async Task<WeatherDTO> GetByCityNameAsync(string cityName)
+        public async Task<WeatherDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
@@ -35,13 +38,14 @@ namespace BusinessLayer.Services
                 throw new ValidationException(validationResult.Errors);
             }
            
-            var weather = await _weatherApiService.GetByCityNameAsync(cityName);
+            var weather = await _weatherApiService.GetByCityNameAsync(cityName, cancellationToken);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
             return result;
         }
         
-        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay)
+        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var countPointForCurrentDay = 
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
                 (24/Constants.WeatherAPI.WeatherPointsInDay); 
@@ -52,13 +56,13 @@ namespace BusinessLayer.Services
                                                 new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
                                                 options => options.IncludeAllRuleSets());
             
-            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint);
+            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, cancellationToken);
             forecast.City.Name = cityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }
 
-        public async Task<Dictionary<bool, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames)
+        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, CancellationToken cancellationToken)
         {
             var timer = new Stopwatch();
             timer.Start();
@@ -68,42 +72,53 @@ namespace BusinessLayer.Services
                 var weatherResponseDTO = new WeatherResponseDTO() { CityName = cityName };
                 try
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
                                                 options => options.IncludeRuleSets("CityName"));
-                    
+
                     if (validationResult.IsValid)
                     {
-                        var temp = (await _weatherApiService.GetByCityNameAsync(cityName))?.TemperatureValues.Temp;
+                        var temp = (await _weatherApiService.GetByCityNameAsync(cityName, cancellationToken))?.TemperatureValues.Temp;
                         if (temp.HasValue)
                         {
                             weatherResponseDTO.Temp = temp.Value;
-                            weatherResponseDTO.IsSuccessfulRequest = true;
+                            weatherResponseDTO.ResponseStatus = ResponseStatus.Successful;
                         }
                         else
                         {
-                            weatherResponseDTO.ErrorMessage = "Unknown error";
+                            weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
+                            weatherResponseDTO.ErrorMessage = Constants.Errors.UnknownError;
                         }
                     }
                     else
                     {
+                        weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
                         weatherResponseDTO.ErrorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
-                    }                    
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    weatherResponseDTO.ErrorMessage = Constants.Errors.TimeoutExpired;
+                    weatherResponseDTO.ResponseStatus = ResponseStatus.Canceled;
                 }
                 catch (Exception ex)
                 {
                     weatherResponseDTO.ErrorMessage = ex.Message;
+                    weatherResponseDTO.ResponseStatus = ResponseStatus.Fail;
                 }
                 weatherResponseDTO.LeadTime = timer.ElapsedMilliseconds;
                 return weatherResponseDTO;
             });
 
+            timer.Stop();
+
             var weatherResponses = await Task.WhenAll(listTasksRequest);
             var result = weatherResponses
-                            .GroupBy(w => w.IsSuccessfulRequest)
+                            .GroupBy(w => w.ResponseStatus)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
-        }        
+        }
     }
 }

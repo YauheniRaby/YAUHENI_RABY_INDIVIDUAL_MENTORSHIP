@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace BusinessLayer.Command.Abstract
 {
     public interface ICommand<T>
     {
-        Task<T> ExecuteAsync();
+        Task<T> ExecuteAsync(CancellationToken cancelationToken);
     }
 }

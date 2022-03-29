@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -20,25 +21,27 @@ namespace BusinessLayer.Services
             _httpClient=httpClient;
         }
 
-        public Task<WeatherApiDTO> GetByCityNameAsync(string cityName)
+        public Task<WeatherApiDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var urlResult = string.Format(Constants.WeatherAPI.WeatherByCityName, cityName, Constants.WeatherAPI.KeyApi);
             
-            return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult);            
+            return _httpClient.GetFromJsonAsync<WeatherApiDTO>(urlResult, cancellationToken);            
         }
 
-        public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint)
+        public async Task<ForecastWeatherApiDTO> GetForecastByCityNameAsync(string cityName, int countWeatherPoint, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var urlResultForCoordinates = string.Format(Constants.WeatherAPI.CoordinatesByCityName, cityName, Constants.WeatherAPI.KeyApi);
 
-            var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates);
-            var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync();
+            var coordinatesResponse = await _httpClient.GetAsync(urlResultForCoordinates, cancellationToken);
+            var coordinatesResponceBody = await coordinatesResponse.Content.ReadAsStringAsync(cancellationToken);
             var cityCoordinates = JsonSerializer.Deserialize<List<CityCoordinatesDTO>>(coordinatesResponceBody).FirstOrDefault();
 
             var urlResultForForecast = string.Format(Constants.WeatherAPI.ForecastByCoordinates, cityCoordinates.Latitude, cityCoordinates.Longitude, countWeatherPoint, Constants.WeatherAPI.KeyApi);
 
-            var forecastResponse = await _httpClient.GetAsync(urlResultForForecast);
-            var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync();
+            var forecastResponse = await _httpClient.GetAsync(urlResultForForecast, cancellationToken);
+            var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync(cancellationToken);
 
             JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());

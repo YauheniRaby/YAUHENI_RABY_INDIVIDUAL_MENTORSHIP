@@ -1,4 +1,6 @@
-﻿namespace BusinessLayer.DTOs
+﻿using BusinessLayer.DTOs.Enums;
+
+namespace BusinessLayer.DTOs
 {
     public class WeatherResponseDTO
     {
@@ -6,7 +8,7 @@
 
         public double Temp { get; set; }
 
-        public bool IsSuccessfulRequest { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
 
         public long LeadTime { get; set; }
 
