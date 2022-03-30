@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using WeatherApi.Configuration;
 
 namespace WeatherApi.Infrastructure
 {
