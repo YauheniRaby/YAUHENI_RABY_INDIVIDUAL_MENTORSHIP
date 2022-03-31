@@ -1,4 +1,4 @@
-﻿namespace BusinessLayer.Configuration.Abstract
+﻿namespace ConsoleApp.Configuration.Abstract
 {
     public interface IConfig
     {
@@ -9,7 +9,5 @@
         bool IsDebugMode { get; }
 
         int? RequestTimeout { get; }
-
-        string FormatDateTime { get; }
     }
 }

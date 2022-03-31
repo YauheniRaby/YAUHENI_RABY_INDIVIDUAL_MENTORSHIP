@@ -17,7 +17,6 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.DTOs;
 using Weather.Tests.Infrastructure;
 using System.Globalization;
-using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs.Enums;
 using System.Threading;
 

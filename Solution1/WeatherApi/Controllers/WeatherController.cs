@@ -1,6 +1,5 @@
 ﻿using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
-using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;

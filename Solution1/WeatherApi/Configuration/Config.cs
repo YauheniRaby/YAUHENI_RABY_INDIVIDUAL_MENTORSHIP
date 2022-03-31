@@ -1,6 +1,4 @@
-﻿using BusinessLayer.Configuration.Abstract;
-
-namespace WeatherApi.Configuration
+﻿namespace WeatherApi.Configuration
 {
     public class Config : IConfig
     {
@@ -11,7 +9,5 @@ namespace WeatherApi.Configuration
         public bool IsDebugMode { get; set; }
 
         public int? RequestTimeout { get; set; }
-
-        public string FormatDateTime { get; set; }
     }
 }

@@ -1,12 +1,11 @@
-﻿using BusinessLayer.Configuration.Abstract;
-using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs;
 using FluentValidation;
 
 namespace BusinessLayer.Vlidators
 {
     public class ForecastWeatherRequestDTOValidator : AbstractValidator<ForecastWeatherRequestDTO>
     {
-        public ForecastWeatherRequestDTOValidator(IConfig config)
+        public ForecastWeatherRequestDTOValidator(int minCountDays, int maxCountDays)
         {
             RuleSet("CityName", () =>
             {
@@ -16,7 +15,7 @@ namespace BusinessLayer.Vlidators
             });
 
             RuleFor(p => p.PeriodOfDays)
-                .InclusiveBetween(config.MinCountDaysForecast, config.MaxCountDaysForecast);
+                .InclusiveBetween(minCountDays, maxCountDays);
         }
     }
 }
