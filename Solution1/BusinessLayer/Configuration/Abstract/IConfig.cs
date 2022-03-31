@@ -8,6 +8,8 @@
 
         bool IsDebugMode { get; }
 
-        int? RequestTimeout {get;}
+        int? RequestTimeout { get; }
+
+        string FormatDateTime { get; }
     }
 }

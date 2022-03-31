@@ -1,27 +1,27 @@
 ﻿using BusinessLayer.Command;
 using BusinessLayer.Command.Abstract;
-using BusinessLayer.Configuration.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using WeatherApi.Configuration;
 using WeatherApi.Controllers;
 using Xunit;
 
-namespace Weather.Tests.WeatherApi
+namespace Weather.Tests.WeatherApi.Controllers
 {
     public class WeatherControllerTests
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
-        private readonly Mock<IConfig> _config;
+        private readonly Mock<IOptions<Config>> _config;
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
 
@@ -29,9 +29,13 @@ namespace Weather.Tests.WeatherApi
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _config = new Mock<IConfig>();
-
+            _config = new Mock<IOptions<Config>>();
+            
             _weatherController = new WeatherController(_weatherServiceMock.Object, _config.Object, _invokerMock.Object);
+
+            _config
+                .Setup(config => config.Value)
+                .Returns(new Config() { RequestTimeout = int.MaxValue });
         }
 
         [Fact]
@@ -51,12 +55,14 @@ namespace Weather.Tests.WeatherApi
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(weather);
-            
+
             //Act
-            var result = (OkObjectResult)(await _weatherController.GetCurrentWeatherByCityNameAsync(cityName)).Result;
+            var response = await _weatherController.GetCurrentWeatherByCityNameAsync(cityName);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
+            Assert.IsType<OkObjectResult>(response.Result);
+            var result = (OkObjectResult)response.Result;
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
             Assert.True(new CompareLogic().Compare(weather, result.Value).AreEqual);           
@@ -88,10 +94,12 @@ namespace Weather.Tests.WeatherApi
                 .ReturnsAsync(forecastWeather);
 
             //Act
-            var result = (OkObjectResult)(await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2)).Result;
+            var response = await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
+            Assert.IsType<OkObjectResult>(response.Result);
+            var result = (OkObjectResult)response.Result;
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
             Assert.True(new CompareLogic().Compare(forecastWeather, result.Value).AreEqual);

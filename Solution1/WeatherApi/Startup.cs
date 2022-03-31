@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WeatherApi.Configuration;
 using WeatherApi.Extensions;
 
 namespace WeatherApi
@@ -21,7 +22,7 @@ namespace WeatherApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddConfiguration();
+            services.AddConfiguration(Configuration.GetSection("Config").Get<Config>());
             services.AddValidators();
             services.AddServices();           
             

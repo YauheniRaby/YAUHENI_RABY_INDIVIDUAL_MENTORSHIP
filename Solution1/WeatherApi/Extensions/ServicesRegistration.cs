@@ -18,8 +18,7 @@ namespace WeatherApi.Extensions
             services.AddSingleton<IWeatherServiсe, WeatherService>();
             services.AddSingleton<IInvoker, Invoker>();
             services.AddSingleton<IWeatherApiService>(service => new WeatherApiService(new HttpClient()));
-            services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));
-            services.AddSingleton<ILogger>(services => LoggerConfiguration.GetConfiguration<Program>());
+            services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));            
         }
     }
 }

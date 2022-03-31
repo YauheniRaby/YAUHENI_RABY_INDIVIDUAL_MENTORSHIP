@@ -44,9 +44,8 @@ namespace Weather.Tests.Integration
             var weather = JsonSerializer.Deserialize<WeatherDTO>(await response.Content.ReadAsStringAsync(), _serializerOptions);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            Assert.Equal(weather?.CityName, cityName);
-            Assert.Contains(weather?.Comment, comments);            
+            Assert.Equal(weather.CityName, cityName);
+            Assert.Contains(weather.Comment, comments);            
         }
 
         [Fact]
@@ -66,8 +65,8 @@ namespace Weather.Tests.Integration
             var forecast = JsonSerializer.Deserialize<ForecastWeatherDTO>(await response.Content.ReadAsStringAsync(), _serializerOptions);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(forecast?.CityName, cityName);
-            Assert.Equal(forecast?.WeatherForPeriod.Count, counDays+1);
+            Assert.Equal(forecast.CityName, cityName);
+            Assert.Equal(forecast.WeatherForPeriod.Count, counDays+1);
             forecast.WeatherForPeriod.ForEach(x =>
             {
                 Assert.Contains(x?.Comment, comments);

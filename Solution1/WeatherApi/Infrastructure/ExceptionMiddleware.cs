@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessLayer.Configuration.Abstract;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace WeatherApi.Infrastructure
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger logger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -21,6 +22,11 @@ namespace WeatherApi.Infrastructure
             try
             {
                 await _next(httpContext);
+            }
+            catch (OperationCanceledException ex)
+            {
+                _logger.LogError($"Error: {ex}");
+                httpContext.Response.StatusCode = StatusCodes.Status408RequestTimeout;
             }
             catch (Exception ex)
             {
