@@ -8,6 +8,7 @@ using System.Net;
 using BusinessLayer.DTOs;
 using System.Text.Json;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Weather.Tests.Integration
@@ -17,11 +18,22 @@ namespace Weather.Tests.Integration
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly string cityName = "Minsk";
+        private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
+        private readonly Dictionary<string, string> configuration = new Dictionary<string, string>
+        {
+            {"Config:MaxCountDaysForecast", "5"},
+            {"Config:MinCountDaysForecast", "0"},
+            {"Config:IsDebugMode", "true"},
+            {"Config:RequestTimeout", "10000"}
+        };
 
-        public WeatherApiTests()
+        public WeatherApiTests()      
         {
             var server = new TestServer(new WebHostBuilder()
-                .UseEnvironment("Development")
+                .ConfigureAppConfiguration(configurationBuilder =>
+                {
+                    configurationBuilder.AddInMemoryCollection(configuration);
+                })
                 .UseStartup<Startup>());
             _httpClient = server.CreateClient();
             _serializerOptions = new JsonSerializerOptions
@@ -34,18 +46,23 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_Success()
         {
             // Arrange
-            var comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/Weather/{cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}");
             
             //Act
             var response = await _httpClient.SendAsync(request);
 
             //Assert
+            Assert.NotNull(response);
+            Assert.NotNull(response.Content);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
             var weather = JsonSerializer.Deserialize<WeatherDTO>(await response.Content.ReadAsStringAsync(), _serializerOptions);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(weather);
+            Assert.NotNull(weather.CityName);
             Assert.Equal(weather.CityName, cityName);
-            Assert.Contains(weather.Comment, comments);            
+            Assert.NotNull(weather.Comment);
+            Assert.Contains(weather.Comment, comments);
         }
 
         [Fact]
@@ -54,23 +71,31 @@ namespace Weather.Tests.Integration
             // Arrange
             var counDays = 3;
             var startDateTime = DateTime.Now.Date;
-            var comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
-
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/Weather/{cityName}/{counDays}");
+            
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{counDays}");
 
             //Act
             var response = await _httpClient.SendAsync(request);
 
             //Assert
+            Assert.NotNull(response);
+            Assert.NotNull(response.Content);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            
             var forecast = JsonSerializer.Deserialize<ForecastWeatherDTO>(await response.Content.ReadAsStringAsync(), _serializerOptions);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(forecast);
+            Assert.NotNull(forecast.CityName);
             Assert.Equal(forecast.CityName, cityName);
+            Assert.NotNull(forecast.WeatherForPeriod);
             Assert.Equal(forecast.WeatherForPeriod.Count, counDays+1);
+            
             forecast.WeatherForPeriod.ForEach(x =>
             {
-                Assert.Contains(x?.Comment, comments);
-                Assert.Equal(startDateTime, x?.DateTime);
+                Assert.NotNull(x);
+                Assert.NotNull(x.Comment);
+                Assert.Contains(x.Comment, comments);
+                Assert.Equal(startDateTime, x.DateTime);
                 startDateTime = startDateTime.AddDays(1);
             });
         }

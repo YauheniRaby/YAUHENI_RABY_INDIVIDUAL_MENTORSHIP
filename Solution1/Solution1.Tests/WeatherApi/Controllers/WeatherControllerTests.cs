@@ -25,6 +25,13 @@ namespace Weather.Tests.WeatherApi.Controllers
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
 
+        public static IEnumerable<object[]> Exceptions =>
+            new List<object[]>
+            {
+                new object[] { new Exception() },
+                new object[] { new OperationCanceledException() }
+            };
+
         public WeatherControllerTests()
         {
             _invokerMock = new Mock<IInvoker>();
@@ -68,6 +75,18 @@ namespace Weather.Tests.WeatherApi.Controllers
             Assert.True(new CompareLogic().Compare(weather, result.Value).AreEqual);           
         }
 
+
+        [Theory]
+        [MemberData(nameof(Exceptions))]
+        public async Task GetCurrentWeatherByCityName_ExceptionHandling_Success(Exception exception)
+        {
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+            
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+        }
+
         [Fact]
         public async Task GetForecastWeatherByCityName_EnterCityNameAndCounDays_ReturnForecast()
         {
@@ -103,6 +122,17 @@ namespace Weather.Tests.WeatherApi.Controllers
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
             Assert.True(new CompareLogic().Compare(forecastWeather, result.Value).AreEqual);
+        }
+
+        [Theory]
+        [MemberData(nameof(Exceptions))]
+        public async Task GetForecastWeatherByCityName_ExceptionHandling_Success(Exception exception)
+        {
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
         }
     }
 }

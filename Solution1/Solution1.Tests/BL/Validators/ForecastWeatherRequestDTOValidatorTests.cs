@@ -1,5 +1,4 @@
-﻿using BusinessLayer.Configuration.Abstract;
-using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs;
 using BusinessLayer.Vlidators;
 using FluentValidation;
 using Moq;
@@ -11,21 +10,13 @@ namespace Weather.Tests.BL.Validators
     public class ForecastWeatherRequestDTOValidatorTests
     {
         private readonly IValidator<ForecastWeatherRequestDTO> _validator;
-        private readonly Mock<IConfig> _config;
-
+        
         public ForecastWeatherRequestDTOValidatorTests()
         {
-            _config = new Mock<IConfig>();
-            _config
-               .Setup(config =>
-                   config.MinCountDaysForecast)
-               .Returns(1);
-            _config
-               .Setup(config =>
-                   config.MaxCountDaysForecast)
-               .Returns(5);
-
-            _validator = new ForecastWeatherRequestDTOValidator(_config.Object);
+            int minCountDays = 0; 
+            int maxCountDays = 5;
+            
+            _validator = new ForecastWeatherRequestDTOValidator(minCountDays, maxCountDays);
         }
 
         [Theory]

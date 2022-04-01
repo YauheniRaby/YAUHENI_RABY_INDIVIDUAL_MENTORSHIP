@@ -1,5 +1,5 @@
-﻿using BusinessLayer.Configuration.Abstract;
-using ConsoleApp;
+﻿using ConsoleApp;
+using ConsoleApp.Configuration.Abstract;
 using Moq;
 using System;
 using System.IO;
