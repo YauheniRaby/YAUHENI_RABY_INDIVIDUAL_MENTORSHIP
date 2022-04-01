@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using KellermanSoftware.CompareNetObjects;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -46,7 +47,7 @@ namespace Weather.Tests.WeatherApi.Extensions
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
+                It.Is<Exception>(x => new CompareLogic().Compare(x, exception).AreEqual),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()));
 
             Assert.Equal(statusCode, httpContext.Response.StatusCode);

@@ -21,10 +21,10 @@ namespace Weather.Tests.Integration
         private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
         private readonly Dictionary<string, string> configuration = new Dictionary<string, string>
         {
-            {"Config:MaxCountDaysForecast", "5"},
-            {"Config:MinCountDaysForecast", "0"},
-            {"Config:IsDebugMode", "true"},
-            {"Config:RequestTimeout", "10000"}
+            {"AppParams:MaxCountDaysForecast", "5"},
+            {"AppParams:MinCountDaysForecast", "0"},
+            {"AppParams:IsDebugMode", "true"},
+            {"AppParams:RequestTimeout", "10000"}
         };
 
         public WeatherApiTests()      

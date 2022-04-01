@@ -9,6 +9,7 @@ namespace WeatherApi.Infrastructure
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
+        private readonly string _errorMessage = "Error info:";
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
@@ -24,12 +25,12 @@ namespace WeatherApi.Infrastructure
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Error: {ex}");
+                _logger.LogError(ex, _errorMessage);
                 httpContext.Response.StatusCode = StatusCodes.Status408RequestTimeout;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error: {ex}");
+                _logger.LogError(ex, _errorMessage);
                 httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
             }
         }
