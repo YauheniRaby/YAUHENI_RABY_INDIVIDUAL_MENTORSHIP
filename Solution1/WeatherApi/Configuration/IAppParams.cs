@@ -1,6 +1,6 @@
 ﻿namespace WeatherApi.Configuration
 {
-    public interface IConfig
+    public interface IAppParams
     {
         int MinCountDaysForecast { get; }
 

@@ -1,6 +1,6 @@
 ﻿namespace WeatherApi.Configuration
 {
-    public class Config : IConfig
+    public class AppParams : IAppParams
     {
         public int MinCountDaysForecast { get; set; }
 

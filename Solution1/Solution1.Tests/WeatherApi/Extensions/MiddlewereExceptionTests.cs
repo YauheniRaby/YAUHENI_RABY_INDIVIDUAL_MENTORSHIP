@@ -47,7 +47,7 @@ namespace Weather.Tests.WeatherApi.Extensions
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
-                It.Is<Exception>(x => new CompareLogic().Compare(x, exception).AreEqual),
+                It.Is<Exception>(x => x.GetType() == exception.GetType()),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()));
 
             Assert.Equal(statusCode, httpContext.Response.StatusCode);

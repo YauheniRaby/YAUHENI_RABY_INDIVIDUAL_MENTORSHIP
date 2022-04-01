@@ -55,7 +55,12 @@ namespace BusinessLayer.Services
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
                                                 options => options.IncludeAllRuleSets());
-            
+
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, cancellationToken);
             forecast.City.Name = cityName;
 

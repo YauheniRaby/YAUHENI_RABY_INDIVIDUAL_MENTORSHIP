@@ -23,12 +23,11 @@ namespace WeatherApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var configSection = Configuration.GetSection("AppParams");
-            services.Configure<Config>(configSection);
+            services.Configure<AppParams>(Configuration.GetSection(nameof(AppParams)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddLogging(opt => opt.AddSimpleConsole());
-            services.AddValidators(configSection.Get<Config>());
+            services.AddValidators();
             services.AddServices();           
             
             services.AddControllers();

@@ -21,9 +21,10 @@ namespace Weather.Tests.WeatherApi.Controllers
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
-        private readonly Mock<IOptions<Config>> _config;
+        private readonly Mock<IOptions<AppParams>> _appParams;
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
+        private readonly int timeout = 0;
 
         public static IEnumerable<object[]> Exceptions =>
             new List<object[]>
@@ -36,13 +37,13 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _config = new Mock<IOptions<Config>>();
+            _appParams = new Mock<IOptions<AppParams>>();
             
-            _weatherController = new WeatherController(_weatherServiceMock.Object, _config.Object, _invokerMock.Object);
+            _weatherController = new WeatherController(_weatherServiceMock.Object, _appParams.Object, _invokerMock.Object);
 
-            _config
-                .Setup(config => config.Value)
-                .Returns(new Config() { RequestTimeout = int.MaxValue });
+            _appParams
+                .Setup(x => x.Value)
+                .Returns(new AppParams() { RequestTimeout = timeout });
         }
 
         [Fact]
@@ -78,13 +79,19 @@ namespace Weather.Tests.WeatherApi.Controllers
 
         [Theory]
         [MemberData(nameof(Exceptions))]
-        public async Task GetCurrentWeatherByCityName_ExceptionHandling_Success(Exception exception)
+        public async Task GetCurrentWeatherByCityName_ExceptionHandlingFromDependencyService_Success(Exception exception)
         {
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
             
             await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+        }
+
+        [Fact]
+        public async Task GetCurrentWeatherByCityName_CancellateOperation_Success()
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
         }
 
         [Fact]
@@ -133,6 +140,12 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .ThrowsAsync(exception);
 
             await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+        }
+
+        [Fact]
+        public async Task GetForecastWeatherByCityName_CancellateOperation_Success()
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
         }
     }
 }
