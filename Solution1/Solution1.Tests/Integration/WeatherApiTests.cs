@@ -209,7 +209,7 @@ namespace Weather.Tests.Integration
 
             //Act
             var response = await httpClient.SendAsync(request);
-
+            
             //Assert
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
@@ -234,14 +234,14 @@ namespace Weather.Tests.Integration
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
-        private HttpClient GetClient(int RequestTimeout = 1000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
+        private HttpClient GetClient(int RequestTimeout = 5000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
         {
             var configuration = new Dictionary<string, string>
             {
-                {"AppParams:MaxCountDaysForecast", $"{maxCountDaysForecast}"},
-                {"AppParams:MinCountDaysForecast", $"{minCountDaysForecast}"},
-                {"AppParams:IsDebugMode", $"{isDebugMode}"},
-                {"AppParams:RequestTimeout", $"{RequestTimeout}"}
+                {"AppConfiguration:MaxCountDaysForecast", $"{maxCountDaysForecast}"},
+                {"AppConfiguration:MinCountDaysForecast", $"{minCountDaysForecast}"},
+                {"AppConfiguration:IsDebugMode", $"{isDebugMode}"},
+                {"AppConfiguration:RequestTimeout", $"{RequestTimeout}"}
             };
 
             var server = new TestServer(new WebHostBuilder()

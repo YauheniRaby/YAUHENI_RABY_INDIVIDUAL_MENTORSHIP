@@ -8,8 +8,7 @@ namespace BusinessLayer.Vlidators
     {
         public ForecastWeatherRequestDTOValidator(int minCountDays, int maxCountDays)
         {
-            ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("en-US");
-            RuleSet("CityName", () =>
+            RuleSet(Constants.Validators.OnlyCityName, () =>
             {
                 RuleFor(p => p.CityName)
                     .NotEmpty()

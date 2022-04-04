@@ -32,7 +32,7 @@ namespace BusinessLayer.Services
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"),
+                                                options => options.IncludeRuleSets(Constants.Validators.OnlyCityName),
                                                 cancellationToken);
             if (!validationResult.IsValid)
             {
@@ -82,7 +82,7 @@ namespace BusinessLayer.Services
                     var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"),
+                                                options => options.IncludeRuleSets(Constants.Validators.OnlyCityName),
                                                 cancellationToken);
 
                     if (validationResult.IsValid)

@@ -4,7 +4,6 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 using WeatherApi.AutoMap;
 
 namespace WeatherApi.Extensions
@@ -15,8 +14,9 @@ namespace WeatherApi.Extensions
         {
             services.AddSingleton<IWeatherServiсe, WeatherService>();
             services.AddSingleton<IInvoker, Invoker>();
-            services.AddSingleton<IWeatherApiService>(service => new WeatherApiService(new HttpClient()));
-            services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));            
+            services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));
+            
+            services.AddHttpClient<IWeatherApiService, WeatherApiService>();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace WeatherApi.Extensions
         {
             services.AddSingleton<IValidator<ForecastWeatherRequestDTO>, ForecastWeatherRequestDTOValidator>(serviseProvider => 
             {
-                var appParams = serviseProvider.GetService<IOptions<AppParams>>();
+                var appParams = serviseProvider.GetService<IOptions<AppConfiguration>>();
                 return new ForecastWeatherRequestDTOValidator(appParams.Value.MinCountDaysForecast, appParams.Value.MaxCountDaysForecast);
             });
         }

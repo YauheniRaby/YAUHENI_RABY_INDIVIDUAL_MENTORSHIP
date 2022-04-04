@@ -21,7 +21,7 @@ namespace Weather.Tests.WeatherApi.Controllers
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
-        private readonly Mock<IOptions<AppParams>> _appParams;
+        private readonly Mock<IOptions<AppConfiguration>> _appParams;
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
 
@@ -36,7 +36,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _appParams = new Mock<IOptions<AppParams>>();
+            _appParams = new Mock<IOptions<AppConfiguration>>();
             
             _weatherController = new WeatherController(_weatherServiceMock.Object, _appParams.Object, _invokerMock.Object);
         }
@@ -93,6 +93,7 @@ namespace Weather.Tests.WeatherApi.Controllers
             SetTimeoutForAppParams(0);
 
             await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -131,6 +132,7 @@ namespace Weather.Tests.WeatherApi.Controllers
             var result = (OkObjectResult)response.Result;
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+            Assert.NotNull(result.Value);
             Assert.True(new CompareLogic().Compare(forecastWeather, result.Value).AreEqual);
         }
 
@@ -153,13 +155,14 @@ namespace Weather.Tests.WeatherApi.Controllers
             SetTimeoutForAppParams(0);
 
             await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         private void SetTimeoutForAppParams(int? timeout = null)
         {
             _appParams
                 .Setup(x => x.Value)
-                .Returns(new AppParams() { RequestTimeout = timeout });
+                .Returns(new AppConfiguration() { RequestTimeout = timeout });
         }
     }
 }

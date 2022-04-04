@@ -15,10 +15,10 @@ namespace WeatherApi.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly IOptions<AppParams> _appParams;
+        private readonly IOptions<AppConfiguration> _appParams;
         private readonly IInvoker _invoker;
 
-        public WeatherController(IWeatherServiсe weatherServiсe, IOptions<AppParams> appParams, IInvoker invoker)
+        public WeatherController(IWeatherServiсe weatherServiсe, IOptions<AppConfiguration> appParams, IInvoker invoker)
         {
             _weatherServiсe = weatherServiсe;
             _appParams = appParams;
