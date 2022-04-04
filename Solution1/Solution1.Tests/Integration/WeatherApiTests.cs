@@ -10,6 +10,8 @@ using System.Text.Json;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System;
+using Microsoft.AspNetCore.Mvc;
+using KellermanSoftware.CompareNetObjects;
 
 namespace Weather.Tests.Integration
 {
@@ -19,14 +21,66 @@ namespace Weather.Tests.Integration
         private readonly string cityName = "Minsk";
         private readonly int counDays = 3;
         private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
-        
+
+        public static IEnumerable<object[]> DataForValidationTest =>
+            new List<object[]>
+            {
+                new object[]
+                {
+                    "Minsk",
+                    -1,
+                    HttpStatusCode.BadRequest,
+                    new ValidationProblemDetails(
+                        new Dictionary<string, string[]>()
+                        {
+                            { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered -1." }}
+                        })
+                },
+                new object[]
+                {
+                    "Minsk",
+                    10,
+                    HttpStatusCode.BadRequest,
+                    new ValidationProblemDetails(
+                        new Dictionary<string, string[]>()
+                        {
+                            { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered 10." }}
+                        })
+                },
+                new object[]
+                {
+                    "aaaaaaaaaaaaaaaaaaaaa",
+                    3,
+                    HttpStatusCode.BadRequest,
+                    new ValidationProblemDetails(
+                        new Dictionary<string, string[]>()
+                        {
+                            { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }}
+                        })
+                },
+                new object[]
+                {
+                    "aaaaaaaaaaaaaaaaaaaaa",
+                    7,
+                    HttpStatusCode.BadRequest,
+                    new ValidationProblemDetails(
+                        new Dictionary<string, string[]>()
+                        {
+                            { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }},
+                            { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered 7." }}
+                        })
+                },
+                new object[] { "", 10, HttpStatusCode.NotFound, null },
+                new object[] { "", 3, HttpStatusCode.NotFound, null },
+            };
+
         public WeatherApiTests()      
         {
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            };
-        }
+            };            
+        }        
 
         [Fact]
         public async Task GetWeatherByCityName_Success()
@@ -95,27 +149,11 @@ namespace Weather.Tests.Integration
             var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}");
             var httpClient = GetClient();
 
-            //Act
-            var response = await httpClient.SendAsync(request);
-
-            //Assert
-            Assert.NotNull(response);
-            Assert.Equal(httpStatusCode, response.StatusCode);            
-        }
-
-        [Theory]
-        [InlineData("Minsk", -1, HttpStatusCode.BadRequest)]
-        [InlineData("Minsk", 10, HttpStatusCode.BadRequest)]
-        [InlineData("aaaaaaaaaaaaaaaaaaaaa", 3, HttpStatusCode.BadRequest)]
-        [InlineData("aaaaaaaaaaaaaaaaaaaaa", 7, HttpStatusCode.BadRequest)]
-        [InlineData("", 10, HttpStatusCode.NotFound)]
-        [InlineData("", 3, HttpStatusCode.NotFound)]
-
-        public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, HttpStatusCode httpStatusCode)
-        {
-            // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{countDays}");
-            var httpClient = GetClient();
+            var validationDetails = new ValidationProblemDetails(
+            new Dictionary<string, string[]>()
+            {
+                { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }}
+            });                
 
             //Act
             var response = await httpClient.SendAsync(request);
@@ -123,6 +161,43 @@ namespace Weather.Tests.Integration
             //Assert
             Assert.NotNull(response);
             Assert.Equal(httpStatusCode, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            if (httpStatusCode == HttpStatusCode.BadRequest)
+            {
+                var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
+                Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            }
+            else
+            {
+                Assert.Empty(await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(DataForValidationTest))]
+        public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, HttpStatusCode httpStatusCode, ValidationProblemDetails validationDetails)
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{countDays}");
+            var httpClient = GetClient();
+            
+            //Act
+            var response = await httpClient.SendAsync(request);
+            //Assert
+            Assert.NotNull(response);
+            Assert.Equal(httpStatusCode, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            if (validationDetails != null)
+            {
+                var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
+                Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            }
+            else
+            {
+                Assert.Empty(await response.Content.ReadAsStringAsync());
+            }
         }
 
         [Fact]
@@ -138,6 +213,8 @@ namespace Weather.Tests.Integration
             //Assert
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
+            Assert.NotNull(response.Content);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
@@ -153,6 +230,8 @@ namespace Weather.Tests.Integration
             //Assert
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
+            Assert.NotNull(response.Content);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         private HttpClient GetClient(int RequestTimeout = 1000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)

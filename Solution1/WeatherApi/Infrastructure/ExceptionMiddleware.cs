@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WeatherApi.Infrastructure
@@ -33,6 +35,11 @@ namespace WeatherApi.Infrastructure
             {
                 _logger.LogError(ex, _errorMessage);
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                var response = new ValidationProblemDetails(
+                      ex.Errors
+                       .GroupBy(o => o.PropertyName)
+                       .ToDictionary(g => g.Key, g => g.Select(x => x.ErrorMessage).ToArray()));
+                await httpContext.Response.WriteAsJsonAsync(response);
             }
             catch (Exception ex)
             {

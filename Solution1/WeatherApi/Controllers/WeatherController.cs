@@ -40,9 +40,9 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appParams.Value.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays);            
+            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays);
             var result = await _invoker.RunAsync(command, token);
-            return Ok(result);
+            return Ok(result);            
         }
     }
 }

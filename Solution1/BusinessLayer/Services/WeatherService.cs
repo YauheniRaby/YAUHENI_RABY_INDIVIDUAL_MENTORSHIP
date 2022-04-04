@@ -32,7 +32,8 @@ namespace BusinessLayer.Services
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"));
+                                                options => options.IncludeRuleSets("CityName"),
+                                                cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -54,8 +55,8 @@ namespace BusinessLayer.Services
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
-                                                options => options.IncludeAllRuleSets());
-
+                                                options => options.IncludeAllRuleSets(),
+                                                cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -81,7 +82,8 @@ namespace BusinessLayer.Services
                     var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"));
+                                                options => options.IncludeRuleSets("CityName"),
+                                                cancellationToken);
 
                     if (validationResult.IsValid)
                     {

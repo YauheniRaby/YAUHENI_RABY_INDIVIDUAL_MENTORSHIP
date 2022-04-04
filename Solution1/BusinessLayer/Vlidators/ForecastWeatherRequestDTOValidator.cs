@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
+using System.Globalization;
 
 namespace BusinessLayer.Vlidators
 {
@@ -7,6 +8,7 @@ namespace BusinessLayer.Vlidators
     {
         public ForecastWeatherRequestDTOValidator(int minCountDays, int maxCountDays)
         {
+            ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("en-US");
             RuleSet("CityName", () =>
             {
                 RuleFor(p => p.CityName)
