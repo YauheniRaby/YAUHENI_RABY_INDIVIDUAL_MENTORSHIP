@@ -24,9 +24,8 @@ namespace WeatherApi.Controllers
             _appParams = appParams;
             _invoker = invoker;
         }
-
-        [HttpGet("{cityName}")]
-        public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync([FromRoute] string cityName)
+        [HttpGet("current")]
+        public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync([FromQuery] string cityName)
         {
             var token = TokenGenerator.GetCancellationToken(_appParams.Value.RequestTimeout);
             token.ThrowIfCancellationRequested();
@@ -34,9 +33,9 @@ namespace WeatherApi.Controllers
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);
         }
-        
-        [HttpGet("{cityName}/{countDays}")]
-        public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync([FromRoute] string cityName, [FromRoute] int countDays)
+
+        [HttpGet("forecast")]
+        public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync([FromQuery] string cityName, [FromQuery] int countDays)
         {
             var token = TokenGenerator.GetCancellationToken(_appParams.Value.RequestTimeout);
             token.ThrowIfCancellationRequested();
