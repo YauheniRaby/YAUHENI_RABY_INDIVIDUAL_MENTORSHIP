@@ -46,8 +46,9 @@ namespace WeatherApi
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherApi v1"));
-                app.UseHttpStatusExceptionHandler();
             }
+
+            app.UseHttpStatusExceptionHandler();
 
             app.UseRouting();
 

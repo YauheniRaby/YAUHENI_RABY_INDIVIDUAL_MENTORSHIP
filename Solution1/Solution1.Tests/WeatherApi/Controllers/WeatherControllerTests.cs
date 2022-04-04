@@ -24,7 +24,6 @@ namespace Weather.Tests.WeatherApi.Controllers
         private readonly Mock<IOptions<AppParams>> _appParams;
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
-        private readonly int timeout = 0;
 
         public static IEnumerable<object[]> Exceptions =>
             new List<object[]>
@@ -40,10 +39,6 @@ namespace Weather.Tests.WeatherApi.Controllers
             _appParams = new Mock<IOptions<AppParams>>();
             
             _weatherController = new WeatherController(_weatherServiceMock.Object, _appParams.Object, _invokerMock.Object);
-
-            _appParams
-                .Setup(x => x.Value)
-                .Returns(new AppParams() { RequestTimeout = timeout });
         }
 
         [Fact]
@@ -63,6 +58,8 @@ namespace Weather.Tests.WeatherApi.Controllers
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(weather);
+
+            SetTimeoutForAppParams();
 
             //Act
             var response = await _weatherController.GetCurrentWeatherByCityNameAsync(cityName);
@@ -84,13 +81,17 @@ namespace Weather.Tests.WeatherApi.Controllers
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
-            
-            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+
+            SetTimeoutForAppParams();
+
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));            
         }
 
         [Fact]
         public async Task GetCurrentWeatherByCityName_CancellateOperation_Success()
         {
+            SetTimeoutForAppParams(0);
+
             await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
         }
 
@@ -119,6 +120,8 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(forecastWeather);
 
+            SetTimeoutForAppParams();
+
             //Act
             var response = await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2);
 
@@ -139,13 +142,24 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 
+            SetTimeoutForAppParams();
+
             await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
         }
 
         [Fact]
         public async Task GetForecastWeatherByCityName_CancellateOperation_Success()
         {
+            SetTimeoutForAppParams(0);
+
             await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+        }
+
+        private void SetTimeoutForAppParams(int? timeout = null)
+        {
+            _appParams
+                .Setup(x => x.Value)
+                .Returns(new AppParams() { RequestTimeout = timeout });
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -27,6 +28,11 @@ namespace WeatherApi.Infrastructure
             {
                 _logger.LogError(ex, _errorMessage);
                 httpContext.Response.StatusCode = StatusCodes.Status408RequestTimeout;
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogError(ex, _errorMessage);
+                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
             catch (Exception ex)
             {

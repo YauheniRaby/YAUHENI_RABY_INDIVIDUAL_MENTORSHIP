@@ -15,27 +15,13 @@ namespace Weather.Tests.Integration
 {
     public class WeatherApiTests
     {
-        private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly string cityName = "Minsk";
+        private readonly int counDays = 3;
         private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
-        private readonly Dictionary<string, string> configuration = new Dictionary<string, string>
-        {
-            {"AppParams:MaxCountDaysForecast", "5"},
-            {"AppParams:MinCountDaysForecast", "0"},
-            {"AppParams:IsDebugMode", "true"},
-            {"AppParams:RequestTimeout", "10000"}
-        };
-
+        
         public WeatherApiTests()      
         {
-            var server = new TestServer(new WebHostBuilder()
-                .ConfigureAppConfiguration(configurationBuilder =>
-                {
-                    configurationBuilder.AddInMemoryCollection(configuration);
-                })
-                .UseStartup<Startup>());
-            _httpClient = server.CreateClient();
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -47,9 +33,10 @@ namespace Weather.Tests.Integration
         {
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}");
-            
+            var httpClient = GetClient();
+
             //Act
-            var response = await _httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request);
 
             //Assert
             Assert.NotNull(response);
@@ -68,14 +55,13 @@ namespace Weather.Tests.Integration
         [Fact]
         public async Task GetForecastByCityName_Success()
         {
-            // Arrange
-            var counDays = 3;
+            // Arrange            
             var startDateTime = DateTime.Now.Date;
-            
+            var httpClient = GetClient();
             var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{counDays}");
 
             //Act
-            var response = await _httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request);
 
             //Assert
             Assert.NotNull(response);
@@ -98,6 +84,95 @@ namespace Weather.Tests.Integration
                 Assert.Equal(startDateTime, x.DateTime);
                 startDateTime = startDateTime.AddDays(1);
             });
+        }
+
+        [Theory]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaa", HttpStatusCode.BadRequest)]
+        [InlineData("", HttpStatusCode.NotFound)]
+        public async Task GetWeatherByCityName_EnterInvalidData_HandlingException(string cityName, HttpStatusCode httpStatusCode)
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}");
+            var httpClient = GetClient();
+
+            //Act
+            var response = await httpClient.SendAsync(request);
+
+            //Assert
+            Assert.NotNull(response);
+            Assert.Equal(httpStatusCode, response.StatusCode);            
+        }
+
+        [Theory]
+        [InlineData("Minsk", -1, HttpStatusCode.BadRequest)]
+        [InlineData("Minsk", 10, HttpStatusCode.BadRequest)]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaa", 3, HttpStatusCode.BadRequest)]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaa", 7, HttpStatusCode.BadRequest)]
+        [InlineData("", 10, HttpStatusCode.NotFound)]
+        [InlineData("", 3, HttpStatusCode.NotFound)]
+
+        public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, HttpStatusCode httpStatusCode)
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{countDays}");
+            var httpClient = GetClient();
+
+            //Act
+            var response = await httpClient.SendAsync(request);
+
+            //Assert
+            Assert.NotNull(response);
+            Assert.Equal(httpStatusCode, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetWeatherByCityName_CanceledOperation_Success()
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}");
+            var httpClient = GetClient(0);
+
+            //Act
+            var response = await httpClient.SendAsync(request);
+
+            //Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetForecastByCityName_CanceledOperation_Success()
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/weather/{cityName}/{counDays}");
+            var httpClient = GetClient(0);
+
+            //Act
+            var response = await httpClient.SendAsync(request);
+
+            //Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
+        }
+
+        private HttpClient GetClient(int RequestTimeout = 1000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
+        {
+            var configuration = new Dictionary<string, string>
+            {
+                {"AppParams:MaxCountDaysForecast", $"{maxCountDaysForecast}"},
+                {"AppParams:MinCountDaysForecast", $"{minCountDaysForecast}"},
+                {"AppParams:IsDebugMode", $"{isDebugMode}"},
+                {"AppParams:RequestTimeout", $"{RequestTimeout}"}
+            };
+
+            var server = new TestServer(new WebHostBuilder()
+                .ConfigureAppConfiguration(configurationBuilder =>
+                {
+                    configurationBuilder.AddInMemoryCollection(configuration);
+                })
+                .UseStartup<Startup>());
+            
+            return server.CreateClient();            
         }
     }
 }

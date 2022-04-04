@@ -1,4 +1,5 @@
-﻿using KellermanSoftware.CompareNetObjects;
+﻿using FluentValidation;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,7 +21,8 @@ namespace Weather.Tests.WeatherApi.Extensions
             new List<object[]>
             {
                 new object[] { StatusCodes.Status500InternalServerError, new Exception() },
-                new object[] { StatusCodes.Status408RequestTimeout, new OperationCanceledException() }
+                new object[] { StatusCodes.Status408RequestTimeout, new OperationCanceledException() },
+                new object[] { StatusCodes.Status400BadRequest, new ValidationException("Test message") }
             };
 
         public MiddlewereExceptionTests()
