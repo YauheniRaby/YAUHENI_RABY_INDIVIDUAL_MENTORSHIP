@@ -97,7 +97,7 @@ namespace Weather.Tests.BL.Validators
                 errors.ToList().ForEach(x =>
                 {
                     result.ShouldHaveValidationErrorFor(x.Key);
-                    Assert.Equal(x.Value, result.Errors.First(errors => errors.PropertyName == x.Key).ErrorMessage);
+                    Assert.Equal(x.Value, result.Errors.Single(errors => errors.PropertyName == x.Key).ErrorMessage);
                 });
             }
         }
