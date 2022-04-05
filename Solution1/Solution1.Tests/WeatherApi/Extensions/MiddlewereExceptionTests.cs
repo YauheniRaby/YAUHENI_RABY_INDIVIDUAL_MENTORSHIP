@@ -78,6 +78,8 @@ namespace Weather.Tests.WeatherApi.Extensions
             if (exception.GetType() == typeof(ValidationException))
             {
                 var actual = JsonSerializer.Deserialize<ValidationProblemDetails>(responseBody);
+                Assert.NotNull(actual);
+                
                 var expected = new ValidationProblemDetails(
                       new Dictionary<string, string[]>()
                       {
