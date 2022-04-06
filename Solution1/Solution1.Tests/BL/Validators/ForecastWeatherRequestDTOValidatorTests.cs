@@ -141,7 +141,7 @@ namespace Weather.Tests.BL.Validators
                 Assert.False(result.IsValid);
                 result.ShouldHaveValidationErrorFor(x => x.CityName);
                 Assert.Single(result.Errors);
-                Assert.Equal(message, result.Errors.First(x => x.PropertyName == nameof(ForecastWeatherDTO.CityName)).ErrorMessage);
+                Assert.Equal(message, result.Errors.Single(x => x.PropertyName == nameof(ForecastWeatherDTO.CityName)).ErrorMessage);
             }
         }
     }
