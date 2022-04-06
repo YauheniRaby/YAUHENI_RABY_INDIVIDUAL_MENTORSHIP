@@ -22,6 +22,8 @@ namespace Weather.Tests.WeatherApi.Extensions
         private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
         private readonly Mock<RequestDelegate> _delegateMock;
         private readonly ExceptionMiddleware _exceptionMiddleware;
+        private readonly string validationMessageForCityName = "City Name must not be empty.";
+        private readonly string validationMessageForPeriodOfDays = "Period Of Days must be between 0 and 5. You entered 7.";
 
         public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
             new List<object[]>
@@ -67,8 +69,8 @@ namespace Weather.Tests.WeatherApi.Extensions
             var exception = new ValidationException(
                 new List<ValidationFailure>()
                 {
-                    new ValidationFailure(nameof(ForecastWeatherRequestDTO.CityName), "City Name must not be empty."),
-                    new ValidationFailure(nameof(ForecastWeatherRequestDTO.PeriodOfDays), "Period Of Days must be between 0 and 5. You entered 7.")
+                    new ValidationFailure(nameof(ForecastWeatherRequestDTO.CityName), validationMessageForCityName),
+                    new ValidationFailure(nameof(ForecastWeatherRequestDTO.PeriodOfDays), validationMessageForPeriodOfDays)
                 });
             int actualStatusCode = default;
 
@@ -90,8 +92,8 @@ namespace Weather.Tests.WeatherApi.Extensions
             var response = new ValidationProblemDetails(
                     new Dictionary<string, string[]>()
                     {
-                        { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "City Name must not be empty." } },
-                        { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "Period Of Days must be between 0 and 5. You entered 7." } }
+                        { nameof(ForecastWeatherRequestDTO.CityName), new string[] { validationMessageForCityName } },
+                        { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { validationMessageForPeriodOfDays } }
                     });
             var arrayByteLength = new ReadOnlyMemory<byte>(JsonSerializer.SerializeToUtf8Bytes(response)).Length;
 
