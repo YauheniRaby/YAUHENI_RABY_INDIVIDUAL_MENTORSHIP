@@ -22,8 +22,6 @@ namespace Weather.Tests.WeatherApi.Extensions
         private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
         private readonly Mock<RequestDelegate> _delegateMock;
         private readonly ExceptionMiddleware _exceptionMiddleware;
-        private readonly string validationMessageForCityName = "City Name must not be empty.";
-        private readonly string validationMessageForPeriodOfDays = "Period Of Days must be between 0 and 5. You entered 7.";
 
         public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
             new List<object[]>
@@ -66,6 +64,9 @@ namespace Weather.Tests.WeatherApi.Extensions
         public async Task InvokeAsync_HandlingValidationException_Success()
         {
             // Arrange
+            string validationMessageForCityName = "City Name must not be empty.";
+            string validationMessageForPeriodOfDays = "Period Of Days must be between 0 and 5. You entered 7.";
+
             var exception = new ValidationException(
                 new List<ValidationFailure>()
                 {
