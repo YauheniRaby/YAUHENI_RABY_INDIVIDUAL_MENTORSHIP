@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using BusinessLayer.Configuration.Abstract;
+using ConsoleApp.Configuration.Abstract;
 
 namespace ConsoleApp.Configuration
 {

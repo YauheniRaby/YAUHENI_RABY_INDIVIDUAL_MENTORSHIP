@@ -1,5 +1,5 @@
-﻿using BusinessLayer.Configuration.Abstract;
-using ConsoleApp;
+﻿using ConsoleApp;
+using ConsoleApp.Configuration.Abstract;
 using Moq;
 using System;
 using System.IO;
@@ -28,7 +28,7 @@ namespace Weather.Tests.Integration
         }
 
         [Fact]
-        public async Task Main_GetCurrentWeather_Seccess()
+        public async Task Main_GetCurrentWeather_Success()
         {
             // Arrange
             var pattern = $"^{menu}{Environment.NewLine}" +
@@ -50,7 +50,7 @@ namespace Weather.Tests.Integration
         }
 
         [Fact]
-        public async Task Main_GetForecastWeather_Seccess()
+        public async Task Main_GetForecastWeather_Success()
         {
             // Arrange
             var countDays = 2;
@@ -76,7 +76,7 @@ namespace Weather.Tests.Integration
         [Theory]
         [InlineData(false)]
         [InlineData(true)]        
-        public async Task Main_GetBestWeatherForArrayCities_Seccess(bool isDebugMode)
+        public async Task Main_GetBestWeatherForArrayCities_Success(bool isDebugMode)
         {
             _config
                 .Setup(config => config.IsDebugMode)
@@ -91,14 +91,14 @@ namespace Weather.Tests.Integration
                 $@"Successful request count: \d, failed: \d.|" +
                 $@"Error, no successful requests. Failed requests count: \d\)";
 
-            var seccessResponsePattern = $"Success case:" +
+            var successResponsePattern = $"Success case:" +
                 $@"\({Environment.NewLine}City: '{cityPattern}', Temp: {temperaturePattern}, Timer: \d{{1,}} ms.\)+";
             var failResponsePattern = $"On fail:" +
                 $@"\({Environment.NewLine}City: '{cityPattern}', ErrorMessage: \w+, Timer: \d{{1,}} ms.\)+";
 
             var debugInfoPattern = isDebugMode
-                ? $@"\({seccessResponsePattern}{Environment.NewLine}|" +
-                $@"{seccessResponsePattern}{Environment.NewLine}{failResponsePattern}{Environment.NewLine}|" +
+                ? $@"\({successResponsePattern}{Environment.NewLine}|" +
+                $@"{successResponsePattern}{Environment.NewLine}{failResponsePattern}{Environment.NewLine}|" +
                 $@"{failResponsePattern}{Environment.NewLine}\)"
                 : string.Empty;
 

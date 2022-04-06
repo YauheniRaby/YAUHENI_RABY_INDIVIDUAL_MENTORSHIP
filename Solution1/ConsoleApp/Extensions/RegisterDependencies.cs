@@ -8,6 +8,7 @@ using BusinessLayer.Services.Abstract;
 using BusinessLayer.Vlidators;
 using ConsoleApp.AutoMap;
 using ConsoleApp.Configuration;
+using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Services;
 using ConsoleApp.Services.Abstract;
 using FluentValidation;
@@ -30,9 +31,11 @@ namespace ConsoleApp.Extensions
             ninjectKernel.Bind<IInvoker>().To<Invoker>();
         }
 
-        public static void AddValidators(this IKernel ninjectKernel)
+        public static void AddValidators(this IKernel ninjectKernel, IConfig config)
         {
-            ninjectKernel.Bind<IValidator<ForecastWeatherRequestDTO>>().To<ForecastWeatherRequestDTOValidator>();
+            ninjectKernel.Bind<IValidator<ForecastWeatherRequestDTO>>().To<ForecastWeatherRequestDTOValidator>()
+                .WithConstructorArgument("minCountDays", config.MinCountDaysForecast)
+                .WithConstructorArgument("maxCountDays", config.MaxCountDaysForecast);
         }
     }
 }

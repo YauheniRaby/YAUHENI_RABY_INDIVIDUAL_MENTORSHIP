@@ -22,7 +22,7 @@ namespace Weather.Tests.BL.Services
         private readonly WeatherApiService _weatherApiService;
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly string cityName = "Minsk";
-        private readonly double temp = 10;
+        private readonly double temp = 10;        
 
         public WeatherApiServiceTests()
         {

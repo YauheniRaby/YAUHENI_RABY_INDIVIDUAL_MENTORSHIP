@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using BusinessLayer.Configuration.Abstract;
 using ConsoleApp.Configuration;
+using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
 using Ninject;
@@ -28,7 +28,7 @@ namespace ConsoleApp
         {
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
-            ninjectKernel.AddValidators();
+            ninjectKernel.AddValidators(config);
             ninjectKernel.Bind<IConfig>().ToConstant(config);
 
             return ninjectKernel;

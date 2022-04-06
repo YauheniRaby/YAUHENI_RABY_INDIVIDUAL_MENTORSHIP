@@ -32,7 +32,8 @@ namespace BusinessLayer.Services
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"));
+                                                options => options.IncludeRuleSets(Constants.Validators.OnlyCityName),
+                                                cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -54,8 +55,13 @@ namespace BusinessLayer.Services
             var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay },
-                                                options => options.IncludeAllRuleSets());
-            
+                                                options => options.IncludeAllRuleSets(),
+                                                cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, cancellationToken);
             forecast.City.Name = cityName;
 
@@ -76,7 +82,8 @@ namespace BusinessLayer.Services
                     var validationResult = await _validator
                                             .ValidateAsync(
                                                 new ForecastWeatherRequestDTO() { CityName = cityName },
-                                                options => options.IncludeRuleSets("CityName"));
+                                                options => options.IncludeRuleSets(Constants.Validators.OnlyCityName),
+                                                cancellationToken);
 
                     if (validationResult.IsValid)
                     {
