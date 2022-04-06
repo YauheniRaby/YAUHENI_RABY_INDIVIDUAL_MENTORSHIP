@@ -64,8 +64,8 @@ namespace Weather.Tests.WeatherApi.Extensions
         public async Task InvokeAsync_HandlingValidationException_Success()
         {
             // Arrange
-            string validationMessageForCityName = "City Name must not be empty.";
-            string validationMessageForPeriodOfDays = "Period Of Days must be between 0 and 5. You entered 7.";
+            var validationMessageForCityName = "City Name must not be empty.";
+            var validationMessageForPeriodOfDays = "Period Of Days must be between 0 and 5. You entered 7.";
 
             var exception = new ValidationException(
                 new List<ValidationFailure>()
