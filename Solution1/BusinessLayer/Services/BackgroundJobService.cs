@@ -15,14 +15,14 @@ namespace BusinessLayer.Services
 {
     public class BackgroundJobService : IBackgroundJobService
     {
-        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IRecurringJobManager _recurringJobManager;
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IMapper _mapper;
         private readonly IWeatherRepository _weatherRepository;
 
-        public BackgroundJobService(IBackgroundJobClient backgroundJobClient, IWeatherServiсe weatherServiсe, IMapper mapper, IWeatherRepository weatherRepository)
+        public BackgroundJobService(IRecurringJobManager recurringJobManager, IWeatherServiсe weatherServiсe, IMapper mapper, IWeatherRepository weatherRepository)
         {
-            _backgroundJobClient = backgroundJobClient;
+            _recurringJobManager = recurringJobManager;
             _weatherRepository = weatherRepository;
             _weatherServiсe = weatherServiсe;
             _mapper = mapper;
@@ -35,8 +35,8 @@ namespace BusinessLayer.Services
             var newArrayCities = request.Select(x => x.CityName.ToLower()).ToList();
             var currentArrayCities = recurringJobs.Select(x => x.Id).ToList();
 
-            currentArrayCities.Except(newArrayCities).ToList().ForEach(x => RecurringJob.RemoveIfExists(x));
-            request.ToList().ForEach(x => RecurringJob.AddOrUpdate(x.CityName.ToLower(), () => GetWeather(x.CityName), Cron.MinuteInterval(x.Timeout)));
+            currentArrayCities.Except(newArrayCities).ToList().ForEach(x => _recurringJobManager.RemoveIfExists(x));
+            request.ToList().ForEach(x => _recurringJobManager.AddOrUpdate(x.CityName.ToLower(), () => GetWeather(x.CityName), Cron.MinuteInterval(x.Timeout)));
         }
 
         public async Task GetWeather(string cityName)
