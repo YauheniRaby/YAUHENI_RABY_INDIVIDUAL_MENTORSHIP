@@ -1,5 +1,4 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services.Abstract;
 using DataAccessLayer.Configuration;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -10,10 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using WeatherApi.Configuration;
 using WeatherApi.Extensions;
+using WeatherApi.Infrastructure;
 
 namespace WeatherApi
 {
@@ -36,6 +35,7 @@ namespace WeatherApi
             services.Configure<PermanentRequestDTO>(Configuration.GetSection(Constants.ConfigurationSection.PermanentRequest));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            services.AddTransient<IStartupFilter, BackgroundJobFilter>();
             services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
             services.AddHangfireServer();
 
@@ -53,7 +53,7 @@ namespace WeatherApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env, IOptionsMonitor<PermanentRequestDTO> monitor)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -73,9 +73,6 @@ namespace WeatherApi
             {
                 endpoints.MapControllers();
             });
-
-            monitor.OnChange(appConfig => backgroundJobs.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(appConfig.CitiesOptions)));
-            backgroundJobs.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(monitor.CurrentValue.CitiesOptions));
         }
     }
 }
