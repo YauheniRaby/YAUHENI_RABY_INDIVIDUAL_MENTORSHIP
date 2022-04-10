@@ -3,8 +3,11 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
+using DataAccessLayer.Configuration;
+using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System;
 using System.Threading.Tasks;
 using WeatherApi.Configuration;
 
@@ -15,19 +18,20 @@ namespace WeatherApi.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly IOptions<AppConfiguration> _AppConfiguration;
+        private readonly IOptions<AppConfiguration> _appConfiguration;
         private readonly IInvoker _invoker;
 
-        public WeatherController(IWeatherServiсe weatherServiсe, IOptions<AppConfiguration> AppConfiguration, IInvoker invoker)
+        public WeatherController(IWeatherServiсe weatherServiсe, IOptions<AppConfiguration> appConfiguration, IInvoker invoker)
         {
             _weatherServiсe = weatherServiсe;
-            _AppConfiguration = AppConfiguration;
+            _appConfiguration = appConfiguration;
             _invoker = invoker;
         }
+
         [HttpGet("current")]
         public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync([FromQuery] string cityName)
         {
-            var token = TokenGenerator.GetCancellationToken(_AppConfiguration.Value.RequestTimeout);
+            var token = TokenGenerator.GetCancellationToken(_appConfiguration.Value.RequestTimeout);
             token.ThrowIfCancellationRequested();
             var command = new CurrentWeatherCommand(_weatherServiсe, cityName);
             var result = await _invoker.RunAsync(command, token);
@@ -37,7 +41,7 @@ namespace WeatherApi.Controllers
         [HttpGet("forecast")]
         public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync([FromQuery] string cityName, [FromQuery] int countDays)
         {
-            var token = TokenGenerator.GetCancellationToken(_AppConfiguration.Value.RequestTimeout);
+            var token = TokenGenerator.GetCancellationToken(_appConfiguration.Value.RequestTimeout);
             token.ThrowIfCancellationRequested();
             var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays);
             var result = await _invoker.RunAsync(command, token);

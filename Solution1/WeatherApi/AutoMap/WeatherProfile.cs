@@ -2,6 +2,7 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Extensions;
+using DataAccessLayer.Models;
 
 namespace WeatherApi.AutoMap
 {
@@ -18,6 +19,9 @@ namespace WeatherApi.AutoMap
             CreateMap<ForecastWeatherApiDTO, ForecastWeatherDTO>()
                 .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.City.Name))
                 .ForMember(dest => dest.WeatherForPeriod, conf => conf.MapFrom(src => src.WeatherPoints.GetMeanValueWeather()));
+            CreateMap<WeatherDTO, Weather>()
+                .ForMember(x => x.Id, opt => opt.Ignore())
+                .ForMember(x => x.Datatime, opt => opt.Ignore());
         }
     }
 }
