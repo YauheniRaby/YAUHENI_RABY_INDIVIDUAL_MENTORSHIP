@@ -10,6 +10,7 @@ using AutoMapper;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository.Abstract;
 using Microsoft.Extensions.Logging;
+using Hangfire.Storage;
 
 namespace BusinessLayer.Services
 {
@@ -34,12 +35,8 @@ namespace BusinessLayer.Services
 
         public Task UpdateJobs(IEnumerable<CityOptionDTO> request)
         {
-            var currentArrayCities = _jobStorage
-                .GetConnection()
-                .GetAllItemsFromSet(Constants.Hangfire.RecurringJobs)
-                .ToList();
-            //var currentArrayCities = _jobStorage.GetConnection().GetRecurringJobs().Select(x => x.Id).ToList();
-
+            var currentArrayCities = _jobStorage.GetConnection().GetRecurringJobs().Select(x => x.Id).ToList();
+            
             var newArrayCities = request.Select(x => x.CityName.ToLower()).ToList();                       
 
             currentArrayCities.Except(newArrayCities).ToList().ForEach(x => _recurringJobManager.RemoveIfExists(x));

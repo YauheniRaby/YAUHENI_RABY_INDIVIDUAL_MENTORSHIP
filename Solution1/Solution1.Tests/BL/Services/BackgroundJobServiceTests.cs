@@ -93,7 +93,9 @@ namespace Weather.Tests.BL.Services
             var cityName3 = "Paris";
             var timeout = 10;
             var timeout2 = 20;
-            
+
+            var jobMode = "recurring-jobs";
+
             var citiesOptionsDto = new List<CityOptionDTO>() 
             { 
                 new CityOptionDTO() { CityName = cityName, Timeout = timeout },
@@ -102,9 +104,9 @@ namespace Weather.Tests.BL.Services
 
             var storageConnectionMock = new Mock<IStorageConnection>();
             storageConnectionMock
-                .Setup(storageConnection => 
+                .Setup(storageConnection =>
                     storageConnection.GetAllItemsFromSet(
-                        It.Is<string>(x => x == Constants.Hangfire.RecurringJobs)))
+                        It.Is<string>(x => x == jobMode)))
                 .Returns(new HashSet<string>() { cityName.ToLower(), cityName3.ToLower()});
 
             _jobStorageMock.Setup(jobStorage => jobStorage.GetConnection()).Returns(storageConnectionMock.Object);
@@ -113,7 +115,7 @@ namespace Weather.Tests.BL.Services
             await _backgroundJobService.UpdateJobs(citiesOptionsDto);
 
             // Assert
-            storageConnectionMock.Verify(x => x.GetAllItemsFromSet(It.Is<string>(x => x == Constants.Hangfire.RecurringJobs)));
+            storageConnectionMock.Verify(x => x.GetAllItemsFromSet(It.Is<string>(x => x == jobMode)));
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == cityName3.ToLower())), Times.Once);
             _recurringJobManagerMock.Verify(
                 x => x.AddOrUpdate(
