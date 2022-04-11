@@ -7,6 +7,7 @@ using DataAccessLayer.Repository.Abstract;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Storage;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -22,7 +23,6 @@ namespace Weather.Tests.BL.Services
     {
         private readonly Mock<IRecurringJobManager> _recurringJobManagerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiсeMock;
-        private readonly IMapper _mapper;
         private readonly Mock<IWeatherRepository> _weatherRepositoryMock;
         private readonly Mock<JobStorage> _jobStorageMock;
         private readonly Mock<ILogger<BackgroundJobService>> _loggerMock;
@@ -33,10 +33,10 @@ namespace Weather.Tests.BL.Services
         {
             _recurringJobManagerMock = new Mock<IRecurringJobManager>();
             _weatherServiсeMock = new Mock<IWeatherServiсe>();
-            _mapper = _mapper = new Mapper(MapperConfig.GetConfiguration());
             _weatherRepositoryMock = new Mock<IWeatherRepository>();
             _jobStorageMock = new Mock<JobStorage>();
             _loggerMock = new Mock<ILogger<BackgroundJobService>>();
+            var _mapper = new Mapper(MapperConfig.GetConfiguration());
             _backgroundJobService = new BackgroundJobService(_weatherServiсeMock.Object, _weatherRepositoryMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object, _mapper, _loggerMock.Object);
         }
         
@@ -94,26 +94,26 @@ namespace Weather.Tests.BL.Services
             var timeout = 10;
             var timeout2 = 20;
             
-            var arrayJobs = new HashSet<string>() { cityName.ToLower(), cityName3.ToLower() };
-            var ciriesOptionsDto = new List<CityOptionDTO>() 
+            var citiesOptionsDto = new List<CityOptionDTO>() 
             { 
                 new CityOptionDTO() { CityName = cityName, Timeout = timeout },
                 new CityOptionDTO() { CityName = cityName2, Timeout = timeout2 }
             };
-            var storageConnection = new Mock<IStorageConnection>();
-            _jobStorageMock.Setup(jobStorage => jobStorage.GetConnection()).Returns(storageConnection.Object);
-            
-            storageConnection
+
+            var storageConnectionMock = new Mock<IStorageConnection>();
+            storageConnectionMock
                 .Setup(storageConnection => 
                     storageConnection.GetAllItemsFromSet(
                         It.Is<string>(x => x == Constants.Hangfire.RecurringJobs)))
-                .Returns(arrayJobs);
+                .Returns(new HashSet<string>() { cityName.ToLower(), cityName3.ToLower()});
+
+            _jobStorageMock.Setup(jobStorage => jobStorage.GetConnection()).Returns(storageConnectionMock.Object);
             
             // Act
-            await _backgroundJobService.UpdateJobs(ciriesOptionsDto);
+            await _backgroundJobService.UpdateJobs(citiesOptionsDto);
 
             // Assert
-            storageConnection.Verify(x => x.GetAllItemsFromSet(It.Is<string>(x => x == Constants.Hangfire.RecurringJobs)));
+            storageConnectionMock.Verify(x => x.GetAllItemsFromSet(It.Is<string>(x => x == Constants.Hangfire.RecurringJobs)));
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == cityName3.ToLower())), Times.Once);
             _recurringJobManagerMock.Verify(
                 x => x.AddOrUpdate(
@@ -121,18 +121,14 @@ namespace Weather.Tests.BL.Services
                     It.IsAny<Job>(),
                     It.IsAny<string>(),
                     It.IsAny<RecurringJobOptions>()), Times.Exactly(2));
-            _recurringJobManagerMock.Verify(
-                x => x.AddOrUpdate(
-                    It.Is<string>(x => x == cityName.ToLower()),
-                    It.Is<Job>(x => x.Method.Name == nameof(BackgroundJobService.GetWeather)),
-                    It.Is<string>(x => x == Cron.MinuteInterval(timeout)),
-                    It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id)));
-            _recurringJobManagerMock.Verify(
-                x => x.AddOrUpdate(
-                    It.Is<string>(x => x == cityName2.ToLower()),
-                    It.Is<Job>(x => x.Method.Name == nameof(BackgroundJobService.GetWeather)),
-                    It.Is<string>(x => x == Cron.MinuteInterval(timeout2)),
-                    It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id)));
+            
+            citiesOptionsDto.ForEach(option =>
+                _recurringJobManagerMock.Verify(x => 
+                    x.AddOrUpdate(
+                        It.Is<string>(x => x == option.CityName.ToLower()),
+                        It.Is<Job>(x => new CompareLogic().Compare(Job.FromExpression<BackgroundJobService>(x => x.GetWeather(option.CityName)), x).AreEqual),
+                        It.Is<string>(x => x == Cron.MinuteInterval(option.Timeout)),
+                        It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id))));
         }
     }
 }
