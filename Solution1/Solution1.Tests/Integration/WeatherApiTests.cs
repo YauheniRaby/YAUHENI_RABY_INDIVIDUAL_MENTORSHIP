@@ -22,6 +22,7 @@ namespace Weather.Tests.Integration
         private readonly int countDays = 3;
         private readonly string currentWeatherURL = "/api/weather/current?";
         private readonly string forecastWeatherURL = "/api/weather/forecast?";
+        private readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=weatherdb;Trusted_Connection=True;";
         private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
 
         public static IEnumerable<object[]> DataForValidationTest =>
@@ -239,14 +240,15 @@ namespace Weather.Tests.Integration
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
-        private HttpClient GetClient(int RequestTimeout = 5000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
+        private HttpClient GetClient(int requestTimeout = 5000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
         {
             var configuration = new Dictionary<string, string>
             {
                 {"AppConfiguration:MaxCountDaysForecast", $"{maxCountDaysForecast}"},
                 {"AppConfiguration:MinCountDaysForecast", $"{minCountDaysForecast}"},
                 {"AppConfiguration:IsDebugMode", $"{isDebugMode}"},
-                {"AppConfiguration:RequestTimeout", $"{RequestTimeout}"}
+                {"AppConfiguration:RequestTimeout", $"{requestTimeout}"},
+                {"ConnectionStrings:DefaultConnection", $"{connectionString}"}
             };
 
             var server = new TestServer(new WebHostBuilder()
