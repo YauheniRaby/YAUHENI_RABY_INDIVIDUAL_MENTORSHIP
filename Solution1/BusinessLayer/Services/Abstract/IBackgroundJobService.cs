@@ -1,10 +1,11 @@
 ﻿using BusinessLayer.DTOs;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BusinessLayer.Services.Abstract
 {
     public interface IBackgroundJobService
     {
-        void UpdateJobs(IEnumerable<CityOptionDTO> options);
+        Task UpdateJobs(IEnumerable<CityOptionDTO> options);
     }
 }
