@@ -19,19 +19,21 @@ namespace BusinessLayer.Services
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IMapper _mapper;
         private readonly IWeatherRepository _weatherRepository;
+        private readonly JobStorage _jobStorage;
 
-        public BackgroundJobService(IRecurringJobManager recurringJobManager, IWeatherServiсe weatherServiсe, IMapper mapper, IWeatherRepository weatherRepository)
+        public BackgroundJobService(IWeatherServiсe weatherServiсe, IWeatherRepository weatherRepository, IRecurringJobManager recurringJobManager, JobStorage jobStorage, IMapper mapper)
         {
             _recurringJobManager = recurringJobManager;
             _weatherRepository = weatherRepository;
             _weatherServiсe = weatherServiсe;
             _mapper = mapper;
+            _jobStorage = jobStorage;
         }
 
         public void UpdateJobs(IEnumerable<CityOptionDTO> request)
         {
-            var recurringJobs = JobStorage.Current.GetConnection().GetRecurringJobs();
-
+            var recurringJobs = _jobStorage.GetConnection().GetRecurringJobs();
+            
             var newArrayCities = request.Select(x => x.CityName.ToLower()).ToList();
             var currentArrayCities = recurringJobs.Select(x => x.Id).ToList();
 
