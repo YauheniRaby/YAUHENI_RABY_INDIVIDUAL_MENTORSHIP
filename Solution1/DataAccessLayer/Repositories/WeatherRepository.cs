@@ -1,10 +1,10 @@
 ﻿using DataAccessLayer.Configuration;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repository.Abstract;
+using DataAccessLayer.Repositories.Abstract;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Repository
+namespace DataAccessLayer.Repositories
 {
     public class WeatherRepository : IWeatherRepository
     {

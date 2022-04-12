@@ -1,5 +1,5 @@
-﻿using DataAccessLayer.Repository;
-using DataAccessLayer.Repository.Abstract;
+﻿using DataAccessLayer.Repositories;
+using DataAccessLayer.Repositories.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace WeatherApi.Extensions

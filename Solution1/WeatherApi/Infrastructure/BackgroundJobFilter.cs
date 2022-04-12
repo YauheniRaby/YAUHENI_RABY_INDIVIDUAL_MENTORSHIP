@@ -1,5 +1,4 @@
-﻿using BusinessLayer.DTOs;
-using BusinessLayer.Models;
+﻿using BusinessLayer.Configuration;
 using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;

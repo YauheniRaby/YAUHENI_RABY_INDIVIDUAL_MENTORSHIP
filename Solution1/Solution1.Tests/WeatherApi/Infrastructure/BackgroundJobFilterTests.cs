@@ -1,4 +1,5 @@
-﻿using BusinessLayer.DTOs;
+﻿using BusinessLayer.Configuration;
+using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Hangfire.Common;
@@ -30,10 +31,10 @@ namespace Weather.Tests.WeatherApi.Infrastructure
         public void Configure_SetStartupSettingsForBackgroundJob_Success()
         {
             //Arrange
-            var citiesOptions = new List<CityOptionDTO>
+            var citiesOptions = new List<CityOption>
             {
-                new CityOptionDTO(){ CityName = "Minsk", Timeout = 10 },
-                new CityOptionDTO(){ CityName = "Paris", Timeout = 15 },
+                new CityOption(){ CityName = "Minsk", Timeout = 10 },
+                new CityOption(){ CityName = "Paris", Timeout = 15 },
             };
             
             _configMonitor

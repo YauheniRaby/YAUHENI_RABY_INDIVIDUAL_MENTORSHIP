@@ -3,7 +3,6 @@ using Hangfire;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Hangfire.Storage;
 using BusinessLayer.Configuration;
 
@@ -15,7 +14,7 @@ namespace BusinessLayer.Services
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly JobStorage _jobStorage;
 
-        public BackgroundJobService(IWeatherServiсe weatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage, IMapper mapper, ILogger<BackgroundJobService> logger)
+        public BackgroundJobService(IWeatherServiсe weatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage, IMapper mapper)
         {
             _recurringJobManager = recurringJobManager;
             _weatherServiсe = weatherServiсe;
@@ -42,13 +41,13 @@ namespace BusinessLayer.Services
             var removeJobs = currentJobs
                 .Where(currentJob => !newJobs.Any(newJob => newJob.Name == currentJob.Name && newJob.Timeout == currentJob.Timeout))
                 .ToList();
-            
+
             removeJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
 
             dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.BackgroundSaveWeatherAsync(x.Value), x.Key));
         }
 
-        public string GetJobName(IEnumerable<string> cities)
+        private string GetJobName(IEnumerable<string> cities)
         {
             return cities
                     .OrderBy(c => c)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Repository.Abstract
+namespace DataAccessLayer.Repositories.Abstract
 {
     public interface IWeatherRepository
     {

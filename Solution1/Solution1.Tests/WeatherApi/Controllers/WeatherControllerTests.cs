@@ -21,7 +21,7 @@ namespace Weather.Tests.WeatherApi.Controllers
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
-        private readonly Mock<IOptions<AppConfiguration>> _appParams;
+        private readonly Mock<IOptionsMonitor<AppConfiguration>> _appParams;
         private readonly WeatherController _weatherController;
         private readonly string cityName = "Minsk";
 
@@ -36,7 +36,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _appParams = new Mock<IOptions<AppConfiguration>>();
+            _appParams = new Mock<IOptionsMonitor<AppConfiguration>>();
             
             _weatherController = new WeatherController(_weatherServiceMock.Object, _appParams.Object, _invokerMock.Object);
         }
@@ -161,7 +161,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         private void SetTimeoutForAppParams(int? timeout = null)
         {
             _appParams
-                .Setup(x => x.Value)
+                .Setup(x => x.CurrentValue)
                 .Returns(new AppConfiguration() { RequestTimeout = timeout });
         }
     }

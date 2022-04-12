@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using BusinessLayer.DTOs.Enums;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repository.Abstract;
+using DataAccessLayer.Repositories.Abstract;
 using Microsoft.Extensions.Logging;
 
 namespace BusinessLayer.Services
@@ -139,13 +139,15 @@ namespace BusinessLayer.Services
         {
             try
             {
-                var weathers = cities.Select(async city => {
+                var weathers = cities.Select(async city =>
+                {
                     var weathers = _mapper.Map<Weather>(await GetByCityNameAsync(city, CancellationToken.None));
                     weathers.Datatime = DateTime.UtcNow;
                     return weathers;
                 });
-                await _weatherRepository.BulkSaveWeatherAsync(await Task.WhenAll(weathers));
 
+                var result = await Task.WhenAll(weathers);                
+                await _weatherRepository.BulkSaveWeatherAsync(result);
             }
             catch(Exception ex)
             {
