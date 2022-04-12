@@ -1,28 +1,24 @@
 ﻿using DataAccessLayer.Configuration;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository.Abstract;
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repository
 {
     public class WeatherRepository : IWeatherRepository
     {
-        readonly IDbContextFactory<RepositoryContext> _repositoryFactory;
+        readonly RepositoryContext _repository;
 
-        public WeatherRepository(IDbContextFactory<RepositoryContext> repositoryFactory)
+        public WeatherRepository(RepositoryContext repository)
         {
-            _repositoryFactory = repositoryFactory;
-        }
-
-        public async Task AddWeatherAsync (Weather weather)
-        {
-            using (var repository = _repositoryFactory.CreateDbContext())
-            {
-                await repository.CurrentWeathers.AddAsync(weather);
-                await repository.SaveChangesAsync();
-            }            
+            _repository = repository;
         }
         
+        public async Task BulkSaveWeatherAsync(IEnumerable<Weather> weather)
+        {
+            await _repository.CurrentWeathers.AddRangeAsync(weather);
+            await _repository.SaveChangesAsync();            
+        }
     }
 }

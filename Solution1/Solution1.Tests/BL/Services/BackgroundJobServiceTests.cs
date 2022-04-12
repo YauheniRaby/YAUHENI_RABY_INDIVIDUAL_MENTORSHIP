@@ -67,7 +67,7 @@ namespace Weather.Tests.BL.Services
                             x.Comment == comment 
                             && x.Temp == temp 
                             && x.CityName == cityName 
-                            && x.Datatime != default(DateTime))));
+                            && x.Datatime.Day == DateTime.UtcNow.Day)));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Weather.Tests.BL.Services
         }
 
         [Fact]
-        public async Task UpdateJobs_EnterArrayCitiesOptions_Success()
+        public void UpdateJobs_EnterArrayCitiesOptions_Success()
         {
             // Arrange
             var cityName2 = "Berlin";
@@ -112,7 +112,7 @@ namespace Weather.Tests.BL.Services
             _jobStorageMock.Setup(jobStorage => jobStorage.GetConnection()).Returns(storageConnectionMock.Object);
             
             // Act
-            await _backgroundJobService.UpdateJobs(citiesOptionsDto);
+            _backgroundJobService.UpdateJobs(citiesOptionsDto);
 
             // Assert
             storageConnectionMock.Verify(x => x.GetAllItemsFromSet(It.Is<string>(x => x == jobMode)));

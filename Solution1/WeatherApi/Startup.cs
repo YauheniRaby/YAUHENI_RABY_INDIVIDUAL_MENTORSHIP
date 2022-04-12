@@ -1,4 +1,4 @@
-using BusinessLayer.DTOs;
+using BusinessLayer.Configuration;
 using DataAccessLayer.Configuration;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WeatherApi.Configuration;
 using WeatherApi.Extensions;
-using WeatherApi.Infrastructure;
 
 namespace WeatherApi
 {
@@ -28,22 +27,21 @@ namespace WeatherApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = Configuration.GetConnectionString(Constants.Connection.NameDBConnection);
-            services.AddDbContextFactory<RepositoryContext>(options => options.UseSqlServer(connectionString));
-            
-            services.Configure<AppConfiguration>(Configuration.GetSection(Constants.ConfigurationSection.AppConfiguration));
-            services.Configure<PermanentRequestDTO>(Configuration.GetSection(Constants.ConfigurationSection.PermanentRequest));
+            string connectionString = Configuration[Constants.Connection.NameDbConnection];
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+            services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
+            services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            services.AddTransient<IStartupFilter, BackgroundJobFilter>();
             services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
             services.AddHangfireServer();
 
-            services.AddLogging(opt => opt.AddSimpleConsole());
-            services.AddValidators();
+            services.AddStartupFilter();
             services.AddServices();
-            services.AddRepository();
-
+            services.AddRepositories();
+            services.AddValidators();
+            services.AddLogging(opt => opt.AddSimpleConsole());
+            
             services.AddControllers();
             
             services.AddSwaggerGen(c =>

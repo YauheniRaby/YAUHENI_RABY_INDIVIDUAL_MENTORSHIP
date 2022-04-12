@@ -4,7 +4,7 @@
     {
         public static class Connection
         {
-            public const string NameDBConnection = "DefaultConnection";
+            public const string NameDbConnection = "ConnectionStrings:DefaultConnection";
         }
     }
 }

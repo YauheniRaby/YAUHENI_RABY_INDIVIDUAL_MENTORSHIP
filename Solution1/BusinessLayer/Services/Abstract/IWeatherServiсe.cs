@@ -13,5 +13,7 @@ namespace BusinessLayer.Services.Abstract
         Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, CancellationToken cancellationToken);
 
         Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, CancellationToken cancellationToken);
+
+        Task BackgroundSaveWeatherAsync(IEnumerable<string> cities);
     }
 }

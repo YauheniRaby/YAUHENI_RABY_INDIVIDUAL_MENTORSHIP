@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.DTOs;
+using BusinessLayer.Models;
 using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -11,9 +12,9 @@ namespace WeatherApi.Infrastructure
     public class BackgroundJobFilter : IStartupFilter
     {
         private readonly IBackgroundJobClient _backgroundJobsClinent;
-        private readonly IOptionsMonitor<PermanentRequestDTO> _configMonitor;
+        private readonly IOptionsMonitor<BackgroundJobConfiguration> _configMonitor;
 
-        public BackgroundJobFilter(IBackgroundJobClient backgroundJobsClinent, IOptionsMonitor<PermanentRequestDTO> configMonitor)
+        public BackgroundJobFilter(IBackgroundJobClient backgroundJobsClinent, IOptionsMonitor<BackgroundJobConfiguration> configMonitor)
         {
             _backgroundJobsClinent = backgroundJobsClinent;
             _configMonitor = configMonitor;

@@ -10,6 +10,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using BusinessLayer.DTOs.Enums;
+using DataAccessLayer.Models;
+using DataAccessLayer.Repository.Abstract;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLayer.Services
 {
@@ -17,13 +20,17 @@ namespace BusinessLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IWeatherApiService _weatherApiService;
-        private readonly IValidator<ForecastWeatherRequestDTO> _validator;        
+        private readonly IWeatherRepository _weatherRepository;
+        private readonly IValidator<ForecastWeatherRequestDTO> _validator;
+        private readonly ILogger<WeatherService> _logger;
 
-        public WeatherService(IMapper mapper, IWeatherApiService weatherApiService, IValidator<ForecastWeatherRequestDTO> validator) 
+        public WeatherService(IMapper mapper, IWeatherApiService weatherApiService, IWeatherRepository weatherRepository, IValidator<ForecastWeatherRequestDTO> validator, ILogger<WeatherService> logger) 
         { 
             _mapper = mapper;
             _weatherApiService = weatherApiService;
+            _weatherRepository = weatherRepository;
             _validator = validator;
+            _logger = logger;
         }
 
         public async Task<WeatherDTO> GetByCityNameAsync(string cityName, CancellationToken cancellationToken)
@@ -126,6 +133,24 @@ namespace BusinessLayer.Services
                             .GroupBy(w => w.ResponseStatus)
                             .ToDictionary(k => k.Key, v => v.Select(response => response));
             return result;
+        }
+
+        public async Task BackgroundSaveWeatherAsync(IEnumerable<string> cities)
+        {
+            try
+            {
+                var weathers = cities.Select(async city => {
+                    var weathers = _mapper.Map<Weather>(await GetByCityNameAsync(city, CancellationToken.None));
+                    weathers.Datatime = DateTime.UtcNow;
+                    return weathers;
+                });
+                await _weatherRepository.BulkSaveWeatherAsync(await Task.WhenAll(weathers));
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
         }
     }
 }

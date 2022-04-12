@@ -16,13 +16,13 @@ namespace Weather.Tests.WeatherApi.Infrastructure
     public class BackgroundJobFilterTests
     {
         private readonly Mock<IBackgroundJobClient> _backgroundJobsClinent;
-        private readonly Mock<IOptionsMonitor<PermanentRequestDTO>> _configMonitor;
+        private readonly Mock<IOptionsMonitor<BackgroundJobConfiguration>> _configMonitor;
         private readonly BackgroundJobFilter _backgroundJobFilter;
         
         public BackgroundJobFilterTests()
         {
             _backgroundJobsClinent = new Mock<IBackgroundJobClient>();
-            _configMonitor = new Mock<IOptionsMonitor<PermanentRequestDTO>>();
+            _configMonitor = new Mock<IOptionsMonitor<BackgroundJobConfiguration>>();
             _backgroundJobFilter = new BackgroundJobFilter(_backgroundJobsClinent.Object, _configMonitor.Object);
         }
 
@@ -38,7 +38,7 @@ namespace Weather.Tests.WeatherApi.Infrastructure
             
             _configMonitor
                 .Setup(config => config.CurrentValue)
-                .Returns(new PermanentRequestDTO() { CitiesOptions = citiesOptions });
+                .Returns(new BackgroundJobConfiguration() { CitiesOptions = citiesOptions });
             
             //Act
             _backgroundJobFilter.Configure(appBilder => { });
@@ -47,7 +47,7 @@ namespace Weather.Tests.WeatherApi.Infrastructure
             var expectedJob = Job.FromExpression<IBackgroundJobService>(x => x.UpdateJobs(citiesOptions));
 
             _configMonitor.Verify(
-                configMonitor => configMonitor.OnChange(It.IsAny<Action<PermanentRequestDTO, string>>()));
+                configMonitor => configMonitor.OnChange(It.IsAny<Action<BackgroundJobConfiguration, string>>()));
 
             _backgroundJobsClinent.Verify(
                 client => client.Create(
