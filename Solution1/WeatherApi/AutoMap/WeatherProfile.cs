@@ -19,9 +19,13 @@ namespace WeatherApi.AutoMap
             CreateMap<ForecastWeatherApiDTO, ForecastWeatherDTO>()
                 .ForMember(dest => dest.CityName, conf => conf.MapFrom(src => src.City.Name))
                 .ForMember(dest => dest.WeatherForPeriod, conf => conf.MapFrom(src => src.WeatherPoints.GetMeanValueWeather()));
-            CreateMap<WeatherDTO, Weather>()
+            //CreateMap<WeatherDTO, Weather>()
+            //    .ForMember(x => x.Id, opt => opt.Ignore())
+            //    .ForMember(x => x.Datatime, opt => opt.Ignore());
+            CreateMap<WeatherResponseDTO, Weather>()
                 .ForMember(x => x.Id, opt => opt.Ignore())
-                .ForMember(x => x.Datatime, opt => opt.Ignore());
+                .ForMember(x => x.Datatime, opt => opt.Ignore())
+                .ForMember(x => x.Comment, opt => opt.Ignore());
         }
     }
 }

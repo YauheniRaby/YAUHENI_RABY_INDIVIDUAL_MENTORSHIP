@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace DataAccessLayer.Models
 {
     public class Weather
@@ -13,5 +12,10 @@ namespace DataAccessLayer.Models
         public double Temp { get; set; }
 
         public DateTime Datatime { get; set; }
+
+        public void Select()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

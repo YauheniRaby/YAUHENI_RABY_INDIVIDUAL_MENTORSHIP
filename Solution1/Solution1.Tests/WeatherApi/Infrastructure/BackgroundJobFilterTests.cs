@@ -1,5 +1,4 @@
-﻿using BusinessLayer.Configuration;
-using BusinessLayer.DTOs;
+﻿using BusinessLayer.Models;
 using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Hangfire.Common;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
+using WeatherApi.Configuration;
 using WeatherApi.Infrastructure;
 using Xunit;
 

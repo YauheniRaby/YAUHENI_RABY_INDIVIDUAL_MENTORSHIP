@@ -1,4 +1,3 @@
-using BusinessLayer.Configuration;
 using DataAccessLayer.Configuration;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -36,7 +35,7 @@ namespace WeatherApi
             services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
             services.AddHangfireServer();
 
-            services.AddStartupFilter();
+            services.AddStartupFilters();
             services.AddServices();
             services.AddRepositories();
             services.AddValidators();

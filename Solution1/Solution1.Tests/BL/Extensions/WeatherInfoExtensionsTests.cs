@@ -1,5 +1,4 @@
-﻿using BusinessLayer;
-using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Extensions;
 using KellermanSoftware.CompareNetObjects;

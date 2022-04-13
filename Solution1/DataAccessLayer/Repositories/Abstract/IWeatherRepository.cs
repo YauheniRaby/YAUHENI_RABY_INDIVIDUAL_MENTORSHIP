@@ -6,6 +6,6 @@ namespace DataAccessLayer.Repositories.Abstract
 {
     public interface IWeatherRepository
     {
-        Task BulkSaveWeatherAsync(IEnumerable<Weather> weather);
+        Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList);
     }
 }

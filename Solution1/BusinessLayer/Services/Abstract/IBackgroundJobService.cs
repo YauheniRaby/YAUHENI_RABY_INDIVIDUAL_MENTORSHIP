@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Configuration;
+﻿using BusinessLayer.Models;
 using System.Collections.Generic;
 
 namespace BusinessLayer.Services.Abstract

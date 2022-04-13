@@ -8,17 +8,17 @@ namespace DataAccessLayer.Repositories
 {
     public class WeatherRepository : IWeatherRepository
     {
-        readonly RepositoryContext _repository;
+        readonly RepositoryContext _context;
 
-        public WeatherRepository(RepositoryContext repository)
+        public WeatherRepository(RepositoryContext context)
         {
-            _repository = repository;
+            _context = context;
         }
         
-        public async Task BulkSaveWeatherAsync(IEnumerable<Weather> weather)
+        public async Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList)
         {
-            await _repository.CurrentWeathers.AddRangeAsync(weather);
-            await _repository.SaveChangesAsync();            
+            await _context.CurrentWeathers.AddRangeAsync(weatherList);
+            await _context.SaveChangesAsync();            
         }
     }
 }

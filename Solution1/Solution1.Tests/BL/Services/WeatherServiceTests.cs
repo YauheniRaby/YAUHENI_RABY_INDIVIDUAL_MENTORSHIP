@@ -29,10 +29,11 @@ namespace Weather.Tests.BL.Services
         private readonly Mock<IWeatherApiService> _weatherApiServiceMock;
         private readonly Mock<IWeatherRepository> _weatherRepositoryMock;
         private readonly Mock<ILogger<WeatherService>> _loggerMock;
-        private readonly string cityName = "Minsk";
-        private readonly double temp = 11;
-        private readonly string comment = Constants.WeatherComments.Fresh;
-        private readonly ValidationResult validResult = new ValidationResult(new List<ValidationFailure>());
+        private readonly string _cityName = "Minsk";
+        private readonly double _temp = 11;
+        private readonly string _comment = Constants.WeatherComments.Fresh;
+        private readonly ValidationResult _validResult = new ValidationResult(new List<ValidationFailure>());
+
 
         public WeatherServiceTests()
         {
@@ -48,33 +49,33 @@ namespace Weather.Tests.BL.Services
         public async Task GetByCityNameAsync_ReturnedWeatherDTO_Success()
         {
             // Arrange            
-            var weatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
+            var weatherApiDto = new WeatherApiDTO() { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = _temp } };
             
             _validator
                  .Setup(validator => validator.ValidateAsync
-                     (It.Is<ValidationContext<ForecastWeatherRequestDTO>>(context => context.InstanceToValidate.CityName == cityName),
+                     (It.Is<ValidationContext<ForecastWeatherRequestDTO>>(context => context.InstanceToValidate.CityName == _cityName),
                      It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(validResult);
+                 .ReturnsAsync(_validResult);
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
                     weatherApiService.GetByCityNameAsync
-                    (It.Is<string>(x => x == cityName),
+                    (It.Is<string>(x => x == _cityName),
                      It.IsAny<CancellationToken>()))
                 .ReturnsAsync(weatherApiDto);
 
             // Act
-            var result = await _weatherService.GetByCityNameAsync(cityName, CancellationToken.None);
+            var result = await _weatherService.GetByCityNameAsync(_cityName, CancellationToken.None);
 
             // Assert
-            var expectedWeatherDto = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = comment };
+            var expectedWeatherDto = new WeatherDTO() { CityName = _cityName, Temp = _temp, Comment = _comment };
             Assert.True(new CompareLogic().Compare(expectedWeatherDto, result).AreEqual);
         }
 
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetByCityNameAsync(cityName, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetByCityNameAsync(_cityName, new CancellationToken(true)));
         }
 
         [Theory]
@@ -91,7 +92,7 @@ namespace Weather.Tests.BL.Services
 
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
-                City = new CityApiDTO() { Name = cityName },
+                City = new CityApiDTO() { Name = _cityName },
                 WeatherPoints = new List<WeatherInfoApiDTO>()
                 {
                     new WeatherInfoApiDTO() { DateTime = startForecast, Temp = new TempApiDTO { Value = 11 }},
@@ -105,27 +106,27 @@ namespace Weather.Tests.BL.Services
                 .Setup(validator => validator.ValidateAsync
                     (It.Is<ValidationContext<ForecastWeatherRequestDTO>>
                         (context =>
-                            context.InstanceToValidate.CityName == cityName
+                            context.InstanceToValidate.CityName == _cityName
                             && context.InstanceToValidate.PeriodOfDays == countDays),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(validResult);
+                .ReturnsAsync(_validResult);
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoints, It.IsAny<CancellationToken>()))
+                    weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
-            var result = await _weatherService.GetForecastByCityNameAsync(cityName, countDays, CancellationToken.None);
+            var result = await _weatherService.GetForecastByCityNameAsync(_cityName, countDays, CancellationToken.None);
 
             //Assert
             var expectedWeatherDto = new ForecastWeatherDTO()
             {
-                CityName = cityName,
+                CityName = _cityName,
                 WeatherForPeriod = new List<WeatherForDateDTO>()
                 {
-                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12, Comment = comment },
-                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15, Comment = comment }
+                    new WeatherForDateDTO() { DateTime = startForecast, Temp = 12, Comment = _comment },
+                    new WeatherForDateDTO() { DateTime = startForecast.AddDays(1), Temp = 15, Comment = _comment }
                 }
             };
 
@@ -135,7 +136,7 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetForecastByCityNameAsync(cityName, 3, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetForecastByCityNameAsync(_cityName, 3, new CancellationToken(true)));
         }
 
         [Fact]
@@ -151,10 +152,10 @@ namespace Weather.Tests.BL.Services
             var errorMessage4 = "Test validation error";
             var errorMessage5 = "Unknown error";
 
-            var weatherApiDto1 = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() };
+            var weatherApiDto1 = new WeatherApiDTO() { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() };
             var weatherApiDto2 = new WeatherApiDTO() { CityName = cityName2, TemperatureValues = new WeatherApiTempDTO() };
 
-            var listCityName = new List<string>() { cityName, cityName2, cityName3, cityName4, cityName5};
+            var listCityName = new List<string>() { _cityName, cityName2, cityName3, cityName4, cityName5};
 
             var validationFailure = new List<ValidationFailure>() { new ValidationFailure("CityName", "Test validation error")};
             var notValidResult = new ValidationResult(validationFailure);
@@ -174,12 +175,12 @@ namespace Weather.Tests.BL.Services
                  .Setup(validator => validator.ValidateAsync(
                      It.Is<ValidationContext<ForecastWeatherRequestDTO>>(
                          context =>
-                            context.InstanceToValidate.CityName == cityName
+                            context.InstanceToValidate.CityName == _cityName
                             || context.InstanceToValidate.CityName == cityName2
                             || context.InstanceToValidate.CityName == cityName3
                             || context.InstanceToValidate.CityName == cityName5),
                      It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(validResult);
+                 .ReturnsAsync(_validResult);
 
             // Act
             var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, CancellationToken.None);
@@ -192,7 +193,7 @@ namespace Weather.Tests.BL.Services
             Assert.Equal(2, result[ResponseStatus.Successful].Count());
             Assert.Equal(3, result[ResponseStatus.Fail].Count());
 
-            Assert.Contains(result[ResponseStatus.Successful], weatherResponse => weatherResponse.CityName == cityName);
+            Assert.Contains(result[ResponseStatus.Successful], weatherResponse => weatherResponse.CityName == _cityName);
             Assert.Contains(result[ResponseStatus.Successful], weatherResponse => weatherResponse.CityName == cityName2);
             Assert.Contains(result[ResponseStatus.Fail], weatherResponse => weatherResponse.CityName == cityName3
                                                               && weatherResponse.ErrorMessage == errorMessage3);
@@ -208,7 +209,7 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var cityName2 = "Paris";
             var errorMessage = "Timeout exceeded";
-            var listCityName = new List<string>() { cityName, cityName2 };
+            var listCityName = new List<string>() { _cityName, cityName2 };
             
             //Act
             var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, new CancellationToken(true));
@@ -217,7 +218,7 @@ namespace Weather.Tests.BL.Services
             Assert.NotNull(result.Keys);
             Assert.Contains(result.Keys, k => k == ResponseStatus.Canceled);
             Assert.Equal(2, result[ResponseStatus.Canceled].Count());
-            Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == cityName
+            Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == _cityName
                                                               && weatherResponse.ErrorMessage == errorMessage);
             Assert.Contains(result[ResponseStatus.Canceled], weatherResponse => weatherResponse.CityName == cityName2
                                                               && weatherResponse.ErrorMessage == errorMessage);
@@ -230,19 +231,18 @@ namespace Weather.Tests.BL.Services
             var cityName2 = "Paris";
             var temp2 = 5;
             var comment2 = Constants.WeatherComments.Fresh;
-            var listCityName = new List<string>() { cityName, cityName2 };
+            var listCityName = new List<string>() { _cityName, cityName2 };
             
             _validator
                  .Setup(validator => validator.ValidateAsync(
                      It.Is<ValidationContext<ForecastWeatherRequestDTO>>(
                          context =>
-                            context.InstanceToValidate.CityName == cityName
+                            context.InstanceToValidate.CityName == _cityName
                             || context.InstanceToValidate.CityName == cityName2),
                      It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(validResult);
+                 .ReturnsAsync(_validResult);
 
-
-            SetWeatherApiServiceSettings(new WeatherApiDTO { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } });
+            SetWeatherApiServiceSettings(new WeatherApiDTO { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = _temp } });
             SetWeatherApiServiceSettings(new WeatherApiDTO { CityName = cityName2, TemperatureValues = new WeatherApiTempDTO() { Temp = temp2 } });
             
             //Act
@@ -250,10 +250,10 @@ namespace Weather.Tests.BL.Services
 
             // Assert
             _weatherRepositoryMock.Verify(repository =>
-                repository.BulkSaveWeatherAsync(
-                    It.Is<DataAccessLayer.Models.Weather[]>(
-                        x => x.Length == 2
-                        && x.Any(weather => weather.CityName == cityName && weather.Temp == temp && weather.Comment == comment && weather.Datatime.Day == DateTime.UtcNow.Day)
+                repository.BulkSaveWeatherListAsync(
+                    It.Is<List<DataAccessLayer.Models.Weather>>(
+                        x => x.Count == 2
+                        && x.Any(weather => weather.CityName == _cityName && weather.Temp == _temp && weather.Comment == _comment && weather.Datatime.Day == DateTime.UtcNow.Day)
                         && x.Any(weather => weather.CityName == cityName2 && weather.Temp == temp2 && weather.Comment == comment2 && weather.Datatime.Day == DateTime.UtcNow.Day)
                         )));
         }
@@ -266,7 +266,7 @@ namespace Weather.Tests.BL.Services
 
             // Assert
             _weatherRepositoryMock.Verify(repository =>
-                repository.BulkSaveWeatherAsync(It.IsAny<DataAccessLayer.Models.Weather[]>()), Times.Never);
+                repository.BulkSaveWeatherListAsync(It.IsAny<DataAccessLayer.Models.Weather[]>()), Times.Never);
             _loggerMock.Verify(logger => logger.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.IsAny<EventId>(),

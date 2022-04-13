@@ -12,6 +12,7 @@ using System.Threading;
 using BusinessLayer.DTOs.Enums;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Abstract;
+using DataAccessLayer.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace BusinessLayer.Services
@@ -139,15 +140,24 @@ namespace BusinessLayer.Services
         {
             try
             {
-                var weathers = cities.Select(async city =>
+                var weatherList = await GetWeatherByArrayCityNameAsync(cities, CancellationToken.None);
+                var dateTime = DateTime.UtcNow;
+                
+                if(weatherList.ContainsKey(ResponseStatus.Successful))
                 {
-                    var weathers = _mapper.Map<Weather>(await GetByCityNameAsync(city, CancellationToken.None));
-                    weathers.Datatime = DateTime.UtcNow;
-                    return weathers;
-                });
+                    var resultWeatherList = _mapper.Map<List<Weather>>(weatherList[ResponseStatus.Successful]);
+                    resultWeatherList.ForEach(weather =>
+                    {
+                        weather.Datatime = dateTime;
+                        weather.FillCommentByTemp();
+                    });
+                    await _weatherRepository.BulkSaveWeatherListAsync(resultWeatherList);
+                }
 
-                var result = await Task.WhenAll(weathers);                
-                await _weatherRepository.BulkSaveWeatherAsync(result);
+                if(weatherList.ContainsKey(ResponseStatus.Fail))
+                {
+                    weatherList[ResponseStatus.Fail].ToList().ForEach(w => _logger.LogError($"{w.CityName} - {w.ErrorMessage}"));                    
+                }
             }
             catch(Exception ex)
             {

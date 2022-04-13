@@ -1,10 +1,10 @@
-﻿using BusinessLayer.Configuration;
-using BusinessLayer.Services.Abstract;
+﻿using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using WeatherApi.Configuration;
 
 namespace WeatherApi.Infrastructure
 {
@@ -20,9 +20,15 @@ namespace WeatherApi.Infrastructure
         }
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
-            _configMonitor.OnChange(appConfig => _backgroundJobsClinent.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(appConfig.CitiesOptions)));
-            _backgroundJobsClinent.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(_configMonitor.CurrentValue.CitiesOptions));
+            _configMonitor.OnChange(appConfig => EnqueueBackgroundJob());
+            EnqueueBackgroundJob();
+
             return next;
+        }
+
+        private void EnqueueBackgroundJob()
+        {
+            _backgroundJobsClinent.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(_configMonitor.CurrentValue.CitiesOptions));
         }
     }
 }

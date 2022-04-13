@@ -18,12 +18,12 @@ namespace Weather.Tests.Integration
     public class WeatherApiTests
     {
         private readonly JsonSerializerOptions _serializerOptions;
-        private readonly string cityName = "Minsk";
-        private readonly int countDays = 3;
-        private readonly string currentWeatherURL = "/api/weather/current?";
-        private readonly string forecastWeatherURL = "/api/weather/forecast?";
-        private readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=weatherdb;Trusted_Connection=True;";
-        private readonly List<string> comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
+        private readonly string _cityName = "Minsk";
+        private readonly int _countDays = 3;
+        private readonly string _currentWeatherURL = "/api/weather/current?cityName=";
+        private readonly string _forecastWeatherURL = "/api/weather/forecast?";
+        private readonly string _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=weatherdb;Trusted_Connection=True;";
+        private readonly List<string> _comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
 
         public static IEnumerable<object[]> DataForValidationTest =>
             new List<object[]>
@@ -104,7 +104,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_Success()
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{currentWeatherURL}{nameof(cityName)}={cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{_cityName}");
             var httpClient = GetClient();
 
             //Act
@@ -119,9 +119,9 @@ namespace Weather.Tests.Integration
 
             Assert.NotNull(weather);
             Assert.NotNull(weather.CityName);
-            Assert.Equal(weather.CityName, cityName);
+            Assert.Equal(weather.CityName, _cityName);
             Assert.NotNull(weather.Comment);
-            Assert.Contains(weather.Comment, comments);
+            Assert.Contains(weather.Comment, _comments);
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace Weather.Tests.Integration
             // Arrange            
             var startDateTime = DateTime.Now.Date;
             var httpClient = GetClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{forecastWeatherURL}{nameof(cityName)}={cityName}&{nameof(countDays)}={countDays}");
+            var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(_cityName, _countDays));
 
             //Act
             var response = await httpClient.SendAsync(request);
@@ -144,15 +144,15 @@ namespace Weather.Tests.Integration
 
             Assert.NotNull(forecast);
             Assert.NotNull(forecast.CityName);
-            Assert.Equal(forecast.CityName, cityName);
+            Assert.Equal(forecast.CityName, _cityName);
             Assert.NotNull(forecast.WeatherForPeriod);
-            Assert.Equal(forecast.WeatherForPeriod.Count, countDays+1);
+            Assert.Equal(forecast.WeatherForPeriod.Count, _countDays+1);
             
             forecast.WeatherForPeriod.ForEach(x =>
             {
                 Assert.NotNull(x);
                 Assert.NotNull(x.Comment);
-                Assert.Contains(x.Comment, comments);
+                Assert.Contains(x.Comment, _comments);
                 Assert.Equal(startDateTime, x.DateTime);
                 startDateTime = startDateTime.AddDays(1);
             });
@@ -164,7 +164,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_EnterInvalidData_HandlingException(string cityName, string message)
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{currentWeatherURL}{nameof(cityName)}={cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{cityName}");
             var httpClient = GetClient();
 
             var validationDetails = new ValidationProblemDetails(
@@ -191,7 +191,7 @@ namespace Weather.Tests.Integration
         public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, ValidationProblemDetails validationDetails)
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{forecastWeatherURL}{nameof(cityName)}={cityName}&{nameof(countDays)}={countDays}");
+            var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(cityName, countDays));
             var httpClient = GetClient();
             
             //Act
@@ -210,7 +210,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_CanceledOperation_Success()
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{currentWeatherURL}{nameof(cityName)}={cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{_cityName}");
             var httpClient = GetClient(0);
 
             //Act
@@ -227,7 +227,7 @@ namespace Weather.Tests.Integration
         public async Task GetForecastByCityName_CanceledOperation_Success()
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{forecastWeatherURL}{nameof(cityName)}={cityName}&{nameof(countDays)}={countDays}");
+            var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(_cityName, _countDays));
             var httpClient = GetClient(0);
 
             //Act
@@ -248,7 +248,7 @@ namespace Weather.Tests.Integration
                 {"AppConfiguration:MinCountDaysForecast", $"{minCountDaysForecast}"},
                 {"AppConfiguration:IsDebugMode", $"{isDebugMode}"},
                 {"AppConfiguration:RequestTimeout", $"{requestTimeout}"},
-                {"ConnectionStrings:DefaultConnection", $"{connectionString}"}
+                {"ConnectionStrings:DefaultConnection", $"{_connectionString}"}
             };
 
             var server = new TestServer(new WebHostBuilder()
@@ -259,6 +259,11 @@ namespace Weather.Tests.Integration
                 .UseStartup<Startup>());
             
             return server.CreateClient();            
+        }
+
+        private string GetForecastWeatherURL(string cityName, int countDays)
+        {
+            return $"{_forecastWeatherURL}cityName={cityName}&countDays={countDays}";
         }
     }
 }

@@ -4,9 +4,9 @@ using WeatherApi.Infrastructure;
 
 namespace WeatherApi.Extensions
 {
-    public static class StartupFilterRegistration
+    public static class StartupFiltersRegistration
     {
-        public static void AddStartupFilter(this IServiceCollection services)
+        public static void AddStartupFilters(this IServiceCollection services)
         {
             services.AddTransient<IStartupFilter, BackgroundJobFilter>();
         }

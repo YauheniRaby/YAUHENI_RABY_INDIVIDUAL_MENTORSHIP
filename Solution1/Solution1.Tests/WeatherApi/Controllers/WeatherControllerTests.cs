@@ -23,7 +23,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly Mock<IOptionsMonitor<AppConfiguration>> _appParams;
         private readonly WeatherController _weatherController;
-        private readonly string cityName = "Minsk";
+        private readonly string _cityName = "Minsk";
 
         public static IEnumerable<object[]> Exceptions =>
             new List<object[]>
@@ -50,7 +50,7 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             var weather = new WeatherDTO()
             {
-                CityName = cityName,
+                CityName = _cityName,
                 Temp = temp,
                 Comment = comment
             };
@@ -62,7 +62,7 @@ namespace Weather.Tests.WeatherApi.Controllers
             SetTimeoutForAppParams();
 
             //Act
-            var response = await _weatherController.GetCurrentWeatherByCityNameAsync(cityName);
+            var response = await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
@@ -84,7 +84,7 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             SetTimeoutForAppParams();
 
-            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));            
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName));            
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             SetTimeoutForAppParams(0);
 
-            await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+            await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName));
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
@@ -109,7 +109,7 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             var forecastWeather = new ForecastWeatherDTO()
             {
-                CityName = cityName, 
+                CityName = _cityName, 
                 WeatherForPeriod =  new List<WeatherForDateDTO>
                 {
                     new WeatherForDateDTO() { Comment = comment1, DateTime = dateTime1, Temp = temp1 },
@@ -124,7 +124,7 @@ namespace Weather.Tests.WeatherApi.Controllers
             SetTimeoutForAppParams();
 
             //Act
-            var response = await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2);
+            var response = await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
@@ -146,7 +146,7 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             SetTimeoutForAppParams();
 
-            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2));
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             SetTimeoutForAppParams(0);
 
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2));
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 

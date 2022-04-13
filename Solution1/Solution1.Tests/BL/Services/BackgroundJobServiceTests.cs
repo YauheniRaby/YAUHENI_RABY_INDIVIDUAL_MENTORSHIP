@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BusinessLayer.Configuration;
+using BusinessLayer.Models;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
 using Hangfire;
@@ -26,8 +26,8 @@ namespace Weather.Tests.BL.Services
             _recurringJobManagerMock = new Mock<IRecurringJobManager>();
             _weatherServiсeMock = new Mock<IWeatherServiсe>();
             _jobStorageMock = new Mock<JobStorage>();
-            var _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _backgroundJobService = new BackgroundJobService(_weatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object, _mapper);
+            var mapper = new Mapper(MapperConfig.GetConfiguration());
+            _backgroundJobService = new BackgroundJobService(_weatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object, mapper);
         }
 
         [Fact]
@@ -61,8 +61,8 @@ namespace Weather.Tests.BL.Services
             {
                 new RecurringJobDto(){ Id = $"{cityName2}; {cityName1}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup1)},
                 new RecurringJobDto(){ Id = $"{cityName3}; {cityName4}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup3)},
-                new RecurringJobDto(){ Id = $"{cityName5}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup5)},
-                new RecurringJobDto(){ Id = $"{cityName6}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup4)}
+                new RecurringJobDto(){ Id = cityName5.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup5)},
+                new RecurringJobDto(){ Id = cityName6.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup4)}
             };
             
             var storageConnectionMock = new Mock<IStorageConnection>();
@@ -86,11 +86,6 @@ namespace Weather.Tests.BL.Services
             _backgroundJobService.UpdateJobs(newOptions);
 
             // Assert
-            var invocations = _recurringJobManagerMock.Invocations;
-            Assert.NotNull(invocations);
-            Assert.Equal(3, invocations.Where(x => x.Method.Name == nameof(IRecurringJobManager.RemoveIfExists)).Count());
-            Assert.Equal(4, invocations.Where(x => x.Method.Name == nameof(IRecurringJobManager.AddOrUpdate)).Count());
-
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == $"{cityName2}; {cityName1}".ToLower())), Times.Once);
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == $"{cityName3}; {cityName4}".ToLower())), Times.Once);
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == $"{cityName5}".ToLower())), Times.Once);
@@ -109,6 +104,8 @@ namespace Weather.Tests.BL.Services
                         It.Is<Job>(x => x.Method.Name == nameof(WeatherService.BackgroundSaveWeatherAsync) && x.Arguments.Single() == option.Args),
                         It.Is<string>(x => x == option.Cron),
                         It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id))));
+
+            _recurringJobManagerMock.VerifyNoOtherCalls();
         }
     }
 }

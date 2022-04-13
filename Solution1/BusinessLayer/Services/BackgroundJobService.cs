@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Hangfire.Storage;
-using BusinessLayer.Configuration;
+using BusinessLayer.Models;
 
 namespace BusinessLayer.Services
 {

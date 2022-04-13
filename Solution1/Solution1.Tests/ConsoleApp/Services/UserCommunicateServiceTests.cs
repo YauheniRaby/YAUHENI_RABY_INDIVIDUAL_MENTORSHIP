@@ -30,10 +30,10 @@ namespace Weather.Tests.ConsoleApp.Services
         private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IConfig> _config;
-        private readonly string cityName = "Minsk";
-        private readonly double temp = 5;
-        private readonly string comment = Constants.WeatherComments.Fresh;
-        private readonly DateTime dateStartForecast = new DateTime(2022, 01, 10);
+        private readonly string _cityName = "Minsk";
+        private readonly double _temp = 5;
+        private readonly string _comment = Constants.WeatherComments.Fresh;
+        private readonly DateTime _dateStartForecast = new DateTime(2022, 01, 10);
 
         public static IEnumerable<object[]> ParamsForExceptionHandlingTest =>
             new List<object[]>
@@ -61,15 +61,15 @@ namespace Weather.Tests.ConsoleApp.Services
             var countDays = 3;
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader($"2{Environment.NewLine}{cityName}{Environment.NewLine}{countDays}"));
+            Console.SetIn(new StringReader($"2{Environment.NewLine}{_cityName}{Environment.NewLine}{countDays}"));
             var culture = new CultureInfo("en_US");
 
             var weatherForPeriod = new List<WeatherForDateDTO>();
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                weatherForPeriod.Add(new WeatherForDateDTO() { DateTime = dateStartForecast.AddDays(currentCountDays), Temp = temp + currentCountDays, Comment = comment });
+                weatherForPeriod.Add(new WeatherForDateDTO() { DateTime = _dateStartForecast.AddDays(currentCountDays), Temp = _temp + currentCountDays, Comment = _comment });
             }
-            var forecastWeather = new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
+            var forecastWeather = new ForecastWeatherDTO() { CityName = _cityName, WeatherForPeriod = weatherForPeriod };
 
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
@@ -79,10 +79,10 @@ namespace Weather.Tests.ConsoleApp.Services
             await _userCommunicationService.CommunicateAsync();
 
             //Assert            
-            var ferecastRepresentation = $"{cityName} weather forecast:{Environment.NewLine}";
+            var ferecastRepresentation = $"{_cityName} weather forecast:{Environment.NewLine}";
             for (int currentCountDays = 0; currentCountDays < countDays; currentCountDays++)
             {
-                ferecastRepresentation+= $"Day {currentCountDays} ({dateStartForecast.AddDays(currentCountDays).ToString(Constants.DateTimeFormats.Date, culture)}): {temp + currentCountDays:f1} C. {comment}{Environment.NewLine}";
+                ferecastRepresentation+= $"Day {currentCountDays} ({_dateStartForecast.AddDays(currentCountDays).ToString(Constants.DateTimeFormats.Date, culture)}): {_temp + currentCountDays:f1} C. {_comment}{Environment.NewLine}";
             }
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
@@ -98,13 +98,13 @@ namespace Weather.Tests.ConsoleApp.Services
             // Arrange
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader($"1{Environment.NewLine}{cityName}{Environment.NewLine}"));
+            Console.SetIn(new StringReader($"1{Environment.NewLine}{_cityName}{Environment.NewLine}"));
 
             var Weather = new WeatherDTO()
             {
-                CityName = cityName,
-                Temp = temp,
-                Comment = comment
+                CityName = _cityName,
+                Temp = _temp,
+                Comment = _comment
             };
 
             _invokerMock
@@ -117,7 +117,7 @@ namespace Weather.Tests.ConsoleApp.Services
             //Assert            
             var expected = $"{Menu.GetMenuRepresentation()}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
-                $"In {cityName} {temp} C. {comment}{Environment.NewLine}";
+                $"In {_cityName} {_temp} C. {_comment}{Environment.NewLine}";
 
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()));
             Assert.Equal(expected, consoleOutput.ToString());
@@ -216,7 +216,7 @@ namespace Weather.Tests.ConsoleApp.Services
             {
                 { ResponseStatus.Successful, new List<WeatherResponseDTO>
                             {
-                                new WeatherResponseDTO() { CityName = cityName, ResponseStatus = ResponseStatus.Successful, Temp = temp, LeadTime = leadTime },
+                                new WeatherResponseDTO() { CityName = _cityName, ResponseStatus = ResponseStatus.Successful, Temp = _temp, LeadTime = leadTime },
                                 new WeatherResponseDTO() { CityName = cityName2, ResponseStatus = ResponseStatus.Successful, Temp = temp2, LeadTime = leadTime2 }
                             }
                 },
@@ -235,7 +235,7 @@ namespace Weather.Tests.ConsoleApp.Services
             var consoleOutput = new StringWriter();
 
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader($"3{Environment.NewLine}{cityName}, {cityName3}, {cityName2}{Environment.NewLine}"));
+            Console.SetIn(new StringReader($"3{Environment.NewLine}{_cityName}, {cityName3}, {cityName2}{Environment.NewLine}"));
 
             _invokerMock
                 .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()))
@@ -253,7 +253,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 $"Successful request count: 2, failed: 1, canceled: 1.";
             
             var successfulResponsesRepresentation = "Success case:" +
-                $"{Environment.NewLine}City: '{cityName}', Temp: {temp}, Timer: {leadTime} ms." +
+                $"{Environment.NewLine}City: '{_cityName}', Temp: {_temp}, Timer: {leadTime} ms." +
                 $"{Environment.NewLine}City: '{cityName2}', Temp: {temp2}, Timer: {leadTime2} ms.";
             var failResponsesRepresentation = "On fail:" +
                 $"{Environment.NewLine}City: '{cityName3}', ErrorMessage: {testError3}, Timer: {leadTime3} ms.";
