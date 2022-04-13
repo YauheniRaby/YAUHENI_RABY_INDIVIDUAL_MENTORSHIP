@@ -256,6 +256,36 @@ namespace Weather.Tests.BL.Services
                         && x.Any(weather => weather.CityName == _cityName && weather.Temp == _temp && weather.Comment == _comment && weather.Datatime.Day == DateTime.UtcNow.Day)
                         && x.Any(weather => weather.CityName == cityName2 && weather.Temp == temp2 && weather.Comment == comment2 && weather.Datatime.Day == DateTime.UtcNow.Day)
                         )));
+            _loggerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task BackgroundSaveWeatherAsync_ReturnFailResponse()
+        {
+            // Arrange
+            var cityName2 = "Paris";
+            var listCityName = new List<string>() { _cityName, cityName2 };
+
+            _validator
+                 .Setup(validator => validator.ValidateAsync(
+                     It.Is<ValidationContext<ForecastWeatherRequestDTO>>(
+                         context =>
+                            context.InstanceToValidate.CityName == _cityName
+                            || context.InstanceToValidate.CityName == cityName2),
+                     It.IsAny<CancellationToken>()))
+                 .ReturnsAsync(_validResult);
+            
+            //Act
+            await _weatherService.BackgroundSaveWeatherAsync(listCityName);
+
+            // Assert
+            _loggerMock.Verify(logger => logger.Log(
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Exactly(2));
+            _weatherRepositoryMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -266,7 +296,7 @@ namespace Weather.Tests.BL.Services
 
             // Assert
             _weatherRepositoryMock.Verify(repository =>
-                repository.BulkSaveWeatherListAsync(It.IsAny<DataAccessLayer.Models.Weather[]>()), Times.Never);
+                repository.BulkSaveWeatherListAsync(It.IsAny<List<DataAccessLayer.Models.Weather>>()), Times.Never);
             _loggerMock.Verify(logger => logger.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.IsAny<EventId>(),

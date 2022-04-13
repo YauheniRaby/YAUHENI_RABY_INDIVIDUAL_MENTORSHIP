@@ -140,11 +140,11 @@ namespace BusinessLayer.Services
         {
             try
             {
-                var weatherList = await GetWeatherByArrayCityNameAsync(cities, CancellationToken.None);
-                var dateTime = DateTime.UtcNow;
+                var weatherList = await GetWeatherByArrayCityNameAsync(cities, CancellationToken.None);                
                 
                 if(weatherList.ContainsKey(ResponseStatus.Successful))
                 {
+                    var dateTime = DateTime.UtcNow;
                     var resultWeatherList = _mapper.Map<List<Weather>>(weatherList[ResponseStatus.Successful]);
                     resultWeatherList.ForEach(weather =>
                     {
