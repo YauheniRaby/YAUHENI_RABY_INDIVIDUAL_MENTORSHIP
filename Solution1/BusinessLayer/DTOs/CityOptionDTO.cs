@@ -1,6 +1,6 @@
-﻿namespace BusinessLayer.Models
+﻿namespace BusinessLayer.DTOs
 {
-    public class CityOption
+    public class CityOptionDTO
     {
         public string CityName { get; set; }
 

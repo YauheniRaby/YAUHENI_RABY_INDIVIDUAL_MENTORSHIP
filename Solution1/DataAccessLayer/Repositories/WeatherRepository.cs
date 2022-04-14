@@ -20,5 +20,11 @@ namespace DataAccessLayer.Repositories
             await _context.CurrentWeathers.AddRangeAsync(weatherList);
             await _context.SaveChangesAsync();            
         }
+
+        public async Task BulkSaveFailWeatherResponseListAsync(IEnumerable<WeatherResponse> failResponses)
+        {
+            await _context.FailWeatherResponses.AddRangeAsync(failResponses);
+            await _context.SaveChangesAsync();
+        }
     }
 }

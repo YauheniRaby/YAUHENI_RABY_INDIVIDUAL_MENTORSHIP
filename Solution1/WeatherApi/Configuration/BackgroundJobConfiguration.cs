@@ -1,11 +1,11 @@
-﻿using BusinessLayer.Models;
+﻿using BusinessLayer.DTOs;
 using System.Collections.Generic;
 
 namespace WeatherApi.Configuration
 {
     public class BackgroundJobConfiguration
     {
-        public IEnumerable<CityOption> CitiesOptions { get; set; }
+        public IEnumerable<CityOptionDTO> CitiesOptions { get; set; }
     }
     
     

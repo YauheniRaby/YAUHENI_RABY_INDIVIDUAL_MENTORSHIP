@@ -1,10 +1,10 @@
-﻿using BusinessLayer.Models;
+﻿using BusinessLayer.DTOs;
 using System.Collections.Generic;
 
 namespace BusinessLayer.Services.Abstract
 {
     public interface IBackgroundJobService
     {
-        void UpdateJobs(IEnumerable<CityOption> options);
+        void UpdateJobs(IEnumerable<CityOptionDTO> options, string currentWeatherUrl, string apiKey);
     }
 }

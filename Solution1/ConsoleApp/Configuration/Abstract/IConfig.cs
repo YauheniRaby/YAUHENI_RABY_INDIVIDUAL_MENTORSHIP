@@ -2,12 +2,10 @@
 {
     public interface IConfig
     {
-        int MinCountDaysForecast { get; }
+        AppConfiguration AppConfig { get; }
 
-        int MaxCountDaysForecast { get; }
+        WeatherAriConfiguration ApiConfig { get; }
 
-        bool IsDebugMode { get; }
-
-        int? RequestTimeout { get; }
+        DbConfiguration DbConfig { get; }
     }
 }

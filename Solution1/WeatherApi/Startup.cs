@@ -26,10 +26,11 @@ namespace WeatherApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = Configuration[Constants.Connection.NameDbConnection];
+            var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
             services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
+            services.Configure<WetherApiConfiguration>(Configuration.GetSection(nameof(WetherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddHangfire(x => x.UseSqlServerStorage(connectionString));

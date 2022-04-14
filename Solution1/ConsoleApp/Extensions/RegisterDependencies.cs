@@ -11,7 +11,11 @@ using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Services;
 using ConsoleApp.Services.Abstract;
+using DataAccessLayer.Configuration;
+using DataAccessLayer.Repositories;
+using DataAccessLayer.Repositories.Abstract;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ninject;
 
@@ -34,8 +38,14 @@ namespace ConsoleApp.Extensions
         public static void AddValidators(this IKernel ninjectKernel, IConfig config)
         {
             ninjectKernel.Bind<IValidator<ForecastWeatherRequestDTO>>().To<ForecastWeatherRequestDTOValidator>()
-                .WithConstructorArgument("minCountDays", config.MinCountDaysForecast)
-                .WithConstructorArgument("maxCountDays", config.MaxCountDaysForecast);
+                .WithConstructorArgument("minCountDays", config.AppConfig.MinCountDaysForecast)
+                .WithConstructorArgument("maxCountDays", config.AppConfig.MaxCountDaysForecast);
+        }
+
+        public static void AddRepositories(this IKernel ninjectKernel, IConfig config)
+        {
+            ninjectKernel.Bind<IWeatherRepository>().To<WeatherRepository>();
+            ninjectKernel.Bind<RepositoryContext>().ToSelf().WithConstructorArgument("options", new DbContextOptionsBuilder<RepositoryContext>().UseSqlServer(config.DbConfig.ConnectionString).Options);
         }
     }
 }

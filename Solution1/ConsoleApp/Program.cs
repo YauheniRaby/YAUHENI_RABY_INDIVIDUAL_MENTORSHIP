@@ -28,6 +28,7 @@ namespace ConsoleApp
         {
             var ninjectKernel = new StandardKernel();
             ninjectKernel.AddServices();
+            ninjectKernel.AddRepositories(config);
             ninjectKernel.AddValidators(config);
             ninjectKernel.Bind<IConfig>().ToConstant(config);
 

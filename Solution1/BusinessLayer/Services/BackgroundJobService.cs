@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Hangfire.Storage;
-using BusinessLayer.Models;
+using BusinessLayer.DTOs;
 
 namespace BusinessLayer.Services
 {
@@ -21,7 +21,7 @@ namespace BusinessLayer.Services
             _jobStorage = jobStorage;
         }
 
-        public void UpdateJobs(IEnumerable<CityOption> request)
+        public void UpdateJobs(IEnumerable<CityOptionDTO> request, string currentWeatherUrl, string apiKey)
         {
             var currentJobs = _jobStorage
                 .GetConnection()
@@ -43,16 +43,13 @@ namespace BusinessLayer.Services
                 .ToList();
 
             removeJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
-
-            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.BackgroundSaveWeatherAsync(x.Value), x.Key));
+            
+            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.SaveWeatherListAsync(x.Value, currentWeatherUrl, apiKey), x.Key));
         }
 
         private string GetJobName(IEnumerable<string> cities)
         {
-            return cities
-                    .OrderBy(c => c)
-                    .Aggregate((result, next) => $"{result}; {next}")
-                    .ToLower();
+            return string.Join(';', cities.OrderBy(c => c)).ToLower();
         }     
     }
 }

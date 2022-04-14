@@ -11,11 +11,6 @@ namespace DataAccessLayer.Models
 
         public double Temp { get; set; }
 
-        public DateTime Datatime { get; set; }
-
-        public void Select()
-        {
-            throw new NotImplementedException();
-        }
+        public DateTime Datetime { get; set; }
     }
 }

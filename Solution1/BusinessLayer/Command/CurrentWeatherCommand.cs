@@ -10,16 +10,20 @@ namespace BusinessLayer.Command
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly string _cityName;
+        private readonly string _currentWeatherUrl;
+        private readonly string _apiKey;
 
-        public CurrentWeatherCommand(IWeatherServiсe weatherServiсe, string cityName)
+        public CurrentWeatherCommand(IWeatherServiсe weatherServiсe, string cityName, string currentWeatherUrl, string apiKey)
         {
             _weatherServiсe = weatherServiсe;
             _cityName = cityName;
+            _currentWeatherUrl = currentWeatherUrl;
+            _apiKey = apiKey;
         }
 
         public Task<WeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return _weatherServiсe.GetByCityNameAsync(_cityName, cancellationToken);
+            return _weatherServiсe.GetByCityNameAsync(_cityName, _currentWeatherUrl, _apiKey, cancellationToken);
         }
     }
 }

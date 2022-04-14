@@ -3,11 +3,8 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
-using DataAccessLayer.Configuration;
-using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
 using System.Threading.Tasks;
 using WeatherApi.Configuration;
 
@@ -19,12 +16,14 @@ namespace WeatherApi.Controllers
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IOptionsMonitor<AppConfiguration> _appConfiguration;
-        private readonly IInvoker _invoker;
+        private readonly WetherApiConfiguration _apiConfiguration;
+        private readonly IInvoker _invoker; 
 
-        public WeatherController(IWeatherServiсe weatherServiсe, IOptionsMonitor<AppConfiguration> appConfiguration, IInvoker invoker)
+        public WeatherController(IWeatherServiсe weatherServiсe, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WetherApiConfiguration> apiConfiguration, IInvoker invoker)
         {
             _weatherServiсe = weatherServiсe;
             _appConfiguration = appConfiguration;
+            _apiConfiguration = apiConfiguration.CurrentValue;
             _invoker = invoker;
         }
 
@@ -33,7 +32,7 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new CurrentWeatherCommand(_weatherServiсe, cityName);
+            var command = new CurrentWeatherCommand(_weatherServiсe, cityName, _apiConfiguration.CurrentWeatherUrl, _apiConfiguration.Key);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);
         }
@@ -43,7 +42,7 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays);
+            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays, _apiConfiguration.ForecastWeatherUrl, _apiConfiguration.CoordinatesUrl, _apiConfiguration.Key, _apiConfiguration.CountPointsInDay);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);            
         }
