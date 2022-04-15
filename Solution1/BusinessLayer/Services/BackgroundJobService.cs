@@ -5,6 +5,7 @@ using System.Linq;
 using AutoMapper;
 using Hangfire.Storage;
 using BusinessLayer.DTOs;
+using Hangfire.Common;
 
 namespace BusinessLayer.Services
 {
@@ -21,7 +22,7 @@ namespace BusinessLayer.Services
             _jobStorage = jobStorage;
         }
 
-        public void UpdateJobs(IEnumerable<CityOptionDTO> request, string currentWeatherUrl, string apiKey)
+        public void UpdateJobs(IEnumerable<CityOptionDTO> request, string currentWeatherUrl)
         {
             var currentJobs = _jobStorage
                 .GetConnection()
@@ -29,6 +30,11 @@ namespace BusinessLayer.Services
                 .Select(x => new {Name = x.Id , Timeout = x.Cron})
                 .ToList();
 
+            if(request == null)
+            {
+                currentJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
+                return;
+            }
             var dictionaryNewJobs = request
                 .GroupBy(opt => Cron.MinuteInterval(opt.Timeout))
                 .ToDictionary(k => k.Key, v => v.Select(opt => opt.CityName))
@@ -44,7 +50,7 @@ namespace BusinessLayer.Services
 
             removeJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
             
-            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.SaveWeatherListAsync(x.Value, currentWeatherUrl, apiKey), x.Key));
+            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.SaveWeatherListAsync(x.Value, currentWeatherUrl), x.Key));
         }
 
         private string GetJobName(IEnumerable<string> cities)

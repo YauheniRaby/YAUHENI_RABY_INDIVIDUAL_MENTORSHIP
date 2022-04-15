@@ -14,14 +14,13 @@ namespace WeatherApi.Infrastructure
     {
         private readonly IBackgroundJobClient _backgroundJobsClinent;
         private readonly IOptionsMonitor<BackgroundJobConfiguration> _backgroundJobConfiguration;
-        private readonly WetherApiConfiguration _apiConfiguration;
-        private readonly ILogger<BackgroundJob> logger;
+        private readonly IOptionsMonitor<WeatherApiConfiguration> _apiConfiguration;
 
-        public BackgroundJobFilter(IBackgroundJobClient backgroundJobsClinent, IOptionsMonitor<BackgroundJobConfiguration> backgroundJobConfiguration, IOptionsMonitor<WetherApiConfiguration> apiConfiguration, ILogger<BackgroundJob> logger)
+        public BackgroundJobFilter(IBackgroundJobClient backgroundJobsClinent, IOptionsMonitor<BackgroundJobConfiguration> backgroundJobConfiguration, IOptionsMonitor<WeatherApiConfiguration> apiConfiguration)
         {
             _backgroundJobsClinent = backgroundJobsClinent;
             _backgroundJobConfiguration = backgroundJobConfiguration;
-            _apiConfiguration = apiConfiguration.CurrentValue;
+            _apiConfiguration = apiConfiguration;
 
         }
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
@@ -34,7 +33,10 @@ namespace WeatherApi.Infrastructure
 
         private void EnqueueBackgroundJob()
         {
-            _backgroundJobsClinent.Enqueue<IBackgroundJobService>(x => x.UpdateJobs(_backgroundJobConfiguration.CurrentValue.CitiesOptions, _apiConfiguration.CurrentWeatherUrl, _apiConfiguration.Key));
+            _backgroundJobsClinent.Enqueue<IBackgroundJobService>(
+                x => x.UpdateJobs(
+                    _backgroundJobConfiguration.CurrentValue.CitiesOptions, 
+                    $"{_apiConfiguration.CurrentValue.CurrentWeatherUrl}{_apiConfiguration.CurrentValue.Key}"));
         }
     }
 }

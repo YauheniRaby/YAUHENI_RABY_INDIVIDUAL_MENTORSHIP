@@ -13,6 +13,7 @@ using BusinessLayer.DTOs.Enums;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Abstract;
 using DataAccessLayer.Extensions;
+using BusinessLayer.Exceptions;
 
 namespace BusinessLayer.Services
 {
@@ -31,7 +32,7 @@ namespace BusinessLayer.Services
             _validator = validator;
         }
 
-        public async Task<WeatherDTO> GetByCityNameAsync(string cityName, string currentWeatherUrl, string apiKey, CancellationToken cancellationToken)
+        public async Task<WeatherDTO> GetByCityNameAsync(string cityName, string currentWeatherUrl, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var validationResult = await _validator
@@ -44,12 +45,12 @@ namespace BusinessLayer.Services
                 throw new ValidationException(validationResult.Errors);
             }
            
-            var weather = await _weatherApiService.GetByCityNameAsync(cityName, currentWeatherUrl, apiKey, cancellationToken);
+            var weather = await _weatherApiService.GetByCityNameAsync(cityName, currentWeatherUrl, cancellationToken);
             var result = _mapper.Map<WeatherDTO>(weather).FillCommentByTemp();
             return result;
         }
         
-        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, string forecastWeatherUrl, string coordinatesUrl, string apiKey, int countWeatherPointInDay, CancellationToken cancellationToken)
+        public async Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, string forecastWeatherUrl, string coordinatesUrl, int countWeatherPointInDay, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var countPointForCurrentDay = 
@@ -67,13 +68,13 @@ namespace BusinessLayer.Services
                 throw new ValidationException(validationResult.Errors);
             }
 
-            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, forecastWeatherUrl, coordinatesUrl, apiKey, cancellationToken);
+            var forecast = await _weatherApiService.GetForecastByCityNameAsync(cityName, countWeatherPoint, forecastWeatherUrl, coordinatesUrl, cancellationToken);
             forecast.City.Name = cityName;
 
             return _mapper.Map<ForecastWeatherDTO>(forecast).FillCommentByTemp(); 
         }
 
-        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, string apiKey, CancellationToken cancellationToken)
+        public async Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, CancellationToken cancellationToken)
         {
             var timer = new Stopwatch();
             timer.Start();
@@ -92,7 +93,7 @@ namespace BusinessLayer.Services
 
                     if (validationResult.IsValid)
                     {
-                        var temp = (await _weatherApiService.GetByCityNameAsync(cityName, currentWeatherUrl, apiKey, cancellationToken))?.TemperatureValues.Temp;
+                        var temp = (await _weatherApiService.GetByCityNameAsync(cityName, currentWeatherUrl, cancellationToken))?.TemperatureValues.Temp;
                         if (temp.HasValue)
                         {
                             weatherResponseDTO.Temp = temp.Value;
@@ -133,9 +134,9 @@ namespace BusinessLayer.Services
             return result;
         }
 
-        public async Task SaveWeatherListAsync(IEnumerable<string> cities, string currentWeatherUrl, string apiKey)
+        public async Task SaveWeatherListAsync(IEnumerable<string> cities, string currentWeatherUrl)
         {
-            var weatherList = await GetWeatherByArrayCityNameAsync(cities, currentWeatherUrl, apiKey, CancellationToken.None);
+            var weatherList = await GetWeatherByArrayCityNameAsync(cities, currentWeatherUrl, CancellationToken.None);
             var dateTime = DateTime.UtcNow;
 
             if (weatherList.ContainsKey(ResponseStatus.Successful))
@@ -152,8 +153,7 @@ namespace BusinessLayer.Services
 
             if(weatherList.ContainsKey(ResponseStatus.Fail))
             {
-                var failResponses = _mapper.Map<List<WeatherResponse>>(weatherList[ResponseStatus.Fail]).ToList();
-                failResponses.ForEach(respose => respose.DateTime = dateTime);
+                throw new BackgroundJobException(weatherList[ResponseStatus.Fail]);
             }
         }
     }

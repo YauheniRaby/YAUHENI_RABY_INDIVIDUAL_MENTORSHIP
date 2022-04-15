@@ -5,6 +5,6 @@ namespace BusinessLayer.Services.Abstract
 {
     public interface IBackgroundJobService
     {
-        void UpdateJobs(IEnumerable<CityOptionDTO> options, string currentWeatherUrl, string apiKey);
+        void UpdateJobs(IEnumerable<CityOptionDTO> options, string currentWeatherUrl);
     }
 }

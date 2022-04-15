@@ -1,6 +1,5 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Vlidators;
-using BusinessLayer;
 using FluentValidation;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,12 +12,12 @@ namespace Weather.Tests.BL.Validators
     public class ForecastWeatherRequestDTOValidatorTests
     {
         private readonly IValidator<ForecastWeatherRequestDTO> _validator;
-        
+
         public ForecastWeatherRequestDTOValidatorTests()
         {
-            int minCountDays = 0; 
+            int minCountDays = 0;
             int maxCountDays = 5;
-            
+
             _validator = new ForecastWeatherRequestDTOValidator(minCountDays, maxCountDays);
         }
 
@@ -75,11 +74,11 @@ namespace Weather.Tests.BL.Validators
         {
             // Arrange
             var countErrors = errors.Count();
-            var forecastWeatherRequestDTO = new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay};
-            
+            var forecastWeatherRequestDTO = new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay };
+
             // Act
             var result = await _validator.TestValidateAsync(forecastWeatherRequestDTO, options => options.IncludeAllRuleSets());
-            
+
             // Assert
             Assert.NotNull(result);
             Assert.NotNull(result.Errors);
@@ -109,26 +108,26 @@ namespace Weather.Tests.BL.Validators
                 new object[]{ "Minsk", 0, true },
                 new object[]{ string.Empty, 3, false, "'City Name' must not be empty." },
                 new object[]
-                { 
-                    "aaaaaaaaaaaaaaaaaaaaa", 
-                    -1, 
-                    false, 
-                    "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." 
-                }                
+                {
+                    "aaaaaaaaaaaaaaaaaaaaa",
+                    -1,
+                    false,
+                    "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters."
+                }
             };
 
         [Theory]
         [MemberData(nameof(DataForValidationTestOnlyCityName))]
-        public async Task GetByCityNameAsync_CheckValidationOnlySityNameRules_Success(string cityName, int countDay,  bool isValid, string message = null)
+        public async Task GetByCityNameAsync_CheckValidationOnlySityNameRules_Success(string cityName, int countDay, bool isValid, string message = null)
         {
             // Arrange
             var forecastWeatherRequestDTO = new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay };
             // Act
             var result = await _validator
                 .TestValidateAsync(
-                    forecastWeatherRequestDTO, 
-                    options => options.IncludeRuleSets(Constants.Validators.OnlyCityName));
-            
+                    forecastWeatherRequestDTO,
+                    options => options.IncludeRuleSets(BusinessLayer.Constants.Validators.OnlyCityName));
+
             // Assert
             Assert.NotNull(result);
             if (isValid)

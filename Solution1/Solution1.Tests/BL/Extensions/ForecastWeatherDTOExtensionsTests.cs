@@ -13,9 +13,9 @@ namespace Weather.Tests.BL.Extensions
         private readonly string _cityName = "Minsk";
         private readonly DateTime _date = new(2022, 10, 10);
         private readonly double _temperature1 = 18;
-        private readonly string _comment1 = Constants.WeatherComments.Fresh;        
+        private readonly string _comment1 = DataAccessLayer.Constants.WeatherComments.Fresh;
         private readonly double _temperature2 = 25;
-        private readonly string _comment2 = Constants.WeatherComments.GoodWeather;
+        private readonly string _comment2 = DataAccessLayer.Constants.WeatherComments.GoodWeather;
 
         [Fact]
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
@@ -26,12 +26,12 @@ namespace Weather.Tests.BL.Extensions
 
             // Act
             var result = forecastWeatherDTO.GetMultiStringRepresentation();
-            
+
             // Assert
             var expected = $"{_cityName} weather forecast:" +
-                $"{Environment.NewLine}Day 0 ({_date.ToString(Constants.DateTimeFormats.Date, culture)}): {_temperature1:f1} C. {_comment1}" +
-                $"{Environment.NewLine}Day 1 ({_date.AddDays(1).ToString(Constants.DateTimeFormats.Date, culture)}): {_temperature2:f1} C. {_comment2}";
-            
+                $"{Environment.NewLine}Day 0 ({_date.ToString(BusinessLayer.Constants.DateTimeFormats.Date, culture)}): {_temperature1:f1} C. {_comment1}" +
+                $"{Environment.NewLine}Day 1 ({_date.AddDays(1).ToString(BusinessLayer.Constants.DateTimeFormats.Date, culture)}): {_temperature2:f1} C. {_comment2}";
+
             Assert.Equal(expected, result);
         }
 

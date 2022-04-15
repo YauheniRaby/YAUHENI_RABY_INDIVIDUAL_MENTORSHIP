@@ -1,6 +1,6 @@
 ﻿namespace WeatherApi.Configuration
 {
-    public class WetherApiConfiguration
+    public class WeatherApiConfiguration
     {
         public string Key { get; set; }
 

@@ -16,14 +16,14 @@ namespace WeatherApi.Controllers
     {
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IOptionsMonitor<AppConfiguration> _appConfiguration;
-        private readonly WetherApiConfiguration _apiConfiguration;
+        private readonly IOptionsMonitor<WeatherApiConfiguration> _apiConfiguration;
         private readonly IInvoker _invoker; 
 
-        public WeatherController(IWeatherServiсe weatherServiсe, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WetherApiConfiguration> apiConfiguration, IInvoker invoker)
+        public WeatherController(IWeatherServiсe weatherServiсe, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WeatherApiConfiguration> apiConfiguration, IInvoker invoker)
         {
             _weatherServiсe = weatherServiсe;
             _appConfiguration = appConfiguration;
-            _apiConfiguration = apiConfiguration.CurrentValue;
+            _apiConfiguration = apiConfiguration;
             _invoker = invoker;
         }
 
@@ -32,7 +32,7 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new CurrentWeatherCommand(_weatherServiсe, cityName, _apiConfiguration.CurrentWeatherUrl, _apiConfiguration.Key);
+            var command = new CurrentWeatherCommand(_weatherServiсe, cityName, $"{_apiConfiguration.CurrentValue.CurrentWeatherUrl}{_apiConfiguration.CurrentValue.Key}");
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);
         }
@@ -42,7 +42,12 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDays, _apiConfiguration.ForecastWeatherUrl, _apiConfiguration.CoordinatesUrl, _apiConfiguration.Key, _apiConfiguration.CountPointsInDay);
+            var command = new ForecastWeatherCommand(
+                _weatherServiсe, 
+                cityName, 
+                countDays, 
+                $"{_apiConfiguration.CurrentValue.ForecastWeatherUrl}{_apiConfiguration.CurrentValue.Key}", 
+                $"{_apiConfiguration.CurrentValue.CoordinatesUrl}{_apiConfiguration.CurrentValue.Key}", _apiConfiguration.CurrentValue.CountPointsInDay);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);            
         }

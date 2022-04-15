@@ -4,7 +4,7 @@
     {
         AppConfiguration AppConfig { get; }
 
-        WeatherAriConfiguration ApiConfig { get; }
+        WeatherApiConfiguration ApiConfig { get; }
 
         DbConfiguration DbConfig { get; }
     }

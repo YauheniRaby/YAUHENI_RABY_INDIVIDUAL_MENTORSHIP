@@ -25,16 +25,14 @@ namespace ConsoleApp.Services
         private readonly ILogger _logger;
         private readonly IInvoker _invoker;
         private readonly IWeatherServiсe _weatherServiсe;
-        private readonly AppConfiguration _appConfig;
-        private readonly WeatherAriConfiguration _apiConfig;
+        private readonly IConfig _config;
 
         public UserCommunicateService(ILogger logger, IInvoker invoker, IWeatherServiсe weatherServiсe, IConfig config)
         {
             _logger = logger;
             _invoker = invoker;
             _weatherServiсe = weatherServiсe;
-            _appConfig = config.AppConfig;
-            _apiConfig = config.ApiConfig;
+            _config = config;
         }
 
         public async Task<bool> CommunicateAsync()
@@ -121,8 +119,8 @@ namespace ConsoleApp.Services
         private async Task GetCurrentWeatherCommandAsync()
         {
             Console.WriteLine("Please, enter city name:");
-            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), _apiConfig.CurrentWeatherUrl, _apiConfig.Key);
-            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_appConfig.RequestTimeout));
+            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), $"{_config.ApiConfig.CurrentWeatherUrl}{_config.ApiConfig.Key}");
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
             Console.WriteLine(result.GetStringRepresentation());
         }
 
@@ -146,8 +144,14 @@ namespace ConsoleApp.Services
                 _logger.LogError($"User entered incorrect value for 'countDay'.");
             }
 
-            var command = new ForecastWeatherCommand(_weatherServiсe, cityName, countDay, _apiConfig.ForecastWeatherUrl, _apiConfig.CoordinatesUrl, _apiConfig.Key, _apiConfig.CountPointsInDay);
-            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_appConfig.RequestTimeout));
+            var command = new ForecastWeatherCommand(
+                _weatherServiсe,
+                cityName,
+                countDay,
+                $"{_config.ApiConfig.ForecastWeatherUrl}{_config.ApiConfig.Key}",
+                $"{_config.ApiConfig.CoordinatesUrl}{_config.ApiConfig.Key}", _config.ApiConfig.CountPointsInDay);
+
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
             Console.WriteLine(result.GetMultiStringRepresentation());
         }
 
@@ -162,9 +166,12 @@ namespace ConsoleApp.Services
                 return;
             }
 
-            var command = new BestWeatherCommand(_weatherServiсe, arrayCityNames.Split(',').Select(cityName => cityName.Trim()), _apiConfig.CurrentWeatherUrl, _apiConfig.Key);
+            var command = new BestWeatherCommand(
+                _weatherServiсe,
+                arrayCityNames.Split(',').Select(cityName => cityName.Trim()),
+                $"{_config.ApiConfig.CurrentWeatherUrl}{_config.ApiConfig.Key}");
 
-            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_appConfig.RequestTimeout));
+            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
             var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
@@ -181,7 +188,7 @@ namespace ConsoleApp.Services
                 Console.WriteLine($"No successful requests. Failed requests count: {countFailResponse}, canceled: {countCanceledResponse}.");
             }
 
-            if (_appConfig.IsDebugMode)
+            if (_config.AppConfig.IsDebugMode)
             {
                 ShowDebugInformation(successfulWeatherResponses, "Success case:", nameof(WeatherResponseDTO.Temp));
                 ShowDebugInformation(failedWeatherResponses, "On fail:", nameof(WeatherResponseDTO.ErrorMessage));

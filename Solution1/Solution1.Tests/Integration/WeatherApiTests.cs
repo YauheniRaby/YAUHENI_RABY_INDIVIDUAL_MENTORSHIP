@@ -22,8 +22,7 @@ namespace Weather.Tests.Integration
         private readonly int _countDays = 3;
         private readonly string _currentWeatherURL = "/api/weather/current?cityName=";
         private readonly string _forecastWeatherURL = "/api/weather/forecast?";
-        private readonly string _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=weatherdb;Trusted_Connection=True;";
-        private readonly List<string> _comments = new List<string>() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
+        private readonly List<string> _comments = new() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
 
         public static IEnumerable<object[]> DataForValidationTest =>
             new List<object[]>
@@ -104,6 +103,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_Success()
         {
             // Arrange
+
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{_cityName}");
             var httpClient = GetClient();
 
@@ -196,6 +196,7 @@ namespace Weather.Tests.Integration
             
             //Act
             var response = await httpClient.SendAsync(request);
+            
             //Assert
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -240,7 +241,7 @@ namespace Weather.Tests.Integration
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
-        private HttpClient GetClient(int requestTimeout = 5000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
+        private HttpClient GetClient(int requestTimeout = 1000000, int maxCountDaysForecast = 5, int minCountDaysForecast = 0, bool isDebugMode = true)
         {
             var configuration = new Dictionary<string, string>
             {
@@ -248,7 +249,12 @@ namespace Weather.Tests.Integration
                 {"AppConfiguration:MinCountDaysForecast", $"{minCountDaysForecast}"},
                 {"AppConfiguration:IsDebugMode", $"{isDebugMode}"},
                 {"AppConfiguration:RequestTimeout", $"{requestTimeout}"},
-                {"ConnectionStrings:DefaultConnection", $"{_connectionString}"}
+                {"ConnectionStrings:DefaultConnection", "Server=(localdb)\\MSSQLLocalDB; Database = weatherdb; Trusted_Connection = True;"},
+                {"WeatherApiConfiguration:Key", $"3fe39edadae3ae57d133a80598d5b120"},
+                {"WeatherApiConfiguration:CurrentWeatherUrl", "https://api.openweathermap.org/data/2.5/weather?q={0}&units=metric&appid="},
+                {"WeatherApiConfiguration:ForecastWeatherUrl", "https://api.openweathermap.org/data/2.5/forecast?lat={0}&lon={1}&cnt={2}&units=metric&appid="},
+                {"WeatherApiConfiguration:CoordinatesUrl", "http://api.openweathermap.org/geo/1.0/direct?q={0}&appid="},
+                {"WeatherApiConfiguration:CountPointsInDay", "8"}
             };
 
             var server = new TestServer(new WebHostBuilder()

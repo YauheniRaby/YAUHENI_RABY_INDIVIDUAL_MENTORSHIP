@@ -8,12 +8,12 @@ namespace BusinessLayer.Services.Abstract
 {
     public interface IWeatherServiсe
     {
-        Task<WeatherDTO> GetByCityNameAsync(string cityName, string currentWeatherUrl, string apiKey, CancellationToken cancellationToken);
+        Task<WeatherDTO> GetByCityNameAsync(string cityName, string currentWeatherUrl, CancellationToken cancellationToken);
 
-        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, string forecastWeatherUrl, string coordinatesUrl, string apiKey, int countWeatherPointInDay, CancellationToken cancellationToken);
+        Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, string forecastWeatherUrl, string coordinatesUrl, int countWeatherPointInDay, CancellationToken cancellationToken);
 
-        Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, string apiKey, CancellationToken cancellationToken);
+        Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, CancellationToken cancellationToken);
 
-        Task SaveWeatherListAsync(IEnumerable<string> cities, string currentWeatherUrl, string apiKey);
+        Task SaveWeatherListAsync(IEnumerable<string> cities, string currentWeatherUrl);
     }
 }

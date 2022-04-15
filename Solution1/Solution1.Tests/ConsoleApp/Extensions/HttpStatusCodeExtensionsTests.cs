@@ -1,24 +1,24 @@
-﻿//using ConsoleApp.Extensions;
-//using System.Net;
-//using Xunit;
+﻿using ConsoleApp.Extensions;
+using System.Net;
+using Xunit;
 
-//namespace Weather.Tests.ConsoleApp.Extensions
-//{
-    
-//    public class HttpStatusCodeExtensionsTests
-//    {
-//        [Fact]
-//        public void GetStringRepresentation_GetStringRepresentationFromHttpStatusCode_Success()
-//        {
-//            // Arrange
-//            var httpStatusCode = HttpStatusCode.BadRequest;
+namespace Weather.Tests.ConsoleApp.Extensions
+{
 
-//            // Act
-//            var result = httpStatusCode.GetStringRepresentation();
-            
-//            // Assert
-//            var expected = "400 BadRequest";
-//            Assert.Equal(expected, result);
-//        }
-//    }
-//}
+    public class HttpStatusCodeExtensionsTests
+    {
+        [Fact]
+        public void GetStringRepresentation_GetStringRepresentationFromHttpStatusCode_Success()
+        {
+            // Arrange
+            var httpStatusCode = HttpStatusCode.BadRequest;
+
+            // Act
+            var result = httpStatusCode.GetStringRepresentation();
+
+            // Assert
+            var expected = "400 BadRequest";
+            Assert.Equal(expected, result);
+        }
+    }
+}
