@@ -74,6 +74,7 @@ namespace Weather.Tests.BL.Services
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = _cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
             };
+            Console.WriteLine($"TESTTESTTEST0 - {listDataForTest[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
 
             var listWeatherAnonymousObject = listDataForTest
                 .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = _temp } })
@@ -82,7 +83,7 @@ namespace Weather.Tests.BL.Services
             var ttt = JsonSerializer.Serialize(
                         new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
                         new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() });
-            Console.WriteLine($"TESTTESTTEST - {ttt}");
+            Console.WriteLine($"TESTTESTTEST1 - {ttt}");
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -113,8 +114,8 @@ namespace Weather.Tests.BL.Services
                     .ToList()
             };
 
-            Console.WriteLine($"TESTTESTTEST - {expected.WeatherPoints[0].DateTime.ToString("day -dd, mounth -MM, year -yyyy HH:mm:ss")}");
-            Console.WriteLine($"TESTTESTTEST - {result.WeatherPoints[0].DateTime.ToString("day -dd, mounth -MM, year -yyyy HH:mm:ss")}");
+            Console.WriteLine($"TESTTESTTEST4 - {expected.WeatherPoints[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
+            Console.WriteLine($"TESTTESTTEST5 - {result.WeatherPoints[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
 
             Assert.Equal(expected.City.Name, result.City.Name);
             Assert.Equal(2,result.WeatherPoints.Count);
