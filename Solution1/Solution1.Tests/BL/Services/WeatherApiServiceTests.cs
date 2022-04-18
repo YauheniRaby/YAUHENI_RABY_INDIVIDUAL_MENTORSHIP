@@ -65,8 +65,8 @@ namespace Weather.Tests.BL.Services
 
             var listDataForTest = new[]
             {
-                new { DateTime = new DateTime(2022, 01 ,13, 09, 00, 00), Temp = _temp },
-                new { DateTime = new DateTime(2022, 01 ,13, 12, 00, 00), Temp = _temp },
+                new { DateTime = new DateTime(2022, 01 ,12, 09, 00, 00), Temp = _temp },
+                new { DateTime = new DateTime(2022, 01 ,12, 12, 00, 00), Temp = _temp },
             };
 
             var responseCoordinates = new HttpResponseMessage
@@ -79,13 +79,17 @@ namespace Weather.Tests.BL.Services
                 .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = _temp } })
                 .ToArray();
 
+            var ttt = JsonSerializer.Serialize(
+                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
+                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() });
+            Console.WriteLine($"TESTTESTTEST - {ttt}");
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(
-                    JsonSerializer.Serialize(
-                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
-                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
+                Content = new StringContent(ttt),
+                    //JsonSerializer.Serialize(
+                    //    new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
+                    //    new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
             };
 
             var countWeatherPoints = listWeatherAnonymousObject.Count();
