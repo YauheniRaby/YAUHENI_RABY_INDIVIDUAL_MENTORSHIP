@@ -24,6 +24,4 @@ jobs:
         run: dotnet restore ./Solution1/Weather.sln
       - name: Build
         run: dotnet build -c Release --no-restore
-      - name: Test
-        run: dotnet test -c Release --no-bild ./Solution1/Weather.sln
       - run: echo "ok"
