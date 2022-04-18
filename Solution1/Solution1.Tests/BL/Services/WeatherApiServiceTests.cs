@@ -108,7 +108,7 @@ namespace Weather.Tests.BL.Services
                     })
                     .ToList()
             };
-
+            Assert.Equal("Minsk", result.City.Name);
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
 
