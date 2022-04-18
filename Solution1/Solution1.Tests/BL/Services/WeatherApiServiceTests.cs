@@ -54,63 +54,63 @@ namespace Weather.Tests.BL.Services
             Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
         }
 
-        [Fact]
-        public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherApiDTO_Success()
-        {
-            // Arrange
-            var lat = 53;
-            var lon = 27;
-            var urlCoordinates = Constants.CoordinatesUrl;
-            var urlForecast = Constants.ForecastUrl;
+        //[Fact]
+        //public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherApiDTO_Success()
+        //{
+        //    // Arrange
+        //    var lat = 53;
+        //    var lon = 27;
+        //    var urlCoordinates = Constants.CoordinatesUrl;
+        //    var urlForecast = Constants.ForecastUrl;
 
-            var listDataForTest = new[]
-            {
-                new { DateTime = new DateTime(2022, 10 ,11, 09, 00, 00), Temp = _temp },
-                new { DateTime = new DateTime(2022, 10 ,11, 12, 00, 00), Temp = _temp },
-            };
+        //    var listDataForTest = new[]
+        //    {
+        //        new { DateTime = new DateTime(2022, 10 ,11, 09, 00, 00), Temp = _temp },
+        //        new { DateTime = new DateTime(2022, 10 ,11, 12, 00, 00), Temp = _temp },
+        //    };
 
-            var responseCoordinates = new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = _cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
-            };
+        //    var responseCoordinates = new HttpResponseMessage
+        //    {
+        //        StatusCode = HttpStatusCode.OK,
+        //        Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = _cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
+        //    };
 
-            var listWeatherAnonymousObject = listDataForTest
-                .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = _temp } })
-                .ToArray();
+        //    var listWeatherAnonymousObject = listDataForTest
+        //        .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = _temp } })
+        //        .ToArray();
 
-            var responseForecast = new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(
-                    JsonSerializer.Serialize(
-                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
-                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
-            };
+        //    var responseForecast = new HttpResponseMessage
+        //    {
+        //        StatusCode = HttpStatusCode.OK,
+        //        Content = new StringContent(
+        //            JsonSerializer.Serialize(
+        //                new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
+        //                new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
+        //    };
 
-            var countWeatherPoints = listWeatherAnonymousObject.Count();
+        //    var countWeatherPoints = listWeatherAnonymousObject.Count();
 
-            SetHttpHandlerSettings(responseCoordinates, string.Format(urlCoordinates, _cityName));
-            SetHttpHandlerSettings(responseForecast, string.Format(urlForecast, lat, lon, countWeatherPoints));
+        //    SetHttpHandlerSettings(responseCoordinates, string.Format(urlCoordinates, _cityName));
+        //    SetHttpHandlerSettings(responseForecast, string.Format(urlForecast, lat, lon, countWeatherPoints));
 
-            // Act
-            var result = await _weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, urlForecast, urlCoordinates, CancellationToken.None);
+        //    // Act
+        //    var result = await _weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, urlForecast, urlCoordinates, CancellationToken.None);
 
-            // Assert            
-            var expected = new ForecastWeatherApiDTO()
-            {
-                City = new CityApiDTO() { Name = _cityName },
-                WeatherPoints = listDataForTest
-                    .Select(w => new WeatherInfoApiDTO()
-                    {
-                        DateTime = w.DateTime,
-                        Temp = new TempApiDTO() { Value = w.Temp }
-                    })
-                    .ToList()
-            };
+        //    // Assert            
+        //    var expected = new ForecastWeatherApiDTO()
+        //    {
+        //        City = new CityApiDTO() { Name = _cityName },
+        //        WeatherPoints = listDataForTest
+        //            .Select(w => new WeatherInfoApiDTO()
+        //            {
+        //                DateTime = w.DateTime,
+        //                Temp = new TempApiDTO() { Value = w.Temp }
+        //            })
+        //            .ToList()
+        //    };
 
-            Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
-        }
+        //    Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
+        //}
 
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
