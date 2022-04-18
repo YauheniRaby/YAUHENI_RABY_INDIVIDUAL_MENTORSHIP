@@ -2,6 +2,7 @@
 using BusinessLayer.DTOs.WeatherAPI;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -45,7 +46,7 @@ namespace BusinessLayer.Services
 
             JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
-
+            Console.WriteLine($"TESTTESTTEST2 - {forecastResponseBody}");
             return JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
         }
     }
