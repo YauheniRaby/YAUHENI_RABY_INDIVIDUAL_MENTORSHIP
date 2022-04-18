@@ -16,13 +16,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: '5.0.x'
       - name: Install dependencies
-        run: dotnet restore ./Solution1/Weather.sln
+        run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Release --no-restore ./Solution1/Weather.sln
+        run: dotnet build -c Release --no-restore
       - run: echo "ok"
-
