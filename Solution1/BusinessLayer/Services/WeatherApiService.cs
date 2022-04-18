@@ -47,6 +47,9 @@ namespace BusinessLayer.Services
             JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             Console.WriteLine($"TESTTESTTEST2 - {forecastResponseBody}");
+            var t = JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
+            Console.WriteLine($"TESTTESTTEST2 - {t.WeatherPoints[0].DateTime.ToString()}");
+
             return JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
         }
     }
