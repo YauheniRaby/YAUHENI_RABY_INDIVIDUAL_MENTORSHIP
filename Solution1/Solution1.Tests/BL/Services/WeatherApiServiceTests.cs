@@ -108,8 +108,12 @@ namespace Weather.Tests.BL.Services
                     })
                     .ToList()
             };
-            Assert.Equal("Minsk", result.City.Name);
-            Assert.True(result.WeatherPoints.Count == 2);
+            Assert.Equal(expected.City.Name, result.City.Name);
+            Assert.Equal(2,result.WeatherPoints.Count);
+            Assert.Equal(expected.WeatherPoints[0].DateTime, result.WeatherPoints[0].DateTime);
+            Assert.Equal(expected.WeatherPoints[1].DateTime, result.WeatherPoints[1].DateTime);
+            Assert.Equal(expected.WeatherPoints[0].Temp.Value, result.WeatherPoints[0].Temp.Value);
+            Assert.Equal(expected.WeatherPoints[1].Temp.Value, result.WeatherPoints[1].Temp.Value);
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
 
