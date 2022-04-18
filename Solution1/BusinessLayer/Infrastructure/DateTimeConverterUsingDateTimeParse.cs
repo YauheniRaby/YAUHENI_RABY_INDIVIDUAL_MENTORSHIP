@@ -13,7 +13,7 @@ namespace BusinessLayer.Infrastructure
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString("dd-MM-yyyy HH:mm:ss"));
+            writer.WriteStringValue(value.ToString());
         }
     }
 }

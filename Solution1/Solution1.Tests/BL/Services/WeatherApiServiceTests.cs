@@ -32,27 +32,27 @@ namespace Weather.Tests.BL.Services
             _serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         }
 
-        //[Fact]
-        //public async Task GetByCityNameAsync_ReturnedWeatherApiDTO_Success()
-        //{
-        //    // Arrange
-        //    var urlCurrentWeather = Constants.CurrentWeatherUrl;
-            
-        //    var response = new HttpResponseMessage
-        //    {
-        //        StatusCode = HttpStatusCode.OK,
-        //        Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = _temp }, Name = _cityName }, _serializerOptions)),
-        //    };
+        [Fact]
+        public async Task GetByCityNameAsync_ReturnedWeatherApiDTO_Success()
+        {
+            // Arrange
+            var urlCurrentWeather = Constants.CurrentWeatherUrl;
 
-        //    SetHttpHandlerSettings(response, string.Format(urlCurrentWeather, _cityName));
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = _temp }, Name = _cityName }, _serializerOptions)),
+            };
 
-        //    // Act
-        //    var result = await _weatherApiService.GetByCityNameAsync(_cityName, urlCurrentWeather, CancellationToken.None);
+            SetHttpHandlerSettings(response, string.Format(urlCurrentWeather, _cityName));
 
-        //    // Assert
-        //    var expectedWeatherApiDto = new WeatherApiDTO() { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = _temp } };
-        //    Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
-        //}
+            // Act
+            var result = await _weatherApiService.GetByCityNameAsync(_cityName, urlCurrentWeather, CancellationToken.None);
+
+            // Assert
+            var expectedWeatherApiDto = new WeatherApiDTO() { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = _temp } };
+            Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
+        }
 
         [Fact]
         public async Task GetForecastByCityNameAsync_ReturnedForecastWeatherApiDTO_Success()
@@ -113,17 +113,17 @@ namespace Weather.Tests.BL.Services
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
 
-        //[Fact]
-        //public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
-        //{
-        //    await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetByCityNameAsync(_cityName, Constants.CurrentWeatherUrl, new CancellationToken(true)));
-        //}
+        [Fact]
+        public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetByCityNameAsync(_cityName, Constants.CurrentWeatherUrl, new CancellationToken(true)));
+        }
 
-        //[Fact]
-        //public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
-        //{
-        //    await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(_cityName, 2, Constants.ForecastUrl, Constants.CoordinatesUrl, new CancellationToken(true)));
-        //}
+        [Fact]
+        public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(_cityName, 2, Constants.ForecastUrl, Constants.CoordinatesUrl, new CancellationToken(true)));
+        }
 
         private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)
         {
