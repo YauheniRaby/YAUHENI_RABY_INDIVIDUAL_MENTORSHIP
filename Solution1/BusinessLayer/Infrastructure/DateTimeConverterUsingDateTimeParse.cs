@@ -10,7 +10,7 @@ namespace BusinessLayer.Infrastructure
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             CultureInfo provider = CultureInfo.InvariantCulture;
-            string format = "dd/MM/yyyy HH:mm:ss.ffffff";
+            string format = "yyyy-MM-dd HH:mm:ss";
 
 
             var str = reader.GetString();
