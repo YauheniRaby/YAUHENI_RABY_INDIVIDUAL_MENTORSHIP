@@ -10,7 +10,7 @@ namespace BusinessLayer.Infrastructure
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             CultureInfo provider = CultureInfo.InvariantCulture;
-            string format = "yyyy-MM-dd HH:mm:ss";
+            string format = "dd-MM-yyyy HH:mm:ss";
 
 
             var str = reader.GetString();
@@ -18,8 +18,8 @@ namespace BusinessLayer.Infrastructure
             
             var V1 = DateTime.Parse(reader.GetString());
             Console.WriteLine($"TestParseV1 - {V1.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
-
-            var V2 = DateTime.ParseExact(str, format, provider);
+           
+            var V2 = DateTime.ParseExact(str, format, null);
             Console.WriteLine($"TestParseV2 - {V2.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
 
 
