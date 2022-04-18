@@ -112,6 +112,10 @@ namespace Weather.Tests.BL.Services
                     })
                     .ToList()
             };
+
+            Console.WriteLine($"TESTTESTTEST - {expected.WeatherPoints[0].DateTime.ToString("day -dd, mounth -MM, year -yyyy HH:mm:ss")}");
+            Console.WriteLine($"TESTTESTTEST - {result.WeatherPoints[0].DateTime.ToString("day -dd, mounth -MM, year -yyyy HH:mm:ss")}");
+
             Assert.Equal(expected.City.Name, result.City.Name);
             Assert.Equal(2,result.WeatherPoints.Count);
             Assert.Equal(expected.WeatherPoints[0].DateTime, result.WeatherPoints[0].DateTime);

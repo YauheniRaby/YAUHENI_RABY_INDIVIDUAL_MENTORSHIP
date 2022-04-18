@@ -48,7 +48,8 @@ namespace BusinessLayer.Services
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             Console.WriteLine($"TESTTESTTEST2 - {forecastResponseBody}");
             var t = JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
-            Console.WriteLine($"TESTTESTTEST2 - {t.WeatherPoints[0].DateTime.ToString()}");
+            Console.WriteLine($"TESTTESTTEST - {t.WeatherPoints[0].DateTime.ToString("day -dd, mounth -MM, year -yyyy HH:mm:ss")}");
+            return t;
 
             return JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
         }
