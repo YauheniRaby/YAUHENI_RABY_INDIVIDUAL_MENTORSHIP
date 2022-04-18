@@ -65,8 +65,8 @@ namespace Weather.Tests.BL.Services
 
             var listDataForTest = new[]
             {
-                new { DateTime = new DateTime(2022, 10 ,11, 09, 00, 00), Temp = _temp },
-                new { DateTime = new DateTime(2022, 10 ,11, 12, 00, 00), Temp = _temp },
+                new { DateTime = new DateTime(2022, 01 ,13, 09, 00, 00), Temp = _temp },
+                new { DateTime = new DateTime(2022, 01 ,13, 12, 00, 00), Temp = _temp },
             };
 
             var responseCoordinates = new HttpResponseMessage
