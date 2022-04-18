@@ -1,19 +1,15 @@
 name: dotnet package
-
 on: 
   push:
     branches: [ master ]      
   pull_request:
     branches: [ master ]
-
 jobs:
   build:
-
     runs-on: windows-latest
     strategy:
       matrix:
         dotnet-version: [ '5.0.x' ]
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -23,8 +19,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./Solution1/Weather.sln
       - name: Build
-        run: dotnet build --configuration Release --no-restore ./Solution1/Weather.sln
+        run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
       - name: Test
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
       - run: echo "ok"
-
