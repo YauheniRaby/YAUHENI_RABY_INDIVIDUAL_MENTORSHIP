@@ -43,10 +43,11 @@ namespace BusinessLayer.Services
 
             var forecastResponse = await _httpClient.GetAsync(urlResultForForecast, cancellationToken);
             var forecastResponseBody = await forecastResponse.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"TESTTESTTEST2 - {forecastResponseBody}");
 
             JsonSerializerOptions options = new();
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
-            Console.WriteLine($"TESTTESTTEST2 - {forecastResponseBody}");
+            
             var t = JsonSerializer.Deserialize<ForecastWeatherApiDTO>(forecastResponseBody, options);
             Console.WriteLine($"TESTTESTTEST3 - {t.WeatherPoints[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
             return t;

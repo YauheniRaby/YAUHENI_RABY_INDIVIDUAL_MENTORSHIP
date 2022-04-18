@@ -8,12 +8,20 @@ namespace BusinessLayer.Infrastructure
     {
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            var str = reader.GetString();
+            
+            var V1 = DateTime.Parse(reader.GetString());
+            var V2 = DateTime.ParseExact(reader.GetString(), "yyyy-MM-dd HH:mm:ss", null);
+            
+            Console.WriteLine($"TestParseV1 - {V1.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
+            Console.WriteLine($"TestParseV2 - {V2.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
+
             return DateTime.Parse(reader.GetString());
         }
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString());
+            writer.WriteStringValue(value.ToString("dd-MM-yyyy HH:mm:ss"));
         }
     }
 }
