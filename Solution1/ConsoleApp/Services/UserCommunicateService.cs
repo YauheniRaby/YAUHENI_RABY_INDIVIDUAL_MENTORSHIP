@@ -11,7 +11,6 @@ using BusinessLayer.DTOs.Enums;
 using BusinessLayer.Extensions;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
-using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
