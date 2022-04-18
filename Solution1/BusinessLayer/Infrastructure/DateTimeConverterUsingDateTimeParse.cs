@@ -19,8 +19,8 @@ namespace BusinessLayer.Infrastructure
             var V1 = DateTime.Parse(reader.GetString());
             Console.WriteLine($"TestParseV1 - {V1.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
            
-            var V2 = DateTime.ParseExact(str, format, null);
-            Console.WriteLine($"TestParseV2 - {V2.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
+            //var V2 = DateTime.ParseExact(str, format, null);
+            //Console.WriteLine($"TestParseV2 - {V2.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
 
 
             ////var V2 = DateTime.ParseExact(reader.GetString(), "yyyy-MM-dd HH:mm:ss", null);
