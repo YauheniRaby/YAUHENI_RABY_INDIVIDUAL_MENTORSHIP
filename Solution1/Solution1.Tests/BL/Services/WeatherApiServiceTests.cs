@@ -74,23 +74,19 @@ namespace Weather.Tests.BL.Services
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = _cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
             };
-            Console.WriteLine($"TESTTESTTEST0 - {listDataForTest[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
+           
 
             var listWeatherAnonymousObject = listDataForTest
                 .Select(t => new { DateTime = t.DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Main = new { Temp = _temp } })
                 .ToArray();
 
-            var ttt = JsonSerializer.Serialize(
-                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
-                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() });
-            Console.WriteLine($"TESTTESTTEST1 - {ttt}");
             var responseForecast = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(ttt),
-                    //JsonSerializer.Serialize(
-                    //    new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
-                    //    new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
+                Content = new StringContent(
+                    JsonSerializer.Serialize(
+                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
+                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
             };
 
             var countWeatherPoints = listWeatherAnonymousObject.Count();
@@ -113,16 +109,7 @@ namespace Weather.Tests.BL.Services
                     })
                     .ToList()
             };
-
-            Console.WriteLine($"TESTTESTTEST4 - {expected.WeatherPoints[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
-            Console.WriteLine($"TESTTESTTEST5 - {result.WeatherPoints[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
-
-            Assert.Equal(expected.City.Name, result.City.Name);
-            Assert.Equal(2,result.WeatherPoints.Count);
-            Assert.Equal(expected.WeatherPoints[0].DateTime, result.WeatherPoints[0].DateTime);
-            Assert.Equal(expected.WeatherPoints[1].DateTime, result.WeatherPoints[1].DateTime);
-            Assert.Equal(expected.WeatherPoints[0].Temp.Value, result.WeatherPoints[0].Temp.Value);
-            Assert.Equal(expected.WeatherPoints[1].Temp.Value, result.WeatherPoints[1].Temp.Value);
+            
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }
 
