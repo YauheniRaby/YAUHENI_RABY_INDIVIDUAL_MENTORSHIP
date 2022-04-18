@@ -77,7 +77,7 @@ namespace Weather.Tests.BL.Services
             Console.WriteLine($"TESTTESTTEST0 - {listDataForTest[0].DateTime.ToString("1 -dd, 2 -MM, 3 -yyyy HH:mm:ss")}");
 
             var listWeatherAnonymousObject = listDataForTest
-                .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = _temp } })
+                .Select(t => new { DateTime = t.DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Main = new { Temp = _temp } })
                 .ToArray();
 
             var ttt = JsonSerializer.Serialize(
