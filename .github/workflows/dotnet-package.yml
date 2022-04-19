@@ -20,6 +20,9 @@ jobs:
         run: dotnet restore ./Solution1/Weather.sln
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
+        
       - name: Test
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
+        env:
+          AppSettings.Key: ${{ secrets.KEY}}
       - run: echo "ok"
