@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
@@ -17,6 +18,8 @@ namespace ConsoleApp
         public static async Task StartUserCommunication(IKernel ninjectKernel)
         {
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
+            Console.WriteLine(Environment.GetEnvironmentVariable("KeyKey"));
+
             while (await userCommunicationService.CommunicateAsync())
             {
             }
