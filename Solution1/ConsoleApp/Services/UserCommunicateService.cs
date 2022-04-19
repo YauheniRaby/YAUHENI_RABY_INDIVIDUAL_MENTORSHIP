@@ -37,6 +37,7 @@ namespace ConsoleApp.Services
 
         public async Task<bool> CommunicateAsync()
         {
+            Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Exit");
             Console.WriteLine("1 - Get currently weather");
             Console.WriteLine("2 - Get weather for a period of time");
