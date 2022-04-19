@@ -18,8 +18,6 @@ namespace ConsoleApp
         public static async Task StartUserCommunication(IKernel ninjectKernel)
         {
             var userCommunicationService = ninjectKernel.Get<IUserCommunicateService>();
-            Console.WriteLine(Environment.GetEnvironmentVariable("KeyKey"));
-
             while (await userCommunicationService.CommunicateAsync())
             {
             }
