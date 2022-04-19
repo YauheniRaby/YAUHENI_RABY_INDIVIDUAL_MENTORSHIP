@@ -2,23 +2,22 @@
 using Hangfire;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Hangfire.Storage;
 using BusinessLayer.DTOs;
-using Hangfire.Common;
+using System.Threading;
 
 namespace BusinessLayer.Services
 {
     public class BackgroundJobService : IBackgroundJobService
     {
         private readonly IRecurringJobManager _recurringJobManager;
-        private readonly IWeatherServiсe _weatherServiсe;
+        private readonly ILogWeatherService _logWeatherServiсe;
         private readonly JobStorage _jobStorage;
 
-        public BackgroundJobService(IWeatherServiсe weatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage, IMapper mapper)
+        public BackgroundJobService(ILogWeatherService logWeatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
         {
             _recurringJobManager = recurringJobManager;
-            _weatherServiсe = weatherServiсe;
+            _logWeatherServiсe = logWeatherServiсe;
             _jobStorage = jobStorage;
         }
 
@@ -50,7 +49,7 @@ namespace BusinessLayer.Services
 
             removeJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
             
-            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _weatherServiсe.SaveWeatherListAsync(x.Value, currentWeatherUrl), x.Key));
+            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _logWeatherServiсe.AddByArrayCityNameAsync(x.Value, currentWeatherUrl, CancellationToken.None), x.Key));
         }
 
         private string GetJobName(IEnumerable<string> cities)

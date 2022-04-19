@@ -1,4 +1,3 @@
-using BusinessLayer.Infrastructure;
 using DataAccessLayer.Configuration;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;

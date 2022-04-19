@@ -17,17 +17,16 @@ namespace Weather.Tests.BL.Services
     public class BackgroundJobServiceTests
     {
         private readonly Mock<IRecurringJobManager> _recurringJobManagerMock;
-        private readonly Mock<IWeatherServiсe> _weatherServiсeMock;
+        private readonly Mock<ILogWeatherService> _logWeatherServiсeMock;
         private readonly Mock<JobStorage> _jobStorageMock;
         private readonly BackgroundJobService _backgroundJobService;
         
         public BackgroundJobServiceTests()
         {
             _recurringJobManagerMock = new Mock<IRecurringJobManager>();
-            _weatherServiсeMock = new Mock<IWeatherServiсe>();
+            _logWeatherServiсeMock = new Mock<ILogWeatherService>();
             _jobStorageMock = new Mock<JobStorage>();
-            var mapper = new Mapper(MapperConfig.GetConfiguration());
-            _backgroundJobService = new BackgroundJobService(_weatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object, mapper);
+            _backgroundJobService = new BackgroundJobService(_logWeatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object);
         }
 
         [Fact]
@@ -104,10 +103,9 @@ namespace Weather.Tests.BL.Services
                     x.AddOrUpdate(
                         It.Is<string>(x => x == option.Name),
                         It.Is<Job>(x =>
-                            x.Method.Name == nameof(WeatherService.SaveWeatherListAsync)
-                            && x.Arguments.Length == 2
-                            && x.Arguments[0] == option.Args
-                            && x.Arguments[1] == $"\"{currentWeatherUrl}\""),
+                            x.Method.Name == nameof(LogWeatherService.AddByArrayCityNameAsync)
+                            && x.Arguments.Contains(option.Args)
+                            && x.Arguments.Contains($"\"{currentWeatherUrl}\"")),
                         It.Is<string>(x => x == option.Cron),
                         It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id))));
 

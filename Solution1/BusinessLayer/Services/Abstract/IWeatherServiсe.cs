@@ -12,8 +12,6 @@ namespace BusinessLayer.Services.Abstract
 
         Task<ForecastWeatherDTO> GetForecastByCityNameAsync(string cityName, int countDay, string forecastWeatherUrl, string coordinatesUrl, int countWeatherPointInDay, CancellationToken cancellationToken);
 
-        Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, CancellationToken cancellationToken);
-
-        Task SaveWeatherListAsync(IEnumerable<string> cities, string currentWeatherUrl);
+        Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> GetWeatherByArrayCityNameAsync(IEnumerable<string> cityNames, string currentWeatherUrl, CancellationToken cancellationToken);       
     }
 }
