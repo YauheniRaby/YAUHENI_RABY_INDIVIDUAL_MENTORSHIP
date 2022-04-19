@@ -20,6 +20,15 @@ jobs:
         run: dotnet restore ./Solution1/Weather.sln
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
+        
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{env.DOTNET_ROOT}}\ConsoleApp\App.config'
+        env:
+          appSettings:key: ${{ secrets.KEY }}
+          CosmosDbSettings:AuthKey: ${{ secrets.COSMOSDBSETTINGS_AUTHKEY }}
+        
       - name: Test
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
       - run: echo "ok"
