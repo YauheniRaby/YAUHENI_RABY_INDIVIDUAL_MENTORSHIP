@@ -125,6 +125,7 @@ namespace ConsoleApp.Services
 
         private async Task GetForecastByCityNameAsync()
         {
+            Console.WriteLine(_config.ApiConfig.Key);
             Console.WriteLine("Please, enter city name:");
             string cityName = Console.ReadLine();
 
