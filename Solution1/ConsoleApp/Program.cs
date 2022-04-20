@@ -20,6 +20,8 @@ namespace ConsoleApp
 
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
+            configuration.ApiConfig = new WeatherApiConfiguration();
+            configuration.AppConfig = new AppConfiguration();
             Console.WriteLine($"KYEKEY - {configuration.Test}");
             await StartUserCommunication(GetRegistrarDependencies(configuration));
         }
