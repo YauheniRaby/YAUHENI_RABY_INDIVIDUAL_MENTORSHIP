@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
       
-      - run: echo ${{ secrets.KEY}}
+      - run: echo ${{ secrets.TEST}}
       
       - name: Test
         env:
