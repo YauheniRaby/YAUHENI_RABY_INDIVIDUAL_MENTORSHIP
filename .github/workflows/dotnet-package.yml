@@ -18,12 +18,15 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore ./Solution1/Weather.sln
+      
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
       
       - run: echo ${{ secrets.KEY}}
       
       - name: Test
+        env:
+          Test: ${{ secrets.TEST}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
        
       - run: echo "ok"
