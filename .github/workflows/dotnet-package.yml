@@ -28,5 +28,5 @@ jobs:
         env:
           Test: ${{ secrets.TEST}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
-       
+        working-directory: ConsoleApp
       - run: echo "ok"
