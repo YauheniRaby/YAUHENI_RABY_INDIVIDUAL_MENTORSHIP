@@ -14,13 +14,13 @@ namespace ConsoleApp
         public static async Task Main()
         {
             var configRoot = new ConfigurationBuilder()
-             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+             //.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
              .AddUserSecrets<Program>()
              .Build();
 
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
-
+            Console.WriteLine($"KYEKEY - {configuration.Test}");
             await StartUserCommunication(GetRegistrarDependencies(configuration));
         }
 
