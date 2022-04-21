@@ -13,7 +13,6 @@ namespace BusinessLayer.Command
         private readonly IWeatherServiсe _weatherServiсe;
         private readonly IEnumerable<string> _cityNames;
         private readonly string _currentWeatherUrl;
-        private readonly string _apiKey;
 
         public BestWeatherCommand(IWeatherServiсe weatherServiсe, IEnumerable<string> cityNames, string currentWeatherUrl)
         {

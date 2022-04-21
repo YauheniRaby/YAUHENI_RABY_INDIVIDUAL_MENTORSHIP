@@ -11,10 +11,10 @@ namespace BusinessLayer.Services
     public class BackgroundJobService : IBackgroundJobService
     {
         private readonly IRecurringJobManager _recurringJobManager;
-        private readonly ILogWeatherService _logWeatherServiсe;
+        private readonly IHistoryWeatherService _logWeatherServiсe;
         private readonly JobStorage _jobStorage;
 
-        public BackgroundJobService(ILogWeatherService logWeatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
+        public BackgroundJobService(IHistoryWeatherService logWeatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
         {
             _recurringJobManager = recurringJobManager;
             _logWeatherServiсe = logWeatherServiсe;
@@ -35,7 +35,7 @@ namespace BusinessLayer.Services
                 return;
             }
             var dictionaryNewJobs = request
-                .GroupBy(opt => Cron.MinuteInterval(opt.Timeout))
+                .GroupBy(opt => $"*/{opt.Timeout} * * * *")
                 .ToDictionary(k => k.Key, v => v.Select(opt => opt.CityName))
                 .ToList();
             

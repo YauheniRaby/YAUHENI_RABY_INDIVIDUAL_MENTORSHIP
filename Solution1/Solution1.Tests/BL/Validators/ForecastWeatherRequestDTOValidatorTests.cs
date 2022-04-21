@@ -73,7 +73,7 @@ namespace Weather.Tests.BL.Validators
         public async Task GetByCityNameAsync_CheckValidationAllRules_Success(string cityName, int countDay, bool isValid, Dictionary<string, string> errors)
         {
             // Arrange
-            var countErrors = errors.Count();
+            var countErrors = errors.Count;
             var forecastWeatherRequestDTO = new ForecastWeatherRequestDTO() { CityName = cityName, PeriodOfDays = countDay };
 
             // Act

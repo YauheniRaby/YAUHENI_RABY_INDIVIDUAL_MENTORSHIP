@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-    public class LogWeatherService : ILogWeatherService
+    public class HistoryWeatherService : IHistoryWeatherService
     {
         private readonly IWeatherServiсe _weatherService;
         private readonly IMapper _mapper;
         private readonly IWeatherRepository _weatherRepository;
 
-        public LogWeatherService(IWeatherServiсe weatherService, IWeatherRepository weatherRepository, IMapper mapper) 
+        public HistoryWeatherService(IWeatherServiсe weatherService, IWeatherRepository weatherRepository, IMapper mapper) 
         {
             _weatherService = weatherService;
             _weatherRepository = weatherRepository;

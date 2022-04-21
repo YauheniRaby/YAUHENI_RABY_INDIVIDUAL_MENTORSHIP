@@ -9,7 +9,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WeatherApi.AutoMap;
 using Xunit;
 
 namespace Weather.Tests.BL.Services
@@ -17,14 +16,14 @@ namespace Weather.Tests.BL.Services
     public class BackgroundJobServiceTests
     {
         private readonly Mock<IRecurringJobManager> _recurringJobManagerMock;
-        private readonly Mock<ILogWeatherService> _logWeatherServiсeMock;
+        private readonly Mock<IHistoryWeatherService> _logWeatherServiсeMock;
         private readonly Mock<JobStorage> _jobStorageMock;
         private readonly BackgroundJobService _backgroundJobService;
         
         public BackgroundJobServiceTests()
         {
             _recurringJobManagerMock = new Mock<IRecurringJobManager>();
-            _logWeatherServiсeMock = new Mock<ILogWeatherService>();
+            _logWeatherServiсeMock = new Mock<IHistoryWeatherService>();
             _jobStorageMock = new Mock<JobStorage>();
             _backgroundJobService = new BackgroundJobService(_logWeatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object);
         }
@@ -60,10 +59,10 @@ namespace Weather.Tests.BL.Services
 
             var currentJobs = new List<RecurringJobDto>
             {
-                new RecurringJobDto(){ Id = $"{cityName2}; {cityName1}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup1)},
-                new RecurringJobDto(){ Id = $"{cityName3}; {cityName4}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup3)},
-                new RecurringJobDto(){ Id = cityName5.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup5)},
-                new RecurringJobDto(){ Id = cityName6.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup4)}
+                new RecurringJobDto(){ Id = $"{cityName2}; {cityName1}".ToLower(), Cron = $"*/{timeoutGroup1} * * * *"},
+                new RecurringJobDto(){ Id = $"{cityName3}; {cityName4}".ToLower(), Cron = $"*/{timeoutGroup3} * * * *"},
+                new RecurringJobDto(){ Id = cityName5.ToLower(), Cron = $"*/{timeoutGroup5} * * * *"},
+                new RecurringJobDto(){ Id = cityName6.ToLower(), Cron = $"*/{timeoutGroup4} * * * *"}
             };
 
             var storageConnectionMock = new Mock<IStorageConnection>();
@@ -92,10 +91,10 @@ namespace Weather.Tests.BL.Services
             _recurringJobManagerMock.Verify(x => x.RemoveIfExists(It.Is<string>(x => x == cityName5.ToLower())), Times.Once);
 
             var paramNewJobs = new[] {
-                new { Name = $"{cityName1};{cityName5}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup1), Args = $"[\"{cityName1}\",\"{cityName5}\"]" },
-                new { Name = $"{cityName3};{cityName4}".ToLower(), Cron = Cron.MinuteInterval(timeoutGroup2), Args = $"[\"{cityName3}\",\"{cityName4}\"]" },
-                new { Name = cityName2.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup5), Args = $"[\"{cityName2}\"]" },
-                new { Name = cityName6.ToLower(), Cron = Cron.MinuteInterval(timeoutGroup4), Args = $"[\"{cityName6}\"]" }
+                new { Name = $"{cityName1};{cityName5}".ToLower(), Cron = $"*/{timeoutGroup1} * * * *", Args = new List<string>{ cityName1, cityName5 } },
+                new { Name = $"{cityName3};{cityName4}".ToLower(), Cron = $"*/{timeoutGroup2} * * * *", Args = new List<string>{ cityName3, cityName4 } },
+                new { Name = cityName2.ToLower(), Cron = $"*/{timeoutGroup5} * * * *", Args = new List<string>{ cityName2 } },
+                new { Name = cityName6.ToLower(), Cron = $"*/{timeoutGroup4} * * * *", Args = new List<string>{ cityName6 } }
             }.ToList();
 
             paramNewJobs.ForEach(option =>
@@ -103,11 +102,13 @@ namespace Weather.Tests.BL.Services
                     x.AddOrUpdate(
                         It.Is<string>(x => x == option.Name),
                         It.Is<Job>(x =>
-                            x.Method.Name == nameof(LogWeatherService.AddByArrayCityNameAsync)
-                            && x.Arguments.Contains(option.Args)
-                            && x.Arguments.Contains($"\"{currentWeatherUrl}\"")),
+                            x.Method.Name == nameof(HistoryWeatherService.AddByArrayCityNameAsync)
+                            && x.Args[0] as IEnumerable<string> != null
+                            && ((IEnumerable<string>)x.Args[0]).Count() == option.Args.Count
+                            && ((IEnumerable<string>)x.Args[0]).Any(i => option.Args.Contains(i))
+                            && x.Args.Contains(currentWeatherUrl)),
                         It.Is<string>(x => x == option.Cron),
-                        It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id))));
+                        It.Is<RecurringJobOptions>(x => x.TimeZone.Id == TimeZoneInfo.Utc.Id)))) ;
 
             _recurringJobManagerMock.VerifyNoOtherCalls();
         }

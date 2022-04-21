@@ -89,7 +89,7 @@ namespace Weather.Tests.BL.Services
                         new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
             };
 
-            var countWeatherPoints = listWeatherAnonymousObject.Count();
+            var countWeatherPoints = listWeatherAnonymousObject.Length;
 
             SetHttpHandlerSettings(responseCoordinates, string.Format(urlCoordinates, _cityName));
             SetHttpHandlerSettings(responseForecast, string.Format(urlForecast, lat, lon, countWeatherPoints));

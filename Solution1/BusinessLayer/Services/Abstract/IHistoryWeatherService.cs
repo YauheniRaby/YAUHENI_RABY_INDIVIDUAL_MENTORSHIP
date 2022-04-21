@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services.Abstract
 {
-    public interface ILogWeatherService
+    public interface IHistoryWeatherService
     {
         Task AddByArrayCityNameAsync(IEnumerable<string> cities, string currentWeatherUrl, CancellationToken token);
     }

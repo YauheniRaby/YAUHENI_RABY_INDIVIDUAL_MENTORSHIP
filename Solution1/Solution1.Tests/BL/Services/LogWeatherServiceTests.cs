@@ -18,7 +18,7 @@ namespace Weather.Tests.BL.Services
 {
     public class LogWeatherServiceTests
     {
-        private readonly LogWeatherService _logWeatherService;
+        private readonly HistoryWeatherService _logWeatherService;
         private readonly Mock<IWeatherRepository> _weatherRepositoryMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly IMapper _mapper;
@@ -35,7 +35,7 @@ namespace Weather.Tests.BL.Services
             _weatherRepositoryMock = new Mock<IWeatherRepository>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
             _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _logWeatherService = new LogWeatherService(_weatherServiceMock.Object, _weatherRepositoryMock.Object, _mapper);
+            _logWeatherService = new HistoryWeatherService(_weatherServiceMock.Object, _weatherRepositoryMock.Object, _mapper);
         }
 
         [Fact]
