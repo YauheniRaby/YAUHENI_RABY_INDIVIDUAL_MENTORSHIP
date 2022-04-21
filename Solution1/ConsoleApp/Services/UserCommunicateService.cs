@@ -42,7 +42,7 @@ namespace ConsoleApp.Services
 
             int i = Convert.ToInt32(_config.Key);
 
-            int m = i * 100;
+            int m = i * 21;
             Console.WriteLine($"configKey2 - {m}");
 
             Console.WriteLine("Select menu item:");
