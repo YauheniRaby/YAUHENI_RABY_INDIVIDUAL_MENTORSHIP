@@ -248,13 +248,7 @@ namespace Weather.Tests.Integration
                 {"AppConfiguration:MaxCountDaysForecast", $"{maxCountDaysForecast}"},
                 {"AppConfiguration:MinCountDaysForecast", $"{minCountDaysForecast}"},
                 {"AppConfiguration:IsDebugMode", $"{isDebugMode}"},
-                {"AppConfiguration:RequestTimeout", $"{requestTimeout}"},
-                //{"ConnectionStrings:DefaultConnection", "Server=(localdb)\\MSSQLLocalDB; Database = weatherdb34; Trusted_Connection = True;"},
-                //{"WeatherApiConfiguration:Key", $"3fe39edadae3ae57d133a80598d5b120"},
-                //{"WeatherApiConfiguration:CurrentWeatherUrl", "https://api.openweathermap.org/data/2.5/weather?q={0}&units=metric&appid="},
-                //{"WeatherApiConfiguration:ForecastWeatherUrl", "https://api.openweathermap.org/data/2.5/forecast?lat={0}&lon={1}&cnt={2}&units=metric&appid="},
-                //{"WeatherApiConfiguration:CoordinatesUrl", "http://api.openweathermap.org/geo/1.0/direct?q={0}&appid="},
-                {"WeatherApiConfiguration:CountPointsInDay", "8"}
+                {"AppConfiguration:RequestTimeout", $"{requestTimeout}"}                
             };
 
             var server = new TestServer(new WebHostBuilder()
