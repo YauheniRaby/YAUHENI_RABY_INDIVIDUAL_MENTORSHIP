@@ -8,7 +8,7 @@ namespace ConsoleApp.Configuration
 
         public WeatherApiConfiguration ApiConfig { get; set; }
 
-        public string Key { get; set; }
+        public Test Test { get; set; }
     }
 
     public class AppConfiguration
@@ -33,5 +33,9 @@ namespace ConsoleApp.Configuration
         public string ForecastWeatherUrl { get; set; }
 
         public string CoordinatesUrl { get; set; }
+    }
+    public class Test
+    {
+        public string Key { get; set; }
     }
 }

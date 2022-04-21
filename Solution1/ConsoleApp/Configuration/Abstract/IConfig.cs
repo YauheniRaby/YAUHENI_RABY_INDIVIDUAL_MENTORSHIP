@@ -6,6 +6,6 @@
 
         WeatherApiConfiguration ApiConfig { get; }
 
-        string Key { get; }
+        Test Test { get; }
     }
 }

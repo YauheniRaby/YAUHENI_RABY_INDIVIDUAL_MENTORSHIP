@@ -38,8 +38,8 @@ namespace ConsoleApp.Services
         public async Task<bool> CommunicateAsync()
         {
             Console.WriteLine($"EnvKey - {Environment.GetEnvironmentVariable("Key")}");
-            Console.WriteLine($"configKey - {_config.Key}");
-            int i = Convert.ToInt32(_config.Key);
+            Console.WriteLine($"configKey - {_config.Test.Key}");
+            int i = Convert.ToInt32(_config.Test.Key);
             Console.WriteLine($"result1 - {i * 100}");
             Console.WriteLine($"result2 - {i * 21}");
 

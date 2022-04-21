@@ -27,6 +27,10 @@ namespace ConsoleApp
 
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
+            
+            
+            
+            
             configuration.ApiConfig = new WeatherApiConfiguration();
             configuration.AppConfig = new AppConfiguration();
 
