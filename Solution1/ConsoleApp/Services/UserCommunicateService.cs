@@ -37,6 +37,9 @@ namespace ConsoleApp.Services
 
         public async Task<bool> CommunicateAsync()
         {
+            Console.WriteLine($"EnvKey - {Environment.GetEnvironmentVariable("Key")}");
+            Console.WriteLine($"configKey - {_config.Key}");
+
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Exit");
             Console.WriteLine("1 - Get currently weather");

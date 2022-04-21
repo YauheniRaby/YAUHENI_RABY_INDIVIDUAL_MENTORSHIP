@@ -8,7 +8,7 @@ namespace ConsoleApp.Configuration
 
         public WeatherApiConfiguration ApiConfig { get; set; }
 
-        public string Test { get; set; }
+        public string Key { get; set; }
     }
 
     public class AppConfiguration

@@ -14,15 +14,21 @@ namespace ConsoleApp
         public static async Task Main()
         {
             var configRoot = new ConfigurationBuilder()
-             //.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-             .AddUserSecrets<Program>()
-             .Build();
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+            //.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            //.AddUserSecrets<Program>()
+            //.Build()
+            //IConfiguration config = new ConfigurationBuilder()
+
+            var t = Environment.GetEnvironmentVariable("Key");
 
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
-            configuration.ApiConfig = new WeatherApiConfiguration();
-            configuration.AppConfig = new AppConfiguration();
-            Console.WriteLine($"KYEKEY - {configuration.Test}");
+            
+
             await StartUserCommunication(GetRegistrarDependencies(configuration));
         }
 

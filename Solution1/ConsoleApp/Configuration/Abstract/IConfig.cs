@@ -5,5 +5,7 @@
         AppConfiguration AppConfig { get; }
 
         WeatherApiConfiguration ApiConfig { get; }
+
+        string Key { get; }
     }
 }
