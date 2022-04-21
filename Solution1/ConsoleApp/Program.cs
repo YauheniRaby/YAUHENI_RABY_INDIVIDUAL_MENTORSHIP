@@ -23,7 +23,7 @@ namespace ConsoleApp
             //.Build()
             //IConfiguration config = new ConfigurationBuilder()
 
-            var t = Environment.GetEnvironmentVariable("Key");
+            //var t = Environment.GetEnvironmentVariable("Key");
 
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
@@ -31,8 +31,8 @@ namespace ConsoleApp
             
             
             
-            configuration.ApiConfig = new WeatherApiConfiguration();
-            configuration.AppConfig = new AppConfiguration();
+            //configuration.ApiConfig = new WeatherApiConfiguration();
+            //configuration.AppConfig = new AppConfiguration();
 
             await StartUserCommunication(GetRegistrarDependencies(configuration));
         }
