@@ -80,10 +80,10 @@ namespace Weather.Tests.Integration
         public async Task Main_GetBestWeatherForArrayCities_Success(bool isDebugMode)
         {
             _config
-                .Setup(config => config.AppConfig)
+                .Setup(config => config.AppConfiguration)
                 .Returns(new AppConfiguration());
             _config
-                .Setup(config => config.ApiConfig)
+                .Setup(config => config.WeatherApiConfiguration)
                 .Returns(new WeatherApiConfiguration());
 
             var ninjectKernel = Program.GetRegistrarDependencies(_config.Object);

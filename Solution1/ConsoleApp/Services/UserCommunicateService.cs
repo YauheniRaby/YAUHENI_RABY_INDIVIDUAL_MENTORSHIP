@@ -118,8 +118,8 @@ namespace ConsoleApp.Services
         private async Task GetCurrentWeatherCommandAsync()
         {
             Console.WriteLine("Please, enter city name:");
-            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), $"{_config.ApiConfig.CurrentWeatherUrl}{_config.ApiConfig.Key}");
-            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
+            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), $"{_config.WeatherApiConfiguration.CurrentWeatherUrl}{_config.WeatherApiConfiguration.Key}");
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
             Console.WriteLine(result.GetStringRepresentation());
         }
 
@@ -147,10 +147,10 @@ namespace ConsoleApp.Services
                 _weatherServiсe,
                 cityName,
                 countDay,
-                $"{_config.ApiConfig.ForecastWeatherUrl}{_config.ApiConfig.Key}",
-                $"{_config.ApiConfig.CoordinatesUrl}{_config.ApiConfig.Key}", _config.ApiConfig.CountPointsInDay);
+                $"{_config.WeatherApiConfiguration.ForecastWeatherUrl}{_config.WeatherApiConfiguration.Key}",
+                $"{_config.WeatherApiConfiguration.CoordinatesUrl}{_config.WeatherApiConfiguration.Key}", _config.WeatherApiConfiguration.CountPointsInDay);
 
-            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
+            var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
             Console.WriteLine(result.GetMultiStringRepresentation());
         }
 
@@ -168,9 +168,9 @@ namespace ConsoleApp.Services
             var command = new BestWeatherCommand(
                 _weatherServiсe,
                 arrayCityNames.Split(',').Select(cityName => cityName.Trim()),
-                $"{_config.ApiConfig.CurrentWeatherUrl}{_config.ApiConfig.Key}");
+                $"{_config.WeatherApiConfiguration.CurrentWeatherUrl}{_config.WeatherApiConfiguration.Key}");
 
-            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfig.RequestTimeout));
+            var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
 
             var countSuccessResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Successful, out var successfulWeatherResponses) ? successfulWeatherResponses.Count() : 0;
             var countFailResponse = dictionaryWeatherResponsesDTO.TryGetValue(ResponseStatus.Fail, out var failedWeatherResponses) ? failedWeatherResponses.Count() : 0;
@@ -187,7 +187,7 @@ namespace ConsoleApp.Services
                 Console.WriteLine($"No successful requests. Failed requests count: {countFailResponse}, canceled: {countCanceledResponse}.");
             }
 
-            if (_config.AppConfig.IsDebugMode)
+            if (_config.AppConfiguration.IsDebugMode)
             {
                 ShowDebugInformation(successfulWeatherResponses, "Success case:", nameof(WeatherResponseDTO.Temp));
                 ShowDebugInformation(failedWeatherResponses, "On fail:", nameof(WeatherResponseDTO.ErrorMessage));

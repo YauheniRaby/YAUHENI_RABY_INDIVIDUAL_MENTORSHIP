@@ -2,8 +2,8 @@
 {
     public interface IConfig
     {
-        AppConfiguration AppConfig { get; }
+        AppConfiguration AppConfiguration { get; }
 
-        WeatherApiConfiguration ApiConfig { get; }
+        WeatherApiConfiguration WeatherApiConfiguration { get; }
     }
 }

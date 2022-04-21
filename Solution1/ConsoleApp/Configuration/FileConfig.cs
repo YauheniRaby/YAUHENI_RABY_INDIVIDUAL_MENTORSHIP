@@ -4,9 +4,9 @@ namespace ConsoleApp.Configuration
 {
     public class FileConfig : IConfig
     {
-        public AppConfiguration AppConfig { get; set; }
+        public AppConfiguration AppConfiguration { get; set; }
 
-        public WeatherApiConfiguration ApiConfig { get; set; }
+        public WeatherApiConfiguration WeatherApiConfiguration { get; set; }
     }
 
     public class AppConfiguration
