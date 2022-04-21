@@ -34,10 +34,10 @@ namespace WeatherApi
             services.Configure<WeatherApiConfiguration>(Configuration.GetSection(nameof(WeatherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             
-            services.AddHangfire((provider, config) => config
-                .UseSqlServerStorage(connectionString)
-                .UseFilter(new ExceptionHangfireFilter(provider.GetService<ILogger<BackgroundJob>>())));
-            services.AddHangfireServer();
+            //services.AddHangfire((provider, config) => config
+            //    .UseSqlServerStorage(connectionString)
+            //    .UseFilter(new ExceptionHangfireFilter(provider.GetService<ILogger<BackgroundJob>>())));
+            //services.AddHangfireServer();
 
             services.AddStartupFilters();
             services.AddServices();
@@ -61,7 +61,7 @@ namespace WeatherApi
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherApi v1"));
-                app.UseHangfireDashboard("/dashboard");
+                //app.UseHangfireDashboard("/dashboard");
                 
             }
             app.UseHttpStatusExceptionHandler();
