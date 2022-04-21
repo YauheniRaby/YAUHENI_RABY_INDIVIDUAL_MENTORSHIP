@@ -34,6 +34,7 @@ jobs:
           WeatherApiConfiguration__CurrentWeatherUrl: ${{ secrets.CURRENT_WEATHER_URL}}
           WeatherApiConfiguration__ForecastWeatherUrl: ${{ secrets.FORECAST_WEATHER_URL}}
           WeatherApiConfiguration__CoordinatesUrl: ${{ secrets.COORDINATES_URL}}
+          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRINGS}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
         
       - run: echo "ok"
