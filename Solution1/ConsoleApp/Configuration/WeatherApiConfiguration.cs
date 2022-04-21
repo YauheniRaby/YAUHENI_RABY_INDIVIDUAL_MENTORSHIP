@@ -2,7 +2,6 @@
 
 namespace ConsoleApp.Configuration
 {
-
     public class WeatherApiConfiguration
     {
         public int CountPointsInDay { get; set; }
