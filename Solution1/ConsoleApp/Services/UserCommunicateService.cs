@@ -40,6 +40,11 @@ namespace ConsoleApp.Services
             Console.WriteLine($"EnvKey - {Environment.GetEnvironmentVariable("Key")}");
             Console.WriteLine($"configKey - {_config.Key}");
 
+            int i = Convert.ToInt32(_config.Key);
+
+            int m = i * 100;
+            Console.WriteLine($"configKey - {m}");
+
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Exit");
             Console.WriteLine("1 - Get currently weather");
