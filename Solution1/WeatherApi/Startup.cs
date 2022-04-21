@@ -28,16 +28,24 @@ namespace WeatherApi
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+
+            var t = "postgres://ajtinkrqmvpxas:02d90547022b435cf0e35831406e2dfeb1e3aab12dd9ce28d9b42505fabd307e@ec2-52-3-200-138.compute-1.amazonaws.com:5432/d8limoqs5pu1it";
+            var m = "Server=ec2-52-3-200-138.compute-1.amazonaws.com";
+
+
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(t), ServiceLifetime.Singleton);
+
+            //services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
             services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
             services.Configure<WeatherApiConfiguration>(Configuration.GetSection(nameof(WeatherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            
-            //services.AddHangfire((provider, config) => config
-            //    .UseSqlServerStorage(connectionString)
-            //    .UseFilter(new ExceptionHangfireFilter(provider.GetService<ILogger<BackgroundJob>>())));
-            //services.AddHangfireServer();
+
+            services.AddHangfire((provider, config) => config
+                .UseSqlServerStorage(m)
+                //.UseSqlServerStorage(connectionString)
+                .UseFilter(new ExceptionHangfireFilter(provider.GetService<ILogger<BackgroundJob>>())));
+            services.AddHangfireServer();
 
             services.AddStartupFilters();
             services.AddServices();
