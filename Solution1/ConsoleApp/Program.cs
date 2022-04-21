@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
@@ -18,21 +17,8 @@ namespace ConsoleApp
                 .AddEnvironmentVariables()
                 .Build();
 
-            //.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            //.AddUserSecrets<Program>()
-            //.Build()
-            //IConfiguration config = new ConfigurationBuilder()
-
-            //var t = Environment.GetEnvironmentVariable("Key");
-
             var configuration = new FileConfig();
             configRoot.Bind(configuration);
-            
-            
-            
-            
-            //configuration.ApiConfig = new WeatherApiConfiguration();
-            //configuration.AppConfig = new AppConfiguration();
 
             await StartUserCommunication(GetRegistrarDependencies(configuration));
         }

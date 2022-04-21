@@ -5,7 +5,5 @@
         AppConfiguration AppConfig { get; }
 
         WeatherApiConfiguration ApiConfig { get; }
-
-        Test Test { get; }
     }
 }

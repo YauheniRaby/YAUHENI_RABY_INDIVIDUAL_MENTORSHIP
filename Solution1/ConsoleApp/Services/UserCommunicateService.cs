@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -37,12 +36,6 @@ namespace ConsoleApp.Services
 
         public async Task<bool> CommunicateAsync()
         {
-            //Console.WriteLine($"EnvKey - {Environment.GetEnvironmentVariable("Key")}");
-            //Console.WriteLine($"configKey - {_config.Test.Key}");
-            //int i = Convert.ToInt32(_config.Test.Key);
-            //Console.WriteLine($"result1 - {i * 100}");
-            //Console.WriteLine($"result2 - {i * 21}");
-
             Console.WriteLine("Select menu item:");
             Console.WriteLine("0 - Exit");
             Console.WriteLine("1 - Get currently weather");
