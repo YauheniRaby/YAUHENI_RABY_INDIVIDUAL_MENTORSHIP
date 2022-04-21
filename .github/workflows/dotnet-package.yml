@@ -27,7 +27,7 @@ jobs:
       
       - name: Test
         env:
-          Key: 12345
+          Test__Key: ${{ secrets.KEY}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
         
       - run: echo "ok"
