@@ -22,11 +22,11 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
       
-      - run: echo ${{ secrets.TEST}}
+      - run: echo ${{ secrets.KEY}}
       
       - name: Test
         env:
-          Test: ${{ secrets.TEST}}
+          Key: ${{ secrets.KEY}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
-        working-directory: Solution1.Tests
+        
       - run: echo "ok"
