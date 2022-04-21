@@ -14,7 +14,7 @@ namespace ConsoleApp
         {
             var configRoot = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.Development.json")
+                .AddUserSecrets<Program>()
                 .AddEnvironmentVariables()
                 .Build();
 
