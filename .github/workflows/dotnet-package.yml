@@ -23,8 +23,6 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
       
-      - run: echo ${{ secrets.KEY}}
-      
       - name: Test
         env:
           AppConfiguration__MinCountDaysForecast: ${{ secrets.MIN_COUNT_DAYS_FORECAST}}
