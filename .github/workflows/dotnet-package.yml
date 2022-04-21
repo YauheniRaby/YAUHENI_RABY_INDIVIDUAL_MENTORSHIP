@@ -4,6 +4,7 @@ on:
     branches: [ master ]      
   pull_request:
     branches: [ master ]
+
 jobs:
   build:
     runs-on: windows-latest
@@ -26,7 +27,7 @@ jobs:
       
       - name: Test
         env:
-          Key: ${{ secrets.KEY}}
+          Key: 12345
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
         
       - run: echo "ok"
