@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
 using Xunit;
 
+[assembly: CollectionBehavior( DisableTestParallelization = true )]
+
 namespace Weather.Tests.Integration
 {
     public class ConsoleAppTests
@@ -32,7 +34,7 @@ namespace Weather.Tests.Integration
         public async Task Main_GetCurrentWeather_Success()
         {
             // Arrange
-            var pattern = $"^{_menu}{Environment.NewLine}" +
+            var pattern = $"{_menu}{Environment.NewLine}" +
                 $"In {_cityName} {_temperaturePattern} C. {_commentPattern}{Environment.NewLine}" +
                 $"{_menu}{Environment.NewLine}" +
                 $"Сlose the application{Environment.NewLine}$";
@@ -56,7 +58,7 @@ namespace Weather.Tests.Integration
             // Arrange
             var countDays = 2;
             var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {_temperaturePattern} C. {_commentPattern}\s{{0,1}}){{{countDays},{countDays + 1}}}";
-            var pattern = $"^{_menu}{Environment.NewLine}" +
+            var pattern = $"{_menu}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"Please, enter count day:{Environment.NewLine}" +
                 $"{_cityName} weather forecast:{forecastPattern}{Environment.NewLine}" +

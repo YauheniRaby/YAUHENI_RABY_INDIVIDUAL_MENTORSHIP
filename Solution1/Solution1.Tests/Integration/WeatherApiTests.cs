@@ -13,6 +13,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using KellermanSoftware.CompareNetObjects;
 
+
 namespace Weather.Tests.Integration
 {
     public class WeatherApiTests
