@@ -27,6 +27,15 @@ jobs:
       
       - name: Test
         env:
+          AppConfig__MinCountDaysForecast: ${{ secrets.MIN_COUNT_DAYS_FORECAST}}
+          AppConfig__MaxCountDaysForecast: ${{ secrets.MAX_COUNT_DAYS_FORECAST}}
+          AppConfig__IsDebugMode: ${{ secrets.IS_DEBUG_MODE}}
+          AppConfig__RequestTimeout: ${{ secrets.REQUEST_TIMEOUT}}
+          ApiConfig__CountPointsInDay: ${{ secrets.COUNT_POINTS_IN_DAY}}
+          ApiConfig__Key: ${{ secrets.API_KEY}}
+          ApiConfig__CurrentWeatherUrl: ${{ secrets.CURRENT_WEATHER_URL}}
+          ApiConfig__ForecastWeatherUrl: ${{ secrets.FORECAST_WEATHER_URL}}
+          ApiConfig__CoordinatesUrl: ${{ secrets.COORDINATES_URL}}
           Test__Key: ${{ secrets.KEY}}
         run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
         
