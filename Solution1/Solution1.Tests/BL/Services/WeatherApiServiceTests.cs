@@ -23,6 +23,9 @@ namespace Weather.Tests.BL.Services
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly string _cityName = "Minsk";
         private readonly double _temp = 10;
+        private readonly string _currentWeatherUrl = "http://test.com/current/{0}/";
+        private readonly string _forecastUrl = "http://test.com/forecast/{0}/{1}/{2}/";
+        private readonly string _coordinatesUrl = "http://test.com/coordinates/{0}/";
 
         public WeatherApiServiceTests()
         {
@@ -36,7 +39,7 @@ namespace Weather.Tests.BL.Services
         public async Task GetByCityNameAsync_ReturnedWeatherApiDTO_Success()
         {
             // Arrange
-            var urlCurrentWeather = Constants.CurrentWeatherUrl;
+            var urlCurrentWeather = _currentWeatherUrl;
 
             var response = new HttpResponseMessage
             {
@@ -60,8 +63,8 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var lat = 53;
             var lon = 27;
-            var urlCoordinates = Constants.CoordinatesUrl;
-            var urlForecast = Constants.ForecastUrl;
+            var urlCoordinates = _coordinatesUrl;
+            var urlForecast = _forecastUrl;
 
             var listDataForTest = new[]
             {
@@ -116,13 +119,13 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetByCityNameAsync(_cityName, Constants.CurrentWeatherUrl, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetByCityNameAsync(_cityName, _currentWeatherUrl, new CancellationToken(true)));
         }
 
         [Fact]
         public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(_cityName, 2, Constants.ForecastUrl, Constants.CoordinatesUrl, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(_cityName, 2, _forecastUrl, _coordinatesUrl, new CancellationToken(true)));
         }
 
         private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)

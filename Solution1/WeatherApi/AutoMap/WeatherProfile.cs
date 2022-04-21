@@ -23,11 +23,6 @@ namespace WeatherApi.AutoMap
                 .ForMember(x => x.Id, opt => opt.Ignore())
                 .ForMember(x => x.Datetime, opt => opt.Ignore())
                 .ForMember(x => x.Comment, opt => opt.Ignore());
-            CreateMap<WeatherResponseDTO, WeatherResponse>()
-                .ForMember(dest => dest.Message, conf => conf.MapFrom(src => src.ErrorMessage))
-                .ForMember(x => x.Id, opt => opt.Ignore())
-                .ForMember(x => x.DateTime, opt => opt.Ignore());
-
         }
     }
 }

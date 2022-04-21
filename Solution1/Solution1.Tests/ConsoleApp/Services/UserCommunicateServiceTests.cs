@@ -23,11 +23,6 @@ using ConsoleApp.Configuration;
 
 namespace Weather.Tests.ConsoleApp.Services
 {
-    class Myclaa
-    {
-        public string CityName { get; set; }
-    };
-
     public class UserCommunicateServiceTests
     {
         private readonly UserCommunicateService _userCommunicationService;

@@ -8,7 +8,7 @@ namespace WeatherApi.Extensions
     {
         public static void AddStartupFilters(this IServiceCollection services)
         {
-            //services.AddSingleton<IStartupFilter, BackgroundJobFilter>();
+            services.AddSingleton<IStartupFilter, BackgroundJobFilter>();
         }
     }
 }

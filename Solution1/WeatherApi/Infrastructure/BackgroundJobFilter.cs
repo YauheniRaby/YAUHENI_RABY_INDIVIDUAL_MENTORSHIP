@@ -1,9 +1,7 @@
-﻿using BusinessLayer.Services;
-using BusinessLayer.Services.Abstract;
+﻿using BusinessLayer.Services.Abstract;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using WeatherApi.Configuration;

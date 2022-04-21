@@ -1,3 +1,4 @@
+using BusinessLayer.Filter;
 using DataAccessLayer.Configuration;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WeatherApi.Configuration;
 using WeatherApi.Extensions;
-using WeatherApi.Infrastructure;
 
 namespace WeatherApi
 {
@@ -35,9 +35,10 @@ namespace WeatherApi
             services.Configure<WeatherApiConfiguration>(Configuration.GetSection(nameof(WeatherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            services.AddSingleton<ExceptionHangfireFilter>();
             services.AddHangfire((provider, config) => config
                 .UseSqlServerStorage(connectionString)
-                .UseFilter(new ExceptionHangfireFilter(provider.GetService<ILogger<BackgroundJob>>())));
+                .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
             services.AddHangfireServer();
 
             services.AddStartupFilters();

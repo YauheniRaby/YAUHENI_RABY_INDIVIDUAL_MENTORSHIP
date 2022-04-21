@@ -103,7 +103,7 @@ namespace Weather.Tests.BL.Services
                         It.Is<string>(x => x == option.Name),
                         It.Is<Job>(x =>
                             x.Method.Name == nameof(HistoryWeatherService.AddByArrayCityNameAsync)
-                            && x.Args[0] as IEnumerable<string> != null
+                            && x.Args[0] is IEnumerable<string> 
                             && ((IEnumerable<string>)x.Args[0]).Count() == option.Args.Count
                             && ((IEnumerable<string>)x.Args[0]).Any(i => option.Args.Contains(i))
                             && x.Args.Contains(currentWeatherUrl)),

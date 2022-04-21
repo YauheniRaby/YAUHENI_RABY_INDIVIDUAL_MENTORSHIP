@@ -2,14 +2,11 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.Enums;
 using BusinessLayer.DTOs.WeatherAPI;
-using BusinessLayer.Exceptions;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Abstract;
-using DataAccessLayer.Repositories.Abstract;
 using FluentValidation;
 using FluentValidation.Results;
 using KellermanSoftware.CompareNetObjects;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -31,6 +28,10 @@ namespace Weather.Tests.BL.Services
         private readonly double _temp = 11;
         private readonly string _comment = DataAccessLayer.Constants.WeatherComments.Fresh;
         private readonly ValidationResult _validResult = new(new List<ValidationFailure>());
+        private readonly string _currentWeatherUrl = "http://test.com/current/{0}/";
+        private readonly string _forecastUrl = "http://test.com/forecast/{0}/{1}/{2}/";
+        private readonly string _coordinatesUrl = "http://test.com/coordinates/{0}/";
+        private readonly int _countWetherPoints = 8;
 
         public WeatherServiceTests()
         {
@@ -56,12 +57,12 @@ namespace Weather.Tests.BL.Services
                 .Setup(weatherApiService =>
                     weatherApiService.GetByCityNameAsync
                     (It.Is<string>(x => x == _cityName),
-                     It.Is<string>(x => x == Constants.CurrentWeatherUrl),
+                     It.Is<string>(x => x == _currentWeatherUrl),
                      It.IsAny<CancellationToken>()))
                 .ReturnsAsync(weatherApiDto);
 
             // Act
-            var result = await _weatherService.GetByCityNameAsync(_cityName, Constants.CurrentWeatherUrl, CancellationToken.None); 
+            var result = await _weatherService.GetByCityNameAsync(_cityName, _currentWeatherUrl, CancellationToken.None); 
 
             // Assert
             var expectedWeatherDto = new WeatherDTO() { CityName = _cityName, Temp = _temp, Comment = _comment };
@@ -71,7 +72,7 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetByCityNameAsync(_cityName, Constants.CurrentWeatherUrl, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherService.GetByCityNameAsync(_cityName, _currentWeatherUrl, new CancellationToken(true)));
         }
 
         [Theory]
@@ -81,11 +82,10 @@ namespace Weather.Tests.BL.Services
         {
             // Arrange
             var startForecast = new DateTime(2022, 10, 12, 00, 00, 00);
-            int countWeatherPointsInDay = Constants.CountWetherPoints;
             var countPointForCurrentDay =
                 (DateTime.UtcNow.Date.AddDays(1) - DateTime.UtcNow).Hours /
-                (24 / countWeatherPointsInDay);
-            var countWeatherPoints = countDays * countWeatherPointsInDay + countPointForCurrentDay;
+                (24 / _countWetherPoints);
+            var countWeatherPoints = countDays * _countWetherPoints + countPointForCurrentDay;
 
             var forecastWeatherApiDTO = new ForecastWeatherApiDTO()
             {
@@ -110,11 +110,11 @@ namespace Weather.Tests.BL.Services
 
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, Constants.ForecastUrl, Constants.CoordinatesUrl, It.IsAny<CancellationToken>()))
+                    weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, _forecastUrl, _coordinatesUrl, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(forecastWeatherApiDTO);
 
             //Act
-            var result = await _weatherService.GetForecastByCityNameAsync(_cityName, countDays, Constants.ForecastUrl, Constants.CoordinatesUrl, countWeatherPointsInDay, CancellationToken.None);
+            var result = await _weatherService.GetForecastByCityNameAsync(_cityName, countDays, _forecastUrl, _coordinatesUrl, _countWetherPoints, CancellationToken.None);
 
             //Assert
             var expectedWeatherDto = new ForecastWeatherDTO()
@@ -136,10 +136,10 @@ namespace Weather.Tests.BL.Services
             await Assert.ThrowsAsync<OperationCanceledException>(
                 async () => await _weatherService.GetForecastByCityNameAsync(
                     _cityName, 
-                    3, 
-                    Constants.ForecastUrl, 
-                    Constants.CoordinatesUrl,
-                    Constants.CountWetherPoints, 
+                    3,
+                    _forecastUrl,
+                    _coordinatesUrl,
+                    _countWetherPoints, 
                     new CancellationToken(true)));
         }
 
@@ -187,7 +187,7 @@ namespace Weather.Tests.BL.Services
                  .ReturnsAsync(_validResult);
 
             // Act
-            var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, Constants.CurrentWeatherUrl, CancellationToken.None);
+            var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, _currentWeatherUrl, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result.Keys);
@@ -216,7 +216,7 @@ namespace Weather.Tests.BL.Services
             var listCityName = new List<string>() { _cityName, cityName2 };
 
             //Act
-            var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, Constants.CurrentWeatherUrl, new CancellationToken(true));
+            var result = await _weatherService.GetWeatherByArrayCityNameAsync(listCityName, _currentWeatherUrl, new CancellationToken(true));
 
             // Assert
             Assert.NotNull(result.Keys);
@@ -232,7 +232,7 @@ namespace Weather.Tests.BL.Services
         {
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetByCityNameAsync(weatherApiDTO.CityName, Constants.CurrentWeatherUrl, It.IsAny<CancellationToken>()))
+                    weatherApiService.GetByCityNameAsync(weatherApiDTO.CityName, _currentWeatherUrl, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(weatherApiDTO);
         }
 
@@ -240,7 +240,7 @@ namespace Weather.Tests.BL.Services
         {
             _weatherApiServiceMock
                 .Setup(weatherApiService =>
-                    weatherApiService.GetByCityNameAsync(cityName, Constants.CurrentWeatherUrl, It.IsAny<CancellationToken>()))
+                    weatherApiService.GetByCityNameAsync(cityName, _currentWeatherUrl, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
         }
     }

@@ -257,6 +257,7 @@ namespace Weather.Tests.Integration
                 {
                     configurationBuilder
                     .AddJsonFile("appsettings.json")
+                    .AddUserSecrets<Program>()
                     .AddEnvironmentVariables()
                     .AddInMemoryCollection(configuration);
                 })
