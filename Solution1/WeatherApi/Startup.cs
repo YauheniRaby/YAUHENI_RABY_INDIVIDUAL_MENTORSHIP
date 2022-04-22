@@ -39,7 +39,7 @@ namespace WeatherApi
             services.AddSingleton<ExceptionHangfireFilter>();
 
             var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
-
+            if (connectionString != connectionString2) throw new Exception(connectionString);
             services.AddHangfire((provider, config) => config
                 .UseSqlServerStorage(connectionString2)
                 .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
