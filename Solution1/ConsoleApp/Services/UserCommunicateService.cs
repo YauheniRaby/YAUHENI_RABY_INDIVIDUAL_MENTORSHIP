@@ -170,7 +170,7 @@ namespace ConsoleApp.Services
             var command = new BestWeatherCommand(
                 _weatherServiсe,
                 arrayCityNames.Split(',').Select(cityName => cityName.Trim()),
-                $"{_config.WeatherApiConfiguration.CurrentWeatherUrl}{_config.WeatherApiConfiguration.Key}");
+                UrlHelper.Combine(_config.WeatherApiConfiguration.CurrentWeatherUrl, _config.WeatherApiConfiguration.Key));
 
             var dictionaryWeatherResponsesDTO = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
 

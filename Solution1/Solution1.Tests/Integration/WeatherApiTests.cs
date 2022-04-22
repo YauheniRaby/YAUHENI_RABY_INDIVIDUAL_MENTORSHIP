@@ -105,7 +105,7 @@ namespace Weather.Tests.Integration
         {
             // Arrange
 
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{_cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, UrlHelper.Combine(_currentWeatherURL, _cityName));
             var httpClient = GetClient();
 
             //Act
