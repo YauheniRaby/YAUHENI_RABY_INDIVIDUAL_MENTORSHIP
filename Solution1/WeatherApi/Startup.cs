@@ -41,7 +41,13 @@ namespace WeatherApi
             //if(connectionString.Length != connectionString2.Length) throw new Exception($"{Environment.NewLine}str1 -{connectionString.Length};{Environment.NewLine} str2 -{ connectionString2.Length+2 }");
             for(int i = 0; i< connectionString.Length; i++)
             {
-                if (connectionString[i] != connectionString2[i]) throw new Exception($"{i}{Environment.NewLine}str1 -{connectionString[i]};{Environment.NewLine}str2 -{ connectionString[2]}");
+                if (connectionString[i] != connectionString2[i]) 
+                    throw new Exception(
+                        $"{i}" +
+                        $"{Environment.NewLine}str1 -{connectionString[i]}" +
+                        $"{Environment.NewLine}str1; {connectionString.Substring(0,i).ToLower()} " +
+                        $"{Environment.NewLine}str2 -{ connectionString2[i]}"+
+                        $"{Environment.NewLine}str1; {connectionString2.Substring(0, i).ToLower()} ");
             }
             
             
