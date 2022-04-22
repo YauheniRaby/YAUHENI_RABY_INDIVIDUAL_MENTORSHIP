@@ -38,7 +38,7 @@ namespace WeatherApi
             services.AddSingleton<ExceptionHangfireFilter>();
 
             var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
-            if(connectionString.Length != connectionString2.Length) throw new Exception($"str1 -{connectionString.Length+2};{Environment.NewLine} str2 -{ connectionString2.Length+2 }");
+            if(connectionString.Length != connectionString2.Length) throw new Exception($"{Environment.NewLine}str1 -{connectionString.Length};{Environment.NewLine} str2 -{ connectionString2.Length+2 }");
             for(int i = 0; i< connectionString.Length; i++)
             {
                 if (connectionString[i] != connectionString2[i]) throw new Exception($"str1 -{connectionString[i]}; str2 -{ connectionString[2]}");
