@@ -44,10 +44,10 @@ namespace WeatherApi
                 if (connectionString[i] != connectionString2[i]) 
                     throw new Exception(
                         $"{i}" +
-                        $"{Environment.NewLine}str1 -{connectionString[i]}" +
+                        $"{Environment.NewLine}str1 -{connectionString[i+1]}" +
                         $"{Environment.NewLine}str1; {connectionString.Substring(0,i).ToLower()} " +
-                        $"{Environment.NewLine}str2 -{ connectionString2[i]}"+
-                        $"{Environment.NewLine}str1; {connectionString2.Substring(0, i).ToLower()} ");
+                        $"{Environment.NewLine}str2 -{ connectionString2[i+1]}"+
+                        $"{Environment.NewLine}str2; {connectionString2.Substring(0, i).ToLower()} ");
             }
             
             
