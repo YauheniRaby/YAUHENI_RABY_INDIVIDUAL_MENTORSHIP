@@ -36,24 +36,8 @@ namespace WeatherApi
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddSingleton<ExceptionHangfireFilter>();
-
-            var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
-            //if(connectionString.Length != connectionString2.Length) throw new Exception($"{Environment.NewLine}str1 -{connectionString.Length};{Environment.NewLine} str2 -{ connectionString2.Length+2 }");
-            for(int i = 0; i< connectionString.Length; i++)
-            {
-                if (connectionString[i] != connectionString2[i]) 
-                    throw new Exception(
-                        $"{i}" +
-                        $"{Environment.NewLine}str1 -{connectionString[i]}" +
-                        $"{Environment.NewLine}str1; {connectionString.Substring(0,i+1).ToLower()}  " +
-                        $"{Environment.NewLine}str2 -{ connectionString2[i]}"+
-                        $"{Environment.NewLine}str2; {connectionString2.Substring(0, i+1).ToLower()} ");
-            }
-            
-            
-            if (connectionString != connectionString2) throw new Exception($"Result-{connectionString}");
             services.AddHangfire((provider, config) => config
-                .UseSqlServerStorage(connectionString2)
+                .UseSqlServerStorage(connectionString)
                 .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
             services.AddHangfireServer();
 
