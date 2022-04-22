@@ -1,7 +1,6 @@
 using BusinessLayer.Filter;
 using DataAccessLayer.Configuration;
 using Hangfire;
-using Hangfire.MySql.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -36,16 +35,14 @@ namespace WeatherApi
             services.Configure<WeatherApiConfiguration>(Configuration.GetSection(nameof(WeatherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            var T = "Server=ec2-52-3-200-138.compute-1.amazonaws.com:5432;Database=d8limoqs5pu1it;User Id=ajtinkrqmvpxas;Password=02d90547022b435cf0e35831406e2dfeb1e3aab12dd9ce28d9b42505fabd307e;";
-
             services.AddSingleton<ExceptionHangfireFilter>();
 
-            var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
+            //var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
 
-            connectionString = "Data Source=remotemysql.com;Initial Catalog=iZHLvPjjuL;User ID=iZHLvPjjuL;Password=wdcmvJlgIA";
+            //connectionString = "Data Source=remotemysql.com;Initial Catalog=iZHLvPjjuL;User ID=iZHLvPjjuL;Password=wdcmvJlgIA";
             
             services.AddHangfire((provider, config) => config
-                .UseSqlServerStorage(connectionString2)
+                .UseSqlServerStorage(connectionString)
                 //.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions() { TablePrefix = "Hangfire" }))
                 .UseFilter(provider.GetService<ExceptionHangfireFilter>())
                 );
