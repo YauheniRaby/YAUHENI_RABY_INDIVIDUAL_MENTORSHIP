@@ -29,7 +29,7 @@ namespace WeatherApi
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-            Console.WriteLine(connectionString);
+            Console.WriteLine("TEST_TEST"+ connectionString);
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
             services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
@@ -40,13 +40,9 @@ namespace WeatherApi
 
             var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
 
-            //connectionString = "Data Source=remotemysql.com;Initial Catalog=iZHLvPjjuL;User ID=iZHLvPjjuL;Password=wdcmvJlgIA";
-            
             services.AddHangfire((provider, config) => config
                 .UseSqlServerStorage(connectionString2)
-                //.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions() { TablePrefix = "Hangfire" }))
-                .UseFilter(provider.GetService<ExceptionHangfireFilter>())
-                );
+                .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
             services.AddHangfireServer();
 
             services.AddStartupFilters();
