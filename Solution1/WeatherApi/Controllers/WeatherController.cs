@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using WeatherApi.Configuration;
-using WeatherApi.Helpers;
+using BusinessLayer.Helpers;
 
 namespace WeatherApi.Controllers
 {

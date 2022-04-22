@@ -9,6 +9,7 @@ using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.DTOs.Enums;
 using BusinessLayer.Extensions;
+using BusinessLayer.Helpers;
 using BusinessLayer.Infrastructure;
 using BusinessLayer.Services.Abstract;
 using ConsoleApp.Configuration.Abstract;
@@ -118,7 +119,7 @@ namespace ConsoleApp.Services
         private async Task GetCurrentWeatherCommandAsync()
         {
             Console.WriteLine("Please, enter city name:");
-            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), $"{_config.WeatherApiConfiguration.CurrentWeatherUrl}{_config.WeatherApiConfiguration.Key}");
+            var command = new CurrentWeatherCommand(_weatherServiсe, Console.ReadLine(), UrlHelper.Combine(_config.WeatherApiConfiguration.CurrentWeatherUrl, _config.WeatherApiConfiguration.Key));
             var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
             Console.WriteLine(result.GetStringRepresentation());
         }
@@ -147,8 +148,9 @@ namespace ConsoleApp.Services
                 _weatherServiсe,
                 cityName,
                 countDay,
-                $"{_config.WeatherApiConfiguration.ForecastWeatherUrl}{_config.WeatherApiConfiguration.Key}",
-                $"{_config.WeatherApiConfiguration.CoordinatesUrl}{_config.WeatherApiConfiguration.Key}", _config.WeatherApiConfiguration.CountPointsInDay);
+                UrlHelper.Combine(_config.WeatherApiConfiguration.ForecastWeatherUrl, _config.WeatherApiConfiguration.Key),
+                UrlHelper.Combine(_config.WeatherApiConfiguration.CoordinatesUrl, _config.WeatherApiConfiguration.Key),
+                _config.WeatherApiConfiguration.CountPointsInDay);
 
             var result = await _invoker.RunAsync(command, TokenGenerator.GetCancellationToken(_config.AppConfiguration.RequestTimeout));
             Console.WriteLine(result.GetMultiStringRepresentation());

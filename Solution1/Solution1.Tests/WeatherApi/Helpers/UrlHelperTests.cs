@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WeatherApi.Helpers;
+﻿using BusinessLayer.Helpers;
 using Xunit;
 
 namespace Weather.Tests.WeatherApi.Helpers
 {
     public  class UrlHelperTests
     {
-
-
-        //first second Third
         [Theory]
         [InlineData("First", "First")]
         [InlineData("FirstSecond", "First", "Second")]

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Microsoft.AspNetCore.Mvc;
 using KellermanSoftware.CompareNetObjects;
-using WeatherApi.Helpers;
+using BusinessLayer.Helpers;
 
 namespace Weather.Tests.Integration
 {

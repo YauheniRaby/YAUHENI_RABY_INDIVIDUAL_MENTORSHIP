@@ -1,4 +1,4 @@
-﻿namespace WeatherApi.Helpers
+﻿namespace BusinessLayer.Helpers
 {
     public static class UrlHelper
     {
