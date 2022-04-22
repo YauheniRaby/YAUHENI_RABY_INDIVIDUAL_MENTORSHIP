@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System;
 using WeatherApi.Configuration;
 using WeatherApi.Extensions;
 
@@ -28,7 +29,7 @@ namespace WeatherApi
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-
+            Console.WriteLine(connectionString);
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
             services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
