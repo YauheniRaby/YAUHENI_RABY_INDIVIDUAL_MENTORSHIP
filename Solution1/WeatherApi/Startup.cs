@@ -37,12 +37,12 @@ namespace WeatherApi
 
             services.AddSingleton<ExceptionHangfireFilter>();
 
-            //var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
+            var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
 
             //connectionString = "Data Source=remotemysql.com;Initial Catalog=iZHLvPjjuL;User ID=iZHLvPjjuL;Password=wdcmvJlgIA";
             
             services.AddHangfire((provider, config) => config
-                .UseSqlServerStorage(connectionString)
+                .UseSqlServerStorage(connectionString2)
                 //.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions() { TablePrefix = "Hangfire" }))
                 .UseFilter(provider.GetService<ExceptionHangfireFilter>())
                 );
