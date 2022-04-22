@@ -200,7 +200,7 @@ namespace Weather.Tests.ConsoleApp.Services
         }
 
         [Theory]
-        //[InlineData(true)]
+        [InlineData(true)]
         [InlineData(false)]
         public async Task CommunicateAsync_GetBestWeatherByArrayCityNameAsync_ShowBestWeather(bool isDebugMode)
         {
@@ -247,12 +247,7 @@ namespace Weather.Tests.ConsoleApp.Services
                 .Setup(invoker => invoker.RunAsync(It.IsAny<BestWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dictionaryWeatherResponsesDTO);
 
-            _config
-                .Setup(config => config.WeatherApiConfiguration)
-                .Returns(new WeatherApiConfiguration());
-            _config
-                .Setup(config => config.AppConfiguration)
-                .Returns(new AppConfiguration() { IsDebugMode = isDebugMode});
+            SetDefaultValueConfig(isDebugMode);            
 
             //Act
             await _userCommunicationService.CommunicateAsync();
@@ -283,14 +278,14 @@ namespace Weather.Tests.ConsoleApp.Services
             Assert.Equal(expected, consoleOutput.ToString());
         }
 
-        private void SetDefaultValueConfig()
+        private void SetDefaultValueConfig(bool isDebugMode = default)
         {
             _config
                 .Setup(config => config.WeatherApiConfiguration)
                 .Returns(new WeatherApiConfiguration());
             _config
                 .Setup(config => config.AppConfiguration)
-                .Returns(new AppConfiguration());
+                .Returns(new AppConfiguration() { IsDebugMode = isDebugMode });
         }
     }
 }

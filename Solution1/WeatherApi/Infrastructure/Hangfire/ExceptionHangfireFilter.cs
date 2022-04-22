@@ -3,7 +3,7 @@ using Hangfire.Common;
 using Hangfire.States;
 using Microsoft.Extensions.Logging;
 
-namespace BusinessLayer.Filter
+namespace WeatherApi.Infrastructure.Hangfire
 {
     public class ExceptionHangfireFilter : JobFilterAttribute, IElectStateFilter
     {

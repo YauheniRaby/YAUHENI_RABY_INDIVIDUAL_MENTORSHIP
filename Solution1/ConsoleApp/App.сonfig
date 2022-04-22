@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<appConfiguration>
+		<minCountDaysForecast>0</minCountDaysForecast>
+		<maxCountDaysForecast>5</maxCountDaysForecast>
+		<isDebugMode>true</isDebugMode>
+		<requestTimeout>100000</requestTimeout>
+	</appConfiguration>
+</configuration>

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
@@ -13,7 +14,7 @@ namespace ConsoleApp
         public static async Task Main()
         {
             var configRoot = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddXmlFile("App.сonfig")
                 .AddUserSecrets<Program>()
                 .AddEnvironmentVariables()
                 .Build();

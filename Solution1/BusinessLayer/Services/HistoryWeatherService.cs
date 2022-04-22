@@ -30,6 +30,7 @@ namespace BusinessLayer.Services
             token.ThrowIfCancellationRequested();
             var weatherList = await _weatherService.GetWeatherByArrayCityNameAsync(cities, currentWeatherUrl, token);
             var dateTime = DateTime.UtcNow;
+            var dateTime2 = DateTime.UtcNow.Date.AddHours(DateTime.UtcNow.Hour).AddMinutes(DateTime.UtcNow.Minute);
 
             if (weatherList.ContainsKey(ResponseStatus.Successful))
             {
