@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using WeatherApi.Configuration;
+using WeatherApi.Helpers;
 
 namespace WeatherApi.Controllers
 {
@@ -32,7 +33,7 @@ namespace WeatherApi.Controllers
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
-            var command = new CurrentWeatherCommand(_weatherServiсe, cityName, $"{_apiConfiguration.CurrentValue.CurrentWeatherUrl}{_apiConfiguration.CurrentValue.Key}");
+            var command = new CurrentWeatherCommand(_weatherServiсe, cityName, UrlHelper.Combine(_apiConfiguration.CurrentValue.CurrentWeatherUrl, _apiConfiguration.CurrentValue.Key));
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);
         }
@@ -45,9 +46,10 @@ namespace WeatherApi.Controllers
             var command = new ForecastWeatherCommand(
                 _weatherServiсe, 
                 cityName, 
-                countDays, 
-                $"{_apiConfiguration.CurrentValue.ForecastWeatherUrl}{_apiConfiguration.CurrentValue.Key}", 
-                $"{_apiConfiguration.CurrentValue.CoordinatesUrl}{_apiConfiguration.CurrentValue.Key}", _apiConfiguration.CurrentValue.CountPointsInDay);
+                countDays,
+                UrlHelper.Combine(_apiConfiguration.CurrentValue.ForecastWeatherUrl, _apiConfiguration.CurrentValue.Key),
+                UrlHelper.Combine(_apiConfiguration.CurrentValue.CoordinatesUrl, _apiConfiguration.CurrentValue.Key), 
+                _apiConfiguration.CurrentValue.CountPointsInDay);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);            
         }

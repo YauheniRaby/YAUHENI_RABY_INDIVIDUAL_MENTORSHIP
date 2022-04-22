@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Microsoft.AspNetCore.Mvc;
 using KellermanSoftware.CompareNetObjects;
-
+using WeatherApi.Helpers;
 
 namespace Weather.Tests.Integration
 {
@@ -165,7 +165,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_EnterInvalidData_HandlingException(string cityName, string message)
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, UrlHelper.Combine(_currentWeatherURL, cityName));
             var httpClient = GetClient();
 
             var validationDetails = new ValidationProblemDetails(
@@ -212,7 +212,7 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_CanceledOperation_Success()
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_currentWeatherURL}{_cityName}");
+            var request = new HttpRequestMessage(HttpMethod.Get, UrlHelper.Combine(_currentWeatherURL, _cityName));
             var httpClient = GetClient(0);
 
             //Act
@@ -256,7 +256,6 @@ namespace Weather.Tests.Integration
                 .ConfigureAppConfiguration(configurationBuilder =>
                 {
                     configurationBuilder
-                    .AddJsonFile("appsettings.json")
                     .AddUserSecrets<Program>()
                     .AddEnvironmentVariables()
                     .AddInMemoryCollection(configuration);

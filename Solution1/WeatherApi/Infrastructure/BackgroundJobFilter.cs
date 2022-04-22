@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using WeatherApi.Configuration;
+using WeatherApi.Helpers;
 
 namespace WeatherApi.Infrastructure
 {
@@ -33,8 +34,8 @@ namespace WeatherApi.Infrastructure
         {
             _backgroundJobsClinent.Enqueue<IBackgroundJobService>(
                 x => x.UpdateJobs(
-                    _backgroundJobConfiguration.CurrentValue.CitiesOptions, 
-                    $"{_apiConfiguration.CurrentValue.CurrentWeatherUrl}{_apiConfiguration.CurrentValue.Key}"));
+                    _backgroundJobConfiguration.CurrentValue.CitiesOptions,
+                    UrlHelper.Combine(_apiConfiguration.CurrentValue.CurrentWeatherUrl, _apiConfiguration.CurrentValue.Key)));
         }
     }
 }
