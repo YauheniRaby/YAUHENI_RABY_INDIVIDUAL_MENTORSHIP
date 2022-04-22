@@ -29,7 +29,6 @@ namespace WeatherApi
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-            Console.WriteLine("TEST_TEST"+ connectionString);
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
             services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
@@ -39,7 +38,14 @@ namespace WeatherApi
             services.AddSingleton<ExceptionHangfireFilter>();
 
             var connectionString2 = "Data Source=sql.bsite.net\\MSSQL2016;Initial Catalog=evgentik_hangfire;User ID=evgentik_hangfire;Password=wdcmvJlgIA";
-            if (connectionString != connectionString2) throw new Exception($"Result-{connectionString.ToLowerInvariant()}");
+            if(connectionString.Length != connectionString2.Length) throw new Exception($"str1 -{connectionString.Length}; str2 -{ connectionString2.Length }");
+            for(int i = 0; i< connectionString.Length; i++)
+            {
+                if (connectionString[i] != connectionString2[i]) throw new Exception($"str1 -{connectionString[i]}; str2 -{ connectionString[2]}");
+            }
+            
+            
+            if (connectionString != connectionString2) throw new Exception($"Result-{connectionString}");
             services.AddHangfire((provider, config) => config
                 .UseSqlServerStorage(connectionString2)
                 .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
