@@ -30,7 +30,7 @@ namespace BusinessLayer.Services
             token.ThrowIfCancellationRequested();
             var weatherList = await _weatherService.GetWeatherByArrayCityNameAsync(cities, currentWeatherUrl, token);
             var dateTime = DateTime.UtcNow;
-            var dateTime2 = DateTime.UtcNow.Date.AddHours(DateTime.UtcNow.Hour).AddMinutes(DateTime.UtcNow.Minute);
+            DateTime timeResult = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0, 0);
 
             if (weatherList.ContainsKey(ResponseStatus.Successful))
             {
@@ -38,7 +38,7 @@ namespace BusinessLayer.Services
                 var resultWeatherList = _mapper.Map<List<Weather>>(weatherList[ResponseStatus.Successful]);
                 resultWeatherList.ForEach(weather =>
                 {
-                    weather.Datetime = dateTime;
+                    weather.Datetime = timeResult;
                     weather.FillCommentByTemp();
                 });
                 await _weatherRepository.BulkSaveWeatherListAsync(resultWeatherList);

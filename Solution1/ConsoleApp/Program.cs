@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
@@ -14,12 +13,11 @@ namespace ConsoleApp
         public static async Task Main()
         {
             var configRoot = new ConfigurationBuilder()
-                .AddXmlFile("App.сonfig")
                 .AddUserSecrets<Program>()
                 .AddEnvironmentVariables()
                 .Build();
 
-            var configuration = new FileConfig();
+            var configuration = new FileConfig() { AppConfiguration = new AppConfiguration() };
             configRoot.Bind(configuration);
 
             await StartUserCommunication(GetRegistrarDependencies(configuration));
