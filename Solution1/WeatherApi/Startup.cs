@@ -45,7 +45,7 @@ namespace WeatherApi
                     throw new Exception(
                         $"{i}" +
                         $"{Environment.NewLine}str1 -{connectionString[i]}" +
-                        $"{Environment.NewLine}str1; {connectionString.Substring(0,i+1).ToLower()} " +
+                        $"{Environment.NewLine}str1; {connectionString.Substring(0,i+1).ToLower()}  " +
                         $"{Environment.NewLine}str2 -{ connectionString2[i]}"+
                         $"{Environment.NewLine}str2; {connectionString2.Substring(0, i+1).ToLower()} ");
             }
