@@ -1,6 +1,9 @@
+using DataAccessLayer.Configuration;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WeatherApi.Configuration;
 using WeatherApi.Extensions;
+using WeatherApi.Infrastructure.Hangfire;
 
 namespace WeatherApi
 {
@@ -23,13 +27,25 @@ namespace WeatherApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
             services.Configure<AppConfiguration>(Configuration.GetSection(nameof(AppConfiguration)));
+            services.Configure<BackgroundJobConfiguration>(Configuration.GetSection(nameof(BackgroundJobConfiguration)));
+            services.Configure<WeatherApiConfiguration>(Configuration.GetSection(nameof(WeatherApiConfiguration)));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            services.AddLogging(opt => opt.AddSimpleConsole());
+            services.AddSingleton<ExceptionHangfireFilter>();
+            services.AddHangfire((provider, config) => config
+                .UseSqlServerStorage(connectionString)
+                .UseFilter(provider.GetService<ExceptionHangfireFilter>()));
+            services.AddHangfireServer();
+
+            services.AddStartupFilters();
+            services.AddServices();
+            services.AddRepositories();
             services.AddValidators();
-            services.AddServices();           
-            
+            services.AddLogging(opt => opt.AddSimpleConsole());
+
             services.AddControllers();
             
             services.AddSwaggerGen(c =>
@@ -46,8 +62,9 @@ namespace WeatherApi
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherApi v1"));
+                app.UseHangfireDashboard("/dashboard");
+                
             }
-
             app.UseHttpStatusExceptionHandler();
 
             app.UseRouting();

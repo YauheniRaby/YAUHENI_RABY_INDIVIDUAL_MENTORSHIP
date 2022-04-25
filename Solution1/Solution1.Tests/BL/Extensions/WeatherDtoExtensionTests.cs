@@ -13,8 +13,8 @@ namespace Weather.Tests.BL.Extensions
             // Arrange
             var cityName = "Minsk";
             var temp = 10;
-            var comment = Constants.WeatherComments.Fresh;
-            var weatherDto = new WeatherDTO() { CityName = cityName , Temp = temp, Comment = comment};
+            var comment = DataAccessLayer.Constants.WeatherComments.Fresh;
+            var weatherDto = new WeatherDTO() { CityName = cityName, Temp = temp, Comment = comment };
 
             // Act
             var result = weatherDto.GetStringRepresentation();

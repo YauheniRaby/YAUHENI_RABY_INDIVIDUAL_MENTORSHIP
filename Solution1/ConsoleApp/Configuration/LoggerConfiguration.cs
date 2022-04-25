@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace ConsoleApp.Configuration
 {
@@ -8,11 +9,7 @@ namespace ConsoleApp.Configuration
         {
             var loggerFactory = LoggerFactory.Create(builder =>
             {
-                builder
-                    .AddConsole(option =>
-                    {
-                        option.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
-                    });
+                builder.AddSimpleConsole(options => options.TimestampFormat = "dd.MM.yyyy HH:mm:ss");
             });
             return loggerFactory.CreateLogger<T>();
         }

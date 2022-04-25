@@ -21,9 +21,10 @@ namespace Weather.Tests.WeatherApi.Controllers
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
-        private readonly Mock<IOptions<AppConfiguration>> _appParams;
+        private readonly Mock<IOptionsMonitor<AppConfiguration>> _appConfig;
+        private readonly Mock<IOptionsMonitor<WeatherApiConfiguration>> _apiConfig;
         private readonly WeatherController _weatherController;
-        private readonly string cityName = "Minsk";
+        private readonly string _cityName = "Minsk";
 
         public static IEnumerable<object[]> Exceptions =>
             new List<object[]>
@@ -36,9 +37,9 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
-            _appParams = new Mock<IOptions<AppConfiguration>>();
-            
-            _weatherController = new WeatherController(_weatherServiceMock.Object, _appParams.Object, _invokerMock.Object);
+            _appConfig = new Mock<IOptionsMonitor<AppConfiguration>>();
+            _apiConfig = new Mock<IOptionsMonitor<WeatherApiConfiguration>>();
+            _weatherController = new WeatherController(_weatherServiceMock.Object, _appConfig.Object, _apiConfig.Object, _invokerMock.Object);
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             var weather = new WeatherDTO()
             {
-                CityName = cityName,
+                CityName = _cityName,
                 Temp = temp,
                 Comment = comment
             };
@@ -59,10 +60,10 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(weather);
 
-            SetTimeoutForAppParams();
-
+            SetTimeoutForAppConfig();
+            SetDefaultValueForApiConfig();
             //Act
-            var response = await _weatherController.GetCurrentWeatherByCityNameAsync(cityName);
+            var response = await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
@@ -70,7 +71,7 @@ namespace Weather.Tests.WeatherApi.Controllers
             var result = (OkObjectResult)response.Result;
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
-            Assert.True(new CompareLogic().Compare(weather, result.Value).AreEqual);           
+            Assert.True(new CompareLogic().Compare(weather, result.Value).AreEqual);
         }
 
 
@@ -82,17 +83,19 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 
-            SetTimeoutForAppParams();
+            SetTimeoutForAppConfig();
+            SetDefaultValueForApiConfig();
 
-            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));            
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName));
         }
 
         [Fact]
         public async Task GetCurrentWeatherByCityName_CancellateOperation_Success()
         {
-            SetTimeoutForAppParams(0);
+            SetTimeoutForAppConfig(0);
+            SetDefaultValueForApiConfig();
 
-            await Assert.ThrowsAsync<OperationCanceledException>( async () => await _weatherController.GetCurrentWeatherByCityNameAsync(cityName));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetCurrentWeatherByCityNameAsync(_cityName));
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<CurrentWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
@@ -109,8 +112,8 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             var forecastWeather = new ForecastWeatherDTO()
             {
-                CityName = cityName, 
-                WeatherForPeriod =  new List<WeatherForDateDTO>
+                CityName = _cityName,
+                WeatherForPeriod = new List<WeatherForDateDTO>
                 {
                     new WeatherForDateDTO() { Comment = comment1, DateTime = dateTime1, Temp = temp1 },
                     new WeatherForDateDTO() { Comment = comment2, DateTime = dateTime2, Temp = temp2 }
@@ -121,10 +124,11 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(forecastWeather);
 
-            SetTimeoutForAppParams();
+            SetTimeoutForAppConfig();
+            SetDefaultValueForApiConfig();
 
             //Act
-            var response = await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2);
+            var response = await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2);
 
             //Assert
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
@@ -144,25 +148,40 @@ namespace Weather.Tests.WeatherApi.Controllers
                 .Setup(invoker => invoker.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 
-            SetTimeoutForAppParams();
+            SetTimeoutForAppConfig();
+            SetDefaultValueForApiConfig();
 
-            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2));
         }
 
         [Fact]
         public async Task GetForecastWeatherByCityName_CancellateOperation_Success()
         {
-            SetTimeoutForAppParams(0);
+            SetTimeoutForAppConfig(0);
+            SetDefaultValueForApiConfig();
 
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(cityName, 2));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2));
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
-        private void SetTimeoutForAppParams(int? timeout = null)
+        private void SetTimeoutForAppConfig(int? timeout = null)
         {
-            _appParams
-                .Setup(x => x.Value)
+            _appConfig
+                .Setup(x => x.CurrentValue)
                 .Returns(new AppConfiguration() { RequestTimeout = timeout });
+        }
+
+        private void SetDefaultValueForApiConfig()
+        {
+            _apiConfig
+                .Setup(x => x.CurrentValue)
+                .Returns(new WeatherApiConfiguration() 
+                { 
+                    CurrentWeatherUrl = "test.com/current", 
+                    CoordinatesUrl = "test.com/coordinates", 
+                    ForecastWeatherUrl = "test.com/forecast", 
+                    Key = "TestKey"
+                });
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
 using FluentValidation.Results;
-using KellermanSoftware.CompareNetObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,7 +14,7 @@ using System.Threading.Tasks;
 using WeatherApi.Infrastructure;
 using Xunit;
 
-namespace Weather.Tests.WeatherApi.Extensions
+namespace Weather.Tests.WeatherApi.Infrastructure
 {
     public class MiddlewereExceptionTests
     {

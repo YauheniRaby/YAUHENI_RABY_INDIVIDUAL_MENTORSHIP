@@ -21,8 +21,11 @@ namespace Weather.Tests.BL.Services
         private readonly HttpClient _httpClient;
         private readonly WeatherApiService _weatherApiService;
         private readonly JsonSerializerOptions _serializerOptions;
-        private readonly string cityName = "Minsk";
-        private readonly double temp = 10;        
+        private readonly string _cityName = "Minsk";
+        private readonly double _temp = 10;
+        private readonly string _currentWeatherUrl = "http://test.com/current/{0}/";
+        private readonly string _forecastUrl = "http://test.com/forecast/{0}/{1}/{2}/";
+        private readonly string _coordinatesUrl = "http://test.com/coordinates/{0}/";
 
         public WeatherApiServiceTests()
         {
@@ -36,21 +39,21 @@ namespace Weather.Tests.BL.Services
         public async Task GetByCityNameAsync_ReturnedWeatherApiDTO_Success()
         {
             // Arrange
-            var urlString = "https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=3fe39edadae3ae57d133a80598d5b120&units=metric";
-            
+            var urlCurrentWeather = _currentWeatherUrl;
+
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = temp }, Name = cityName }, _serializerOptions)),
+                Content = new StringContent(JsonSerializer.Serialize(new { Main = new { Temp = _temp }, Name = _cityName }, _serializerOptions)),
             };
 
-            SetHttpHandlerSettings(response, urlString);
+            SetHttpHandlerSettings(response, string.Format(urlCurrentWeather, _cityName));
 
             // Act
-            var result = await _weatherApiService.GetByCityNameAsync(cityName, CancellationToken.None);
+            var result = await _weatherApiService.GetByCityNameAsync(_cityName, urlCurrentWeather, CancellationToken.None);
 
             // Assert
-            var expectedWeatherApiDto = new WeatherApiDTO() { CityName = cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = temp } };
+            var expectedWeatherApiDto = new WeatherApiDTO() { CityName = _cityName, TemperatureValues = new WeatherApiTempDTO() { Temp = _temp } };
             Assert.True(new CompareLogic().Compare(expectedWeatherApiDto, result).AreEqual);
         }
 
@@ -60,22 +63,24 @@ namespace Weather.Tests.BL.Services
             // Arrange
             var lat = 53;
             var lon = 27;
-            var urlCoordinates = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid=3fe39edadae3ae57d133a80598d5b120";
-            var urlForecast = $"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=2&units=metric&appid=3fe39edadae3ae57d133a80598d5b120";
+            var urlCoordinates = _coordinatesUrl;
+            var urlForecast = _forecastUrl;
+
             var listDataForTest = new[]
             {
-                new { DateTime = new DateTime(2022, 10 ,11, 09, 00, 00), Temp = temp },
-                new { DateTime = new DateTime(2022, 10 ,11, 12, 00, 00), Temp = temp },
+                new { DateTime = new DateTime(2022, 01 ,12, 09, 00, 00), Temp = _temp },
+                new { DateTime = new DateTime(2022, 01 ,12, 12, 00, 00), Temp = _temp },
             };
 
             var responseCoordinates = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
+                Content = new StringContent(JsonSerializer.Serialize(new[] { new { Name = _cityName, Lat = lat, Lon = lon } }, _serializerOptions)),
             };
+           
 
             var listWeatherAnonymousObject = listDataForTest
-                .Select(t => new { DateTime = t.DateTime.ToString("dd-MM-yyyy HH:mm:ss"), Main = new { Temp = temp } })
+                .Select(t => new { DateTime = t.DateTime.ToString("yyyy-MM-dd HH:mm:ss"), Main = new { Temp = _temp } })
                 .ToArray();
 
             var responseForecast = new HttpResponseMessage
@@ -83,20 +88,22 @@ namespace Weather.Tests.BL.Services
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(
                     JsonSerializer.Serialize(
-                        new { City = new { Name = cityName }, List = listWeatherAnonymousObject},
-                        new JsonSerializerOptions{ PropertyNamingPolicy = new CamelCaseNamingPolicy()})),
+                        new { City = new { Name = _cityName }, List = listWeatherAnonymousObject },
+                        new JsonSerializerOptions { PropertyNamingPolicy = new CamelCaseNamingPolicy() })),
             };
 
-            SetHttpHandlerSettings(responseCoordinates, urlCoordinates);
-            SetHttpHandlerSettings(responseForecast, urlForecast);      
-            
+            var countWeatherPoints = listWeatherAnonymousObject.Length;
+
+            SetHttpHandlerSettings(responseCoordinates, string.Format(urlCoordinates, _cityName));
+            SetHttpHandlerSettings(responseForecast, string.Format(urlForecast, lat, lon, countWeatherPoints));
+
             // Act
-            var result = await _weatherApiService.GetForecastByCityNameAsync(cityName, listWeatherAnonymousObject.Count(), CancellationToken.None);
+            var result = await _weatherApiService.GetForecastByCityNameAsync(_cityName, countWeatherPoints, urlForecast, urlCoordinates, CancellationToken.None);
 
             // Assert            
             var expected = new ForecastWeatherApiDTO()
             {
-                City = new CityApiDTO() { Name = cityName },
+                City = new CityApiDTO() { Name = _cityName },
                 WeatherPoints = listDataForTest
                     .Select(w => new WeatherInfoApiDTO()
                     {
@@ -112,13 +119,13 @@ namespace Weather.Tests.BL.Services
         [Fact]
         public async Task GetByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async() => await _weatherApiService.GetByCityNameAsync(cityName, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetByCityNameAsync(_cityName, _currentWeatherUrl, new CancellationToken(true)));
         }
 
         [Fact]
         public async Task GetForecastByCityNameAsync_GenerateOperationCanceledException_Success()
         {
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(cityName, 2, new CancellationToken(true)));
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherApiService.GetForecastByCityNameAsync(_cityName, 2, _forecastUrl, _coordinatesUrl, new CancellationToken(true)));
         }
 
         private void SetHttpHandlerSettings(HttpResponseMessage response, string uri)
@@ -133,6 +140,6 @@ namespace Weather.Tests.BL.Services
                       && request.RequestUri.ToString() == uri),
                   ItExpr.IsAny<CancellationToken>())
                .ReturnsAsync(response);
-        }        
+        }
     }
 }

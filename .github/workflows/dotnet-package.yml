@@ -1,0 +1,40 @@
+name: dotnet package
+on: 
+  push:
+    branches: [ master ]      
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '5.0.x' ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore ./Solution1/Weather.sln
+      
+      - name: Build
+        run: dotnet build -c Release --no-restore ./Solution1/Weather.sln
+      
+      - name: Test
+        env:
+          AppConfiguration__MinCountDaysForecast: ${{ secrets.MIN_COUNT_DAYS_FORECAST}}
+          AppConfiguration__MaxCountDaysForecast: ${{ secrets.MAX_COUNT_DAYS_FORECAST}}
+          AppConfiguration__IsDebugMode: ${{ secrets.IS_DEBUG_MODE}}
+          AppConfiguration__RequestTimeout: ${{ secrets.REQUEST_TIMEOUT}}
+          WeatherApiConfiguration__CountPointsInDay: ${{ secrets.COUNT_POINTS_IN_DAY}}
+          WeatherApiConfiguration__Key: ${{ secrets.API_KEY}}
+          WeatherApiConfiguration__CurrentWeatherUrl: ${{ secrets.CURRENT_WEATHER_URL}}
+          WeatherApiConfiguration__ForecastWeatherUrl: ${{ secrets.FORECAST_WEATHER_URL}}
+          WeatherApiConfiguration__CoordinatesUrl: ${{ secrets.COORDINATES_URL}}
+          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRINGS}}
+        run: dotnet test --no-restore --verbosity normal ./Solution1/Weather.sln
+        
+      - run: echo "ok"

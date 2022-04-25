@@ -13,9 +13,11 @@ namespace WeatherApi.Extensions
         public static void AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IWeatherServiсe, WeatherService>();
+            services.AddSingleton<IHistoryWeatherService, HistoryWeatherService>();
             services.AddSingleton<IInvoker, Invoker>();
             services.AddSingleton<IMapper>(service => new Mapper(MapperConfig.GetConfiguration()));
-            
+            services.AddSingleton<IBackgroundJobService, BackgroundJobService>();
+
             services.AddHttpClient<IWeatherApiService, WeatherApiService>();
         }
     }

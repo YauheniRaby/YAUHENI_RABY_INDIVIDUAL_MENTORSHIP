@@ -34,8 +34,8 @@ namespace ConsoleApp.Extensions
         public static void AddValidators(this IKernel ninjectKernel, IConfig config)
         {
             ninjectKernel.Bind<IValidator<ForecastWeatherRequestDTO>>().To<ForecastWeatherRequestDTOValidator>()
-                .WithConstructorArgument("minCountDays", config.MinCountDaysForecast)
-                .WithConstructorArgument("maxCountDays", config.MaxCountDaysForecast);
+                .WithConstructorArgument("minCountDays", config.AppConfiguration.MinCountDaysForecast)
+                .WithConstructorArgument("maxCountDays", config.AppConfiguration.MaxCountDaysForecast);
         }
     }
 }

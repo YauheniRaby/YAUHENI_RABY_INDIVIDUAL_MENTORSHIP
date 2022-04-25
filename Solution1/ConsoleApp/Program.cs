@@ -3,6 +3,7 @@ using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using ConsoleApp.Extensions;
 using ConsoleApp.Services.Abstract;
+using Microsoft.Extensions.Configuration;
 using Ninject;
 
 namespace ConsoleApp
@@ -11,7 +12,15 @@ namespace ConsoleApp
     {
         public static async Task Main()
         {
-            await StartUserCommunication(GetRegistrarDependencies(new FileConfig()));
+            var configRoot = new ConfigurationBuilder()
+                .AddUserSecrets<Program>()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var configuration = new FileConfig() { AppConfiguration = new AppConfiguration() };
+            configRoot.Bind(configuration);
+
+            await StartUserCommunication(GetRegistrarDependencies(configuration));
         }
 
         public static async Task StartUserCommunication(IKernel ninjectKernel)

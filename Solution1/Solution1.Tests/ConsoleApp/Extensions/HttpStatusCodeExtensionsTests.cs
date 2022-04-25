@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Weather.Tests.ConsoleApp.Extensions
 {
-    
+
     public class HttpStatusCodeExtensionsTests
     {
         [Fact]
@@ -15,7 +15,7 @@ namespace Weather.Tests.ConsoleApp.Extensions
 
             // Act
             var result = httpStatusCode.GetStringRepresentation();
-            
+
             // Assert
             var expected = "400 BadRequest";
             Assert.Equal(expected, result);

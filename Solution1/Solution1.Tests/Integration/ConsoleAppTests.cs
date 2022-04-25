@@ -1,4 +1,5 @@
 ﻿using ConsoleApp;
+using ConsoleApp.Configuration;
 using ConsoleApp.Configuration.Abstract;
 using Moq;
 using System;
@@ -7,16 +8,18 @@ using System.Threading.Tasks;
 using Weather.Tests.Infrastructure;
 using Xunit;
 
+[assembly: CollectionBehavior( DisableTestParallelization = true )]
+
 namespace Weather.Tests.Integration
 {
     public class ConsoleAppTests
     {
         private readonly Mock<IConfig> _config;
 
-        private readonly string cityName = "Minsk";
-        private readonly string menu = Menu.GetMenuRepresentation();
-        private readonly string temperaturePattern = @"-*\d{1,2}.\d{1,2}";
-        private readonly string commentPattern =
+        private readonly string _cityName = "Minsk";
+        private readonly string _menu = Menu.GetMenuRepresentation();
+        private readonly string _temperaturePattern = @"-*\d{1,2}.\d{1,2}";
+        private readonly string _commentPattern =
             $"({BusinessLayer.Constants.WeatherComments.DressWarmly}" +
             $"|{BusinessLayer.Constants.WeatherComments.Fresh}" +
             $"|{BusinessLayer.Constants.WeatherComments.GoodWeather}" +
@@ -31,15 +34,15 @@ namespace Weather.Tests.Integration
         public async Task Main_GetCurrentWeather_Success()
         {
             // Arrange
-            var pattern = $"^{menu}{Environment.NewLine}" +
-                $"In {cityName} {temperaturePattern} C. {commentPattern}{Environment.NewLine}" +
-                $"{menu}{Environment.NewLine}" +
+            var pattern = $"{_menu}{Environment.NewLine}" +
+                $"In {_cityName} {_temperaturePattern} C. {_commentPattern}{Environment.NewLine}" +
+                $"{_menu}{Environment.NewLine}" +
                 $"Сlose the application{Environment.NewLine}$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
 
-            Console.SetIn(new StringReader($"1{Environment.NewLine}{cityName}{Environment.NewLine}0{Environment.NewLine}"));
+            Console.SetIn(new StringReader($"1{Environment.NewLine}{_cityName}{Environment.NewLine}0{Environment.NewLine}"));
 
             //Act
             await Program.Main();
@@ -54,18 +57,18 @@ namespace Weather.Tests.Integration
         {
             // Arrange
             var countDays = 2;
-            var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {temperaturePattern} C. {commentPattern}\s{{0,1}}){{{countDays},{countDays + 1}}}";
-            var pattern = $"^{menu}{Environment.NewLine}" +
+            var forecastPattern = $@"({Environment.NewLine}Day [0-5]{{1}} \(\w+ \d{{1,2}}, \d{{4}}\): {_temperaturePattern} C. {_commentPattern}\s{{0,1}}){{{countDays},{countDays + 1}}}";
+            var pattern = $"{_menu}{Environment.NewLine}" +
                 $"Please, enter city name:{Environment.NewLine}" +
                 $"Please, enter count day:{Environment.NewLine}" +
-                $"{cityName} weather forecast:{forecastPattern}{Environment.NewLine}" +
-                $"{menu}{Environment.NewLine}" +
+                $"{_cityName} weather forecast:{forecastPattern}{Environment.NewLine}" +
+                $"{_menu}{Environment.NewLine}" +
                 $"Сlose the application{Environment.NewLine}$";
 
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            Console.SetIn(new StringReader($"2{Environment.NewLine}{cityName}{Environment.NewLine}{countDays}{Environment.NewLine}0{Environment.NewLine}"));
-            
+            Console.SetIn(new StringReader($"2{Environment.NewLine}{_cityName}{Environment.NewLine}{countDays}{Environment.NewLine}0{Environment.NewLine}"));
+
             //Act
             await Program.Main();
 
@@ -75,24 +78,27 @@ namespace Weather.Tests.Integration
 
         [Theory]
         [InlineData(false)]
-        [InlineData(true)]        
+        [InlineData(true)]
         public async Task Main_GetBestWeatherForArrayCities_Success(bool isDebugMode)
         {
             _config
-                .Setup(config => config.IsDebugMode)
-                .Returns(isDebugMode);
+                .Setup(config => config.AppConfiguration)
+                .Returns(new AppConfiguration());
+            _config
+                .Setup(config => config.WeatherApiConfiguration)
+                .Returns(new WeatherApiConfiguration());
 
             var ninjectKernel = Program.GetRegistrarDependencies(_config.Object);
 
-            var arrayCityNames = $"{cityName}, ААА, {string.Empty}, Paris";
+            var arrayCityNames = $"{_cityName}, ААА, {string.Empty}, Paris";
             string cityPattern = arrayCityNames.Replace(" ", "").Replace(',', '|');
 
-            var resultRequestPattern = $@"\(City with the highest temperature {temperaturePattern} C: {cityPattern}. " +
+            var resultRequestPattern = $@"\(City with the highest temperature {_temperaturePattern} C: {cityPattern}. " +
                 $@"Successful request count: \d, failed: \d.|" +
                 $@"Error, no successful requests. Failed requests count: \d\)";
 
             var successResponsePattern = $"Success case:" +
-                $@"\({Environment.NewLine}City: '{cityPattern}', Temp: {temperaturePattern}, Timer: \d{{1,}} ms.\)+";
+                $@"\({Environment.NewLine}City: '{cityPattern}', Temp: {_temperaturePattern}, Timer: \d{{1,}} ms.\)+";
             var failResponsePattern = $"On fail:" +
                 $@"\({Environment.NewLine}City: '{cityPattern}', ErrorMessage: \w+, Timer: \d{{1,}} ms.\)+";
 
@@ -102,10 +108,10 @@ namespace Weather.Tests.Integration
                 $@"{failResponsePattern}{Environment.NewLine}\)"
                 : string.Empty;
 
-            var pattern = $@"^{menu}{Environment.NewLine}" +
+            var pattern = $@"^{_menu}{Environment.NewLine}" +
                 $@"Please, enter array city name \(separator symbal - ','\) :" +
                 $"{resultRequestPattern}{Environment.NewLine}{debugInfoPattern}" +
-                $"{menu}{Environment.NewLine}" +
+                $"{_menu}{Environment.NewLine}" +
                 $"Сlose the application{Environment.NewLine}$";
 
             var consoleOutput = new StringWriter();
@@ -116,7 +122,7 @@ namespace Weather.Tests.Integration
             await Program.StartUserCommunication(ninjectKernel);
 
             //Assert
-            Assert.Matches(pattern, consoleOutput.ToString());            
-        }        
+            Assert.Matches(pattern, consoleOutput.ToString());
+        }
     }
 }

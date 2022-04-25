@@ -10,28 +10,28 @@ namespace Weather.Tests.BL.Extensions
 {
     public class ForecastWeatherDTOExtensionsTests
     {
-        private readonly string cityName = "Minsk";
-        private readonly DateTime date = new(2022, 10, 10);
-        private readonly double temperature1 = 18;
-        private readonly string comment1 = Constants.WeatherComments.Fresh;        
-        private readonly double temperature2 = 25;
-        private readonly string comment2 = Constants.WeatherComments.GoodWeather;
+        private readonly string _cityName = "Minsk";
+        private readonly DateTime _date = new(2022, 10, 10);
+        private readonly double _temperature1 = 18;
+        private readonly string _comment1 = DataAccessLayer.Constants.WeatherComments.Fresh;
+        private readonly double _temperature2 = 25;
+        private readonly string _comment2 = DataAccessLayer.Constants.WeatherComments.GoodWeather;
 
         [Fact]
         public void GetMultiStringRepresentation_GetMultiStringRepresentationFromWeatherDTO_Success()
         {
             // Arrange
-            var forecastWeatherDTO = GetForecastWeatherDTO(comment1, comment2);
+            var forecastWeatherDTO = GetForecastWeatherDTO(_comment1, _comment2);
             var culture = new CultureInfo("en-US");
 
             // Act
             var result = forecastWeatherDTO.GetMultiStringRepresentation();
-            
+
             // Assert
-            var expected = $"{cityName} weather forecast:" +
-                $"{Environment.NewLine}Day 0 ({date.ToString(Constants.DateTimeFormats.Date, culture)}): {temperature1:f1} C. {comment1}" +
-                $"{Environment.NewLine}Day 1 ({date.AddDays(1).ToString(Constants.DateTimeFormats.Date, culture)}): {temperature2:f1} C. {comment2}";
-            
+            var expected = $"{_cityName} weather forecast:" +
+                $"{Environment.NewLine}Day 0 ({_date.ToString(BusinessLayer.Constants.DateTimeFormats.Date, culture)}): {_temperature1:f1} C. {_comment1}" +
+                $"{Environment.NewLine}Day 1 ({_date.AddDays(1).ToString(BusinessLayer.Constants.DateTimeFormats.Date, culture)}): {_temperature2:f1} C. {_comment2}";
+
             Assert.Equal(expected, result);
         }
 
@@ -45,17 +45,18 @@ namespace Weather.Tests.BL.Extensions
             forecastWeatherDTO.FillCommentByTemp();
 
             // Assert            
-            Assert.Equal(comment1, forecastWeatherDTO.WeatherForPeriod[0].Comment);
-            Assert.Equal(comment2, forecastWeatherDTO.WeatherForPeriod[1].Comment);
+            Assert.Equal(_comment1, forecastWeatherDTO.WeatherForPeriod[0].Comment);
+            Assert.Equal(_comment2, forecastWeatherDTO.WeatherForPeriod[1].Comment);
         }
+
         private ForecastWeatherDTO GetForecastWeatherDTO(string comment1, string comment2)
         {
             var weatherForPeriod = new List<WeatherForDateDTO>()
             {
-                new WeatherForDateDTO(){ DateTime = date, Temp = temperature1, Comment = comment1 },
-                new WeatherForDateDTO(){ DateTime = date.AddDays(1), Temp = temperature2, Comment = comment2 }
+                new WeatherForDateDTO(){ DateTime = _date, Temp = _temperature1, Comment = comment1 },
+                new WeatherForDateDTO(){ DateTime = _date.AddDays(1), Temp = _temperature2, Comment = comment2 }
             };
-            return new ForecastWeatherDTO() { CityName = cityName, WeatherForPeriod = weatherForPeriod };
+            return new ForecastWeatherDTO() { CityName = _cityName, WeatherForPeriod = weatherForPeriod };
         }
     }
 }
