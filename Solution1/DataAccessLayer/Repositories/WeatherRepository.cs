@@ -21,8 +21,8 @@ namespace DataAccessLayer.Repositories
         public async Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            await _context.CurrentWeathers.AddRangeAsync(weatherList);
-            await _context.SaveChangesAsync();            
+            await _context.CurrentWeathers.AddRangeAsync(weatherList, token);
+            await _context.SaveChangesAsync(token);            
         }
 
         public async Task<IEnumerable<Weather>> GetWeatherListAsync(HistoryWeatherRequest historyWeatherRequest, CancellationToken token)
@@ -33,7 +33,7 @@ namespace DataAccessLayer.Repositories
                     x.CityName == historyWeatherRequest.CityName
                     && x.Datetime >= historyWeatherRequest.StartPeriod
                     && x.Datetime <= historyWeatherRequest.EndPeriod)
-                .ToListAsync();
+                .ToListAsync(token);
         }
     }
 }

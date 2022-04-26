@@ -8,8 +8,8 @@ namespace BusinessLayer.Command
 {
     public  class HistoryWeatherCommand : ICommand<HistoryWeatherDTO>
     {
-        IHistoryWeatherService _historyWeatherService;
-        HistoryWeatherRequestDTO _requestHistoryWeatherDTO;
+        readonly IHistoryWeatherService _historyWeatherService;
+        readonly HistoryWeatherRequestDTO _requestHistoryWeatherDTO;
 
         public HistoryWeatherCommand(IHistoryWeatherService historyWeatherService, HistoryWeatherRequestDTO requestHistoryWeatherDTO)
         {

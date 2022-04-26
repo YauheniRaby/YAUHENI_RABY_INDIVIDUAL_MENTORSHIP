@@ -63,7 +63,7 @@ namespace WeatherApi.Controllers
             token.ThrowIfCancellationRequested();
             var command = new HistoryWeatherCommand(_historyWeatherService, requestHistoryWeatherDto);
             var result = await _invoker.RunAsync(command, token);
-            return Ok(result);
+            return Ok(result);            
         }
     }
 }
