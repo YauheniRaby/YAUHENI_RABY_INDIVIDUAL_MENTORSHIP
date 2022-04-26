@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using BusinessLayer.DTOs.Enums;
-using BusinessLayer.Exceptions;
+using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
-using DataAccessLayer.Extensions;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Abstract;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,40 +11,25 @@ namespace BusinessLayer.Services
 {
     public class HistoryWeatherService : IHistoryWeatherService
     {
-        private readonly IWeatherServiсe _weatherService;
-        private readonly IMapper _mapper;
-        private readonly IWeatherRepository _weatherRepository;
+        IWeatherRepository _weatherRepository;
+        IMapper _mapper;
 
-        public HistoryWeatherService(IWeatherServiсe weatherService, IWeatherRepository weatherRepository, IMapper mapper) 
+        public HistoryWeatherService(IWeatherRepository weatherRepository, IMapper mapper)
         {
-            _weatherService = weatherService;
             _weatherRepository = weatherRepository;
-            _mapper = mapper;            
+            _mapper = mapper;
         }
 
-        public async Task AddByArrayCityNameAsync(IEnumerable<string> cities, string currentWeatherUrl, CancellationToken token)
+        public async Task<HistoryWeatherDTO> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO historyWeatherRequestDTO, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            var weatherList = await _weatherService.GetWeatherByArrayCityNameAsync(cities, currentWeatherUrl, token);
-            var dateTime = DateTime.UtcNow;
-            var timeResult = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0, 0);
-
-            if (weatherList.ContainsKey(ResponseStatus.Successful))
-            {
-
-                var resultWeatherList = _mapper.Map<List<Weather>>(weatherList[ResponseStatus.Successful]);
-                resultWeatherList.ForEach(weather =>
-                {
-                    weather.Datetime = timeResult;
-                    weather.FillCommentByTemp();
-                });
-                await _weatherRepository.BulkSaveWeatherListAsync(resultWeatherList);
-            }
-
-            if (weatherList.ContainsKey(ResponseStatus.Fail))
-            {
-                throw new BackgroundJobException(weatherList[ResponseStatus.Fail]);
-            }
-        }        
+            var historyWeatherRequest = _mapper.Map<HistoryWeatherRequest>(historyWeatherRequestDTO);
+            var wetherList = await _weatherRepository.GetWeatherListAsync(historyWeatherRequest, token);
+            return new HistoryWeatherDTO() 
+            { 
+                CityName = historyWeatherRequest.CityName, 
+                WeatherList = _mapper.Map<IEnumerable<WeatherWithDatetimeDTO>>(wetherList) 
+            };
+        }
     }
 }

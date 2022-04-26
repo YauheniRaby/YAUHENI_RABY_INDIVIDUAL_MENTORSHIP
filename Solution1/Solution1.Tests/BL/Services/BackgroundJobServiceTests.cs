@@ -16,16 +16,16 @@ namespace Weather.Tests.BL.Services
     public class BackgroundJobServiceTests
     {
         private readonly Mock<IRecurringJobManager> _recurringJobManagerMock;
-        private readonly Mock<IHistoryWeatherService> _logWeatherServiсeMock;
+        private readonly Mock<ISaveWeatherService> _saveWeatherServiсeMock;
         private readonly Mock<JobStorage> _jobStorageMock;
         private readonly BackgroundJobService _backgroundJobService;
         
         public BackgroundJobServiceTests()
         {
             _recurringJobManagerMock = new Mock<IRecurringJobManager>();
-            _logWeatherServiсeMock = new Mock<IHistoryWeatherService>();
+            _saveWeatherServiсeMock = new Mock<ISaveWeatherService>();
             _jobStorageMock = new Mock<JobStorage>();
-            _backgroundJobService = new BackgroundJobService(_logWeatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object);
+            _backgroundJobService = new BackgroundJobService(_saveWeatherServiсeMock.Object, _recurringJobManagerMock.Object, _jobStorageMock.Object);
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace Weather.Tests.BL.Services
                     x.AddOrUpdate(
                         It.Is<string>(x => x == option.Name),
                         It.Is<Job>(x =>
-                            x.Method.Name == nameof(HistoryWeatherService.AddByArrayCityNameAsync)
+                            x.Method.Name == nameof(SaveWeatherService.AddByArrayCityNameAsync)
                             && x.Args[0] is IEnumerable<string> 
                             && ((IEnumerable<string>)x.Args[0]).Count() == option.Args.Count
                             && ((IEnumerable<string>)x.Args[0]).Any(i => option.Args.Contains(i))

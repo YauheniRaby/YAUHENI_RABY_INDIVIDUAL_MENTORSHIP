@@ -23,6 +23,8 @@ namespace WeatherApi.AutoMap
                 .ForMember(x => x.Id, opt => opt.Ignore())
                 .ForMember(x => x.Datetime, opt => opt.Ignore())
                 .ForMember(x => x.Comment, opt => opt.Ignore());
+            CreateMap<HistoryWeatherRequestDTO, HistoryWeatherRequest>();
+            CreateMap<Weather, WeatherWithDatetimeDTO>();
         }
     }
 }

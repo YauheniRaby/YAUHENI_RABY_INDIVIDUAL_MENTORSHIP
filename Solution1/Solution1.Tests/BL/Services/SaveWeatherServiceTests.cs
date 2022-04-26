@@ -16,9 +16,9 @@ using Xunit;
 
 namespace Weather.Tests.BL.Services
 {
-    public class HistoryWeatherServiceTests
+    public class SaveWeatherServiceTests
     {
-        private readonly HistoryWeatherService _logWeatherService;
+        private readonly SaveWeatherService _saveWeatherService;
         private readonly Mock<IWeatherRepository> _weatherRepositoryMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly IMapper _mapper;
@@ -30,13 +30,13 @@ namespace Weather.Tests.BL.Services
         private readonly string _currentWeatherUrl = "http://test.com/current/{0}/";
 
 
-        public HistoryWeatherServiceTests()
+        public SaveWeatherServiceTests()
         {
             _cityNameList = new List<string>() { _cityName, _cityName2 };
             _weatherRepositoryMock = new Mock<IWeatherRepository>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
             _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _logWeatherService = new HistoryWeatherService(_weatherServiceMock.Object, _weatherRepositoryMock.Object, _mapper);
+            _saveWeatherService = new SaveWeatherService(_weatherServiceMock.Object, _weatherRepositoryMock.Object, _mapper);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Weather.Tests.BL.Services
             SetWeatherServiceSettings(ResponseStatus.Successful);            
 
             //Act
-            await _logWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None);
+            await _saveWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None);
 
             // Assert
             _weatherServiceMock.Verify(service =>
@@ -79,14 +79,14 @@ namespace Weather.Tests.BL.Services
         {
             SetWeatherServiceSettings(ResponseStatus.Fail);            
             
-            await Assert.ThrowsAsync<BackgroundJobException>(async () => await _logWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None));
+            await Assert.ThrowsAsync<BackgroundJobException>(async () => await _saveWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None));
         }
 
         [Fact]
         public async Task AddByArrayCityNameAsync_GenerateOperationCanceledException_Success()
         {
             await Assert.ThrowsAsync<OperationCanceledException>(
-                async () => await _logWeatherService.AddByArrayCityNameAsync(
+                async () => await _saveWeatherService.AddByArrayCityNameAsync(
                     _cityNameList,
                     _currentWeatherUrl,
                     new CancellationToken(true)));

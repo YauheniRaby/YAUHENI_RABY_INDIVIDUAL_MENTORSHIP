@@ -16,13 +16,15 @@ namespace WeatherApi.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly IWeatherServiсe _weatherServiсe;
+        private readonly IHistoryWeatherService _historyWeatherService;
         private readonly IOptionsMonitor<AppConfiguration> _appConfiguration;
         private readonly IOptionsMonitor<WeatherApiConfiguration> _apiConfiguration;
         private readonly IInvoker _invoker; 
 
-        public WeatherController(IWeatherServiсe weatherServiсe, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WeatherApiConfiguration> apiConfiguration, IInvoker invoker)
+        public WeatherController(IWeatherServiсe weatherServiсe, IHistoryWeatherService historyWeatherService, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WeatherApiConfiguration> apiConfiguration, IInvoker invoker)
         {
             _weatherServiсe = weatherServiсe;
+            _historyWeatherService = historyWeatherService;
             _appConfiguration = appConfiguration;
             _apiConfiguration = apiConfiguration;
             _invoker = invoker;
@@ -52,6 +54,16 @@ namespace WeatherApi.Controllers
                 _apiConfiguration.CurrentValue.CountPointsInDay);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);            
+        }
+
+        [HttpGet("history")]
+        public async Task<ActionResult> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
+        {
+            var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
+            token.ThrowIfCancellationRequested();
+            var command = new HistoryWeatherCommand(_historyWeatherService, requestHistoryWeatherDto);
+            var result = await _invoker.RunAsync(command, token);
+            return Ok(result);
         }
     }
 }
