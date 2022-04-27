@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace BusinessLayer.Vlidators
 {
@@ -13,15 +14,15 @@ namespace BusinessLayer.Vlidators
             RuleFor(p => p.StartPeriod)
                 .Must(x =>
                     x != default)
-                .WithMessage(x => $"Value \'{nameof(x.StartPeriod)}\' must not be empty.");
+                .WithErrorCode("NotEmptyValidator");
             RuleFor(p => p.EndPeriod)
                .Must(x =>
                    x != default)
-               .WithMessage(x => $"Value \'{nameof(x.EndPeriod)}\' must not be empty.");
+               .WithErrorCode("NotEmptyValidator");
             RuleFor(p => p)
                 .Must(x =>
-                    x.StartPeriod <= x.EndPeriod)
-                .WithMessage(x => $"Value \'{nameof(x.EndPeriod)}\' must be more or equal than value \'{nameof(x.EndPeriod)}\'.");
+                    x.StartPeriod <= x.EndPeriod)                
+                .WithMessage(x => $"'{Regex.Replace(nameof(x.EndPeriod), @"([A-Z])", " $1").Trim()}' must be more or equal than '{Regex.Replace(nameof(x.StartPeriod), @"([A-Z])", " $1").Trim()}'.");
         }
     }
 }
