@@ -21,6 +21,7 @@ namespace Weather.Tests.WeatherApi.Controllers
     {
         private readonly Mock<IInvoker> _invokerMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
+        private readonly Mock<IHistoryWeatherService> _historyWeatherServiceMock;
         private readonly Mock<IOptionsMonitor<AppConfiguration>> _appConfig;
         private readonly Mock<IOptionsMonitor<WeatherApiConfiguration>> _apiConfig;
         private readonly WeatherController _weatherController;
@@ -37,9 +38,10 @@ namespace Weather.Tests.WeatherApi.Controllers
         {
             _invokerMock = new Mock<IInvoker>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
+            _historyWeatherServiceMock = new Mock<IHistoryWeatherService>();
             _appConfig = new Mock<IOptionsMonitor<AppConfiguration>>();
             _apiConfig = new Mock<IOptionsMonitor<WeatherApiConfiguration>>();
-            _weatherController = new WeatherController(_weatherServiceMock.Object, _appConfig.Object, _apiConfig.Object, _invokerMock.Object);
+            _weatherController = new WeatherController(_weatherServiceMock.Object, _historyWeatherServiceMock.Object, _appConfig.Object, _apiConfig.Object, _invokerMock.Object);
         }
 
         [Fact]
@@ -162,6 +164,73 @@ namespace Weather.Tests.WeatherApi.Controllers
 
             await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetForecastWeatherByCityNameAsync(_cityName, 2));
             _invokerMock.Verify(i => i.RunAsync(It.IsAny<ForecastWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetHistoryWeatherByCityNameAsync_EnterHistoryWeatherRequest_ReturnHistoryWeather()
+        {
+            // Arrange
+            var dateTimeStart = new DateTime(2022, 02, 02, 12, 0, 0);
+            var dateTimeEnd = new DateTime(2022, 03, 03, 15, 30, 0);
+            
+            var dateTime1 = new DateTime(2022, 02, 05, 0, 0, 0);
+            var Temp1 = 10;
+            var Comment1 = "TestComment1";
+
+            var dateTime2 = new DateTime(2022, 02, 07, 0, 0, 0);
+            var Temp2 = 10;
+            var Comment2 = "TestComment2";
+
+            var historyWeather = new HistoryWeatherDTO()
+            {
+                CityName = _cityName,
+                WeatherList = new List<WeatherWithDatetimeDTO>()
+                { 
+                    new WeatherWithDatetimeDTO() { DateTime = dateTime1, Temp = Temp1, Comment = Comment1 },
+                    new WeatherWithDatetimeDTO() { DateTime = dateTime2, Temp = Temp2, Comment = Comment2 }
+                }
+            };
+
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<HistoryWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
+                .ReturnsAsync(historyWeather);
+
+            SetTimeoutForAppConfig();            
+
+            //Act
+            var response = await _weatherController.GetHistoryWeatherByCityNameAsync(new HistoryWeatherRequestDTO() { CityName = _cityName, EndPeriod = dateTimeEnd, StartPeriod = dateTimeStart});
+
+            //Assert
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<HistoryWeatherCommand>(), It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
+            Assert.IsType<OkObjectResult>(response.Result);
+            var result = (OkObjectResult)response.Result;
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+            Assert.NotNull(result.Value);
+            Assert.True(new CompareLogic().Compare(historyWeather, result.Value).AreEqual);
+        }
+
+        [Fact]
+        public async Task GetHistoryWeatherByCityNameAsync_CancellateOperation_Success()
+        {
+            SetTimeoutForAppConfig(0);
+            
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await _weatherController.GetHistoryWeatherByCityNameAsync(new HistoryWeatherRequestDTO()));
+            _invokerMock.Verify(i => i.RunAsync(It.IsAny<HistoryWeatherCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Theory]
+        [MemberData(nameof(Exceptions))]
+        public async Task GetHistoryWeatherByCityNameAsync_ExceptionHandling_Success(Exception exception)
+        {
+            _invokerMock
+                .Setup(invoker => invoker.RunAsync(It.IsAny<HistoryWeatherCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            SetTimeoutForAppConfig();
+            SetDefaultValueForApiConfig();
+
+            await Assert.ThrowsAsync(exception.GetType(), async () => await _weatherController.GetHistoryWeatherByCityNameAsync(new HistoryWeatherRequestDTO()));
         }
 
         private void SetTimeoutForAppConfig(int? timeout = null)

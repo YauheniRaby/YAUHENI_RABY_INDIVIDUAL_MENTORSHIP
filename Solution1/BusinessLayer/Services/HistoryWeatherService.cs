@@ -31,5 +31,11 @@ namespace BusinessLayer.Services
                 WeatherList = _mapper.Map<IEnumerable<WeatherWithDatetimeDTO>>(wetherList) 
             };
         }
+
+        public async Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await _weatherRepository.BulkSaveWeatherListAsync(weatherList, token);
+        }
     }
 }

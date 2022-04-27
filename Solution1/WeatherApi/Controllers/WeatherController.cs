@@ -57,7 +57,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<ActionResult> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
+        public async Task<ActionResult<HistoryWeatherDTO>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();

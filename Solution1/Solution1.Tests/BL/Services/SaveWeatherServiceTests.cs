@@ -19,7 +19,7 @@ namespace Weather.Tests.BL.Services
     public class SaveWeatherServiceTests
     {
         private readonly SaveWeatherService _saveWeatherService;
-        private readonly Mock<IWeatherRepository> _weatherRepositoryMock;
+        private readonly Mock<IHistoryWeatherService> _historyWeatherServiceMock;
         private readonly Mock<IWeatherServiсe> _weatherServiceMock;
         private readonly IMapper _mapper;
         private readonly string _cityName = "Minsk";
@@ -33,10 +33,10 @@ namespace Weather.Tests.BL.Services
         public SaveWeatherServiceTests()
         {
             _cityNameList = new List<string>() { _cityName, _cityName2 };
-            _weatherRepositoryMock = new Mock<IWeatherRepository>();
             _weatherServiceMock = new Mock<IWeatherServiсe>();
+            _historyWeatherServiceMock = new Mock<IHistoryWeatherService>();
             _mapper = new Mapper(MapperConfig.GetConfiguration());
-            _saveWeatherService = new SaveWeatherService(_weatherServiceMock.Object, _weatherRepositoryMock.Object, _mapper);
+            _saveWeatherService = new SaveWeatherService(_weatherServiceMock.Object, _historyWeatherServiceMock.Object, _mapper);
         }
 
         [Fact]
@@ -62,15 +62,16 @@ namespace Weather.Tests.BL.Services
                         It.Is<CancellationToken>(
                             x => !x.IsCancellationRequested)));
 
-           _weatherRepositoryMock.Verify(repository =>
-                repository.BulkSaveWeatherListAsync(
+            _historyWeatherServiceMock.Verify(service =>
+                service.BulkSaveWeatherListAsync(
                     It.Is<List<DataAccessLayer.Models.Weather>>(
                         x => x.Count == 2
                         && x.Any(weather => weather.CityName == _cityName && weather.Temp == _temp && weather.Comment == comment && weather.Datetime.Day == DateTime.UtcNow.Day)
                         && x.Any(weather => weather.CityName == _cityName2 && weather.Temp == _temp2 && weather.Comment == comment2 && weather.Datetime.Day == DateTime.UtcNow.Day)
-                        )));
+                        ),
+                    It.Is<CancellationToken>(x => !x.IsCancellationRequested)));
 
-            _weatherRepositoryMock.VerifyNoOtherCalls();
+            _historyWeatherServiceMock.VerifyNoOtherCalls();
         }
 
 
