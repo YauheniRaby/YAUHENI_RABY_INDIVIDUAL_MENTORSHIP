@@ -181,14 +181,10 @@ namespace Weather.Tests.WeatherApi.Controllers
             var Temp2 = 10;
             var Comment2 = "TestComment2";
 
-            var historyWeather = new HistoryWeatherDTO()
-            {
-                CityName = _cityName,
-                WeatherList = new List<WeatherWithDatetimeDTO>()
-                { 
-                    new WeatherWithDatetimeDTO() { DateTime = dateTime1, Temp = Temp1, Comment = Comment1 },
-                    new WeatherWithDatetimeDTO() { DateTime = dateTime2, Temp = Temp2, Comment = Comment2 }
-                }
+            var historyWeather = new List<WeatherWithDateTimeDTO>()
+            { 
+                new WeatherWithDateTimeDTO() { DateTime = dateTime1, Temp = Temp1, Comment = Comment1 },
+                new WeatherWithDateTimeDTO() { DateTime = dateTime2, Temp = Temp2, Comment = Comment2 }
             };
 
             _invokerMock

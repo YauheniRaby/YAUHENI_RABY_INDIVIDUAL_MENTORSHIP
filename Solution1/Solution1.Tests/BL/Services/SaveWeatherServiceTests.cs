@@ -80,7 +80,7 @@ namespace Weather.Tests.BL.Services
         {
             SetWeatherServiceSettings(ResponseStatus.Fail);            
             
-            await Assert.ThrowsAsync<BackgroundJobException>(async () => await _saveWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None));
+            await Assert.ThrowsAsync<FailWeatherResponseException>(async () => await _saveWeatherService.AddByArrayCityNameAsync(_cityNameList, _currentWeatherUrl, CancellationToken.None));
         }
 
         [Fact]

@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace BusinessLayer.Exceptions
 {
-    public class BackgroundJobException : Exception
+    public class FailWeatherResponseException : Exception
     {
-        public BackgroundJobException(IEnumerable<WeatherResponseDTO> failResponse)
+        public FailWeatherResponseException(IEnumerable<WeatherResponseDTO> failResponse)
             : base(string.Join(Environment.NewLine, failResponse.Select(x => $"{x.CityName}: {x.ResponseStatus} - {x.ErrorMessage};")))
         {
             

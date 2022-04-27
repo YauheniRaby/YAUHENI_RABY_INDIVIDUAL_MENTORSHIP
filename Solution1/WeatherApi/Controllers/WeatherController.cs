@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using WeatherApi.Configuration;
 using BusinessLayer.Helpers;
+using System.Collections.Generic;
 
 namespace WeatherApi.Controllers
 {
@@ -57,7 +58,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<ActionResult<HistoryWeatherDTO>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
+        public async Task<ActionResult<IEnumerable<WeatherWithDateTimeDTO>>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();

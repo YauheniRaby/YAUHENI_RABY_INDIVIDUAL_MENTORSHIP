@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
+using System;
 using System.Text.RegularExpressions;
 
 namespace BusinessLayer.Vlidators
@@ -8,21 +9,18 @@ namespace BusinessLayer.Vlidators
     {
         public HistoryWeatherRequestDTOValidator()
         {
-            RuleFor(p => p.CityName)
+            RuleFor(w => w.CityName)
                 .NotEmpty()
                 .MaximumLength(20);
-            RuleFor(p => p.StartPeriod)
-                .Must(x =>
-                    x != default)
+            RuleFor(w => w.StartPeriod)
+                .NotEqual((DateTime)default)
                 .WithErrorCode("NotEmptyValidator");
-            RuleFor(p => p.EndPeriod)
-               .Must(x =>
-                   x != default)
+            RuleFor(w => w.EndPeriod)
+               .NotEqual((DateTime)default)
                .WithErrorCode("NotEmptyValidator");
-            RuleFor(p => p)
-                .Must(x =>
-                    x.StartPeriod <= x.EndPeriod)                
-                .WithMessage(x => $"'{Regex.Replace(nameof(x.EndPeriod), @"([A-Z])", " $1").Trim()}' must be more or equal than '{Regex.Replace(nameof(x.StartPeriod), @"([A-Z])", " $1").Trim()}'.");
+            RuleFor(w => w.StartPeriod)
+                .LessThanOrEqualTo(w => w.EndPeriod)
+                .WithMessage(x => $"'{Regex.Replace(nameof(x.StartPeriod), @"([A-Z])", " $1").Trim()}' must be less than or equal to '{Regex.Replace(nameof(x.EndPeriod), @"([A-Z])", " $1").Trim()}'.");
         }
     }
 }

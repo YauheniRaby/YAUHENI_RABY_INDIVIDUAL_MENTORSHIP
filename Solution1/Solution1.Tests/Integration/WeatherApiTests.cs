@@ -235,11 +235,11 @@ namespace Weather.Tests.Integration
             var expected = new HistoryWeatherDTO()
             {
                 CityName = _cityName,
-                WeatherList = new List<WeatherWithDatetimeDTO>()
+                WeatherList = new List<WeatherWithDateTimeDTO>()
                 {
-                    new WeatherWithDatetimeDTO(){ DateTime = new DateTime(2020, 02, 01, 10, 45, 0), Comment = "It's frash" , Temp = 5},
-                    new WeatherWithDatetimeDTO(){ DateTime = new DateTime(2020, 02, 01, 15, 30, 0), Comment = "Good weather." , Temp = 21},
-                    new WeatherWithDatetimeDTO(){ DateTime = new DateTime(2020, 02, 02, 11, 0, 0), Comment = "Dress warmly." , Temp = -5},
+                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 10, 45, 0), Comment = "It's frash" , Temp = 5},
+                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 15, 30, 0), Comment = "Good weather." , Temp = 21},
+                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 02, 11, 0, 0), Comment = "Dress warmly." , Temp = -5},
                 }
             };
 

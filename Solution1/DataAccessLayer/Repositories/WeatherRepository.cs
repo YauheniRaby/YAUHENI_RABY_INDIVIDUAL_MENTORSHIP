@@ -2,6 +2,7 @@
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace DataAccessLayer.Repositories
 {
     public class WeatherRepository : IWeatherRepository
     {
-        readonly RepositoryContext _context;
+        private readonly RepositoryContext _context;
 
         public WeatherRepository(RepositoryContext context)
         {
@@ -25,14 +26,14 @@ namespace DataAccessLayer.Repositories
             await _context.SaveChangesAsync(token);            
         }
 
-        public async Task<IEnumerable<Weather>> GetWeatherListAsync(HistoryWeatherRequest historyWeatherRequest, CancellationToken token)
+        public async Task<IEnumerable<Weather>> GetWeatherListAsync(string cityName, DateTime startPeriod, DateTime endPeriod, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             return await _context.CurrentWeathers
                 .Where(x =>
-                    x.CityName == historyWeatherRequest.CityName
-                    && x.Datetime >= historyWeatherRequest.StartPeriod
-                    && x.Datetime <= historyWeatherRequest.EndPeriod)
+                    x.CityName == cityName
+                    && x.Datetime >= startPeriod
+                    && x.Datetime <= endPeriod)
                 .ToListAsync(token);
         }
     }

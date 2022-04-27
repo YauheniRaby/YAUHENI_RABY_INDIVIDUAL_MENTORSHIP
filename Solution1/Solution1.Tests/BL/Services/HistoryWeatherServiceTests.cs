@@ -61,10 +61,9 @@ namespace Weather.Tests.BL.Services
             _weatherRepository
                 .Setup(repository =>
                     repository.GetWeatherListAsync
-                    (It.Is<HistoryWeatherRequest>(x =>
-                        x.CityName == _cityName
-                        && x.StartPeriod == _startDateTime
-                        && x.EndPeriod == _endDateTime),
+                    (It.Is<string>(x => x == _cityName),
+                     It.Is<DateTime>(x => x == _startDateTime),
+                     It.Is<DateTime>(x => x == _endDateTime),
                      It.Is<CancellationToken>(x => !x.IsCancellationRequested)))
                 .ReturnsAsync(_weatherList);
 
@@ -76,11 +75,11 @@ namespace Weather.Tests.BL.Services
             var expected = new HistoryWeatherDTO()
             {
                 CityName = _cityName,
-                WeatherList = new List<WeatherWithDatetimeDTO>()
+                WeatherList = new List<WeatherWithDateTimeDTO>()
                 {
-                    new WeatherWithDatetimeDTO() { Comment = _comment1, DateTime = _dateTime1, Temp = _temp1 },
-                    new WeatherWithDatetimeDTO() { Comment = _comment2, DateTime = _dateTime2, Temp = _temp2 },
-                    new WeatherWithDatetimeDTO() { Comment = _comment3, DateTime = _dateTime3, Temp = _temp3 }
+                    new WeatherWithDateTimeDTO() { Comment = _comment1, DateTime = _dateTime1, Temp = _temp1 },
+                    new WeatherWithDateTimeDTO() { Comment = _comment2, DateTime = _dateTime2, Temp = _temp2 },
+                    new WeatherWithDateTimeDTO() { Comment = _comment3, DateTime = _dateTime3, Temp = _temp3 }
                 }
             };
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);

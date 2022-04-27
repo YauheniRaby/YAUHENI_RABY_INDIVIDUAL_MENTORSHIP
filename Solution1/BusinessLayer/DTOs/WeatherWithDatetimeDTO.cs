@@ -2,7 +2,7 @@
 
 namespace BusinessLayer.DTOs
 {
-    public class WeatherWithDatetimeDTO : BaseWeatherDTO
+    public class WeatherWithDateTimeDTO : BaseWeatherDTO
     {
         public DateTime DateTime { get; set; }
     }

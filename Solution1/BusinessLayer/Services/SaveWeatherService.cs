@@ -45,7 +45,7 @@ namespace BusinessLayer.Services
 
             if (weatherList.ContainsKey(ResponseStatus.Fail))
             {
-                throw new BackgroundJobException(weatherList[ResponseStatus.Fail]);
+                throw new FailWeatherResponseException(weatherList[ResponseStatus.Fail]);
             }
         }        
     }

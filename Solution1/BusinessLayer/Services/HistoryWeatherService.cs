@@ -20,22 +20,17 @@ namespace BusinessLayer.Services
             _mapper = mapper;
         }
 
-        public async Task<HistoryWeatherDTO> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO historyWeatherRequestDTO, CancellationToken token)
+        public async Task<IEnumerable<WeatherWithDateTimeDTO>> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO requestDto, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            var historyWeatherRequest = _mapper.Map<HistoryWeatherRequest>(historyWeatherRequestDTO);
-            var wetherList = await _weatherRepository.GetWeatherListAsync(historyWeatherRequest, token);
-            return new HistoryWeatherDTO() 
-            { 
-                CityName = historyWeatherRequest.CityName, 
-                WeatherList = _mapper.Map<IEnumerable<WeatherWithDatetimeDTO>>(wetherList) 
-            };
+            var wetherList = await _weatherRepository.GetWeatherListAsync(requestDto.CityName, requestDto.StartPeriod, requestDto.EndPeriod, token);
+            return _mapper.Map<IEnumerable<WeatherWithDateTimeDTO>>(wetherList);
         }
 
-        public async Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token)
+        public Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            await _weatherRepository.BulkSaveWeatherListAsync(weatherList, token);
+            return _weatherRepository.BulkSaveWeatherListAsync(weatherList, token);
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using BusinessLayer.Command.Abstract;
 using BusinessLayer.DTOs;
 using BusinessLayer.Services.Abstract;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Command
 {
-    public  class HistoryWeatherCommand : ICommand<HistoryWeatherDTO>
+    public  class HistoryWeatherCommand : ICommand<IEnumerable<WeatherWithDateTimeDTO>>
     {
-        readonly IHistoryWeatherService _historyWeatherService;
-        readonly HistoryWeatherRequestDTO _requestHistoryWeatherDTO;
+        private readonly IHistoryWeatherService _historyWeatherService;
+        private readonly HistoryWeatherRequestDTO _requestHistoryWeatherDTO;
 
         public HistoryWeatherCommand(IHistoryWeatherService historyWeatherService, HistoryWeatherRequestDTO requestHistoryWeatherDTO)
         {
@@ -17,8 +18,9 @@ namespace BusinessLayer.Command
             _requestHistoryWeatherDTO = requestHistoryWeatherDTO;
         }
 
-        public Task<HistoryWeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
+        public Task<IEnumerable<WeatherWithDateTimeDTO>> ExecuteAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return _historyWeatherService.GetByCityNameAndPeriodAsync(_requestHistoryWeatherDTO, cancellationToken);
         }
     }

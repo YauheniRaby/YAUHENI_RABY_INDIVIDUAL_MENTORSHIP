@@ -8,7 +8,7 @@ namespace BusinessLayer.Services.Abstract
 {
     public interface IHistoryWeatherService
     {
-        Task<HistoryWeatherDTO> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO historyWeatherRequestDTO, CancellationToken token);
+        Task<IEnumerable<WeatherWithDateTimeDTO>> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO historyWeatherRequestDTO, CancellationToken token);
 
         Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token);
     }

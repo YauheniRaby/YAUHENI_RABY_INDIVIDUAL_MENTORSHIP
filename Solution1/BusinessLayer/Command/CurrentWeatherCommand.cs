@@ -21,6 +21,7 @@ namespace BusinessLayer.Command
 
         public Task<WeatherDTO> ExecuteAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return _weatherServiсe.GetByCityNameAsync(_cityName, _currentWeatherUrl, cancellationToken);
         }
     }
