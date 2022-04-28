@@ -26,15 +26,14 @@ namespace DataAccessLayer.Repositories
             await _context.SaveChangesAsync(token);            
         }
 
-        public async Task<IEnumerable<Weather>> GetWeatherListAsync(string cityName, DateTime startPeriod, DateTime endPeriod, CancellationToken token)
+        public Task<List<Weather>> GetWeatherListAsync(string cityName, DateTime startPeriod, DateTime endPeriod, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return await _context.CurrentWeathers
+            return _context.CurrentWeathers
                 .Where(x =>
                     x.CityName == cityName
                     && x.Datetime >= startPeriod
-                    && x.Datetime <= endPeriod)
-                .ToListAsync(token);
+                    && x.Datetime <= endPeriod).ToListAsync();
         }
     }
 }

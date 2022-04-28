@@ -10,6 +10,6 @@ namespace DataAccessLayer.Repositories.Abstract
     {
         Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token);
 
-        Task<IEnumerable<Weather>> GetWeatherListAsync(string cityName, DateTime startPeriod, DateTime endPeriod, CancellationToken token);
+        Task<List<Weather>> GetWeatherListAsync(string cityName, DateTime startPeriod, DateTime endPeriod, CancellationToken token);
     }
 }
