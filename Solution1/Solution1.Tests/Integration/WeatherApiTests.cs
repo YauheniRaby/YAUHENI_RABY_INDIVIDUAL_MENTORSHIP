@@ -122,7 +122,7 @@ namespace Weather.Tests.Integration
                     new ValidationProblemDetails(
                         new Dictionary<string, string[]>()
                         {
-                            { string.Empty, new string[] { "'End Period' must be more or equal than 'Start Period'." }}
+                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }}
                         })
                 },
                 new object[]
@@ -143,7 +143,7 @@ namespace Weather.Tests.Integration
                         {
                             { nameof(HistoryWeatherRequestDTO.CityName), new string[] { "'City Name' must not be empty." }},
                             { nameof(HistoryWeatherRequestDTO.EndPeriod), new string[] { "'End Period' must not be empty." }},
-                            { string.Empty, new string[] { "'End Period' must be more or equal than 'Start Period'." }},
+                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }},
                         })
                 }
             };
@@ -230,22 +230,16 @@ namespace Weather.Tests.Integration
             Assert.NotNull(response.Content);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var historyWeather = JsonSerializer.Deserialize<HistoryWeatherDTO>(await response.Content.ReadAsStringAsync(), _serializerOptions);
+            var historyWeather = JsonSerializer.Deserialize<IEnumerable<WeatherWithDateTimeDTO>>(await response.Content.ReadAsStringAsync(), _serializerOptions);
 
-            var expected = new HistoryWeatherDTO()
+            var expected = new List<WeatherWithDateTimeDTO>()
             {
-                CityName = _cityName,
-                WeatherList = new List<WeatherWithDateTimeDTO>()
-                {
-                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 10, 45, 0), Comment = "It's frash" , Temp = 5},
-                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 15, 30, 0), Comment = "Good weather." , Temp = 21},
-                    new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 02, 11, 0, 0), Comment = "Dress warmly." , Temp = -5},
-                }
+                new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 10, 45, 0), Comment = "It's frash" , Temp = 5},
+                new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 01, 15, 30, 0), Comment = "Good weather." , Temp = 21},
+                new WeatherWithDateTimeDTO(){ DateTime = new DateTime(2020, 02, 02, 11, 0, 0), Comment = "Dress warmly." , Temp = -5},
             };
 
             Assert.NotNull(historyWeather);
-            Assert.NotNull(historyWeather.CityName);
-            Assert.NotNull(historyWeather.WeatherList);
             Assert.True(new CompareLogic().Compare(expected, historyWeather).AreEqual);
         }
 

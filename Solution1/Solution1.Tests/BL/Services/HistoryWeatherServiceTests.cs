@@ -72,15 +72,11 @@ namespace Weather.Tests.BL.Services
 
             // Assert
             Assert.NotNull(result);
-            var expected = new HistoryWeatherDTO()
+            var expected = new List<WeatherWithDateTimeDTO>()
             {
-                CityName = _cityName,
-                WeatherList = new List<WeatherWithDateTimeDTO>()
-                {
-                    new WeatherWithDateTimeDTO() { Comment = _comment1, DateTime = _dateTime1, Temp = _temp1 },
-                    new WeatherWithDateTimeDTO() { Comment = _comment2, DateTime = _dateTime2, Temp = _temp2 },
-                    new WeatherWithDateTimeDTO() { Comment = _comment3, DateTime = _dateTime3, Temp = _temp3 }
-                }
+                new WeatherWithDateTimeDTO() { Comment = _comment1, DateTime = _dateTime1, Temp = _temp1 },
+                new WeatherWithDateTimeDTO() { Comment = _comment2, DateTime = _dateTime2, Temp = _temp2 },
+                new WeatherWithDateTimeDTO() { Comment = _comment3, DateTime = _dateTime3, Temp = _temp3 }
             };
             Assert.True(new CompareLogic().Compare(expected, result).AreEqual);
         }

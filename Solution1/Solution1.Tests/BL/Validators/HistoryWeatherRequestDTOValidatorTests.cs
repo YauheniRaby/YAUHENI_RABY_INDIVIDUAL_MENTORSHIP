@@ -52,7 +52,7 @@ namespace Weather.Tests.BL.Validators
                     false,
                     new Dictionary<string, string>()
                     {
-                        { string.Empty , "'End Period' must be more or equal than 'Start Period'." }
+                        { nameof(HistoryWeatherRequestDTO.StartPeriod) , "'Start Period' must be less than or equal to 'End Period'." }
                     }
                 },
                 new object[]
@@ -73,7 +73,7 @@ namespace Weather.Tests.BL.Validators
                     {
                         { nameof(HistoryWeatherRequestDTO.CityName), "'City Name' must not be empty." },
                         { nameof(HistoryWeatherRequestDTO.EndPeriod) , "'End Period' must not be empty." },
-                        { string.Empty , "'Start Period' must be less than or equal 'End Period'." }
+                        { nameof(HistoryWeatherRequestDTO.StartPeriod) , "'Start Period' must be less than or equal to 'End Period'." }
                     }
                 }
             };
