@@ -11,8 +11,8 @@ namespace BusinessLayer.Services
 {
     public class HistoryWeatherService : IHistoryWeatherService
     {
-        readonly IWeatherRepository _weatherRepository;
-        readonly IMapper _mapper;
+        private readonly IWeatherRepository _weatherRepository;
+        private readonly IMapper _mapper;
 
         public HistoryWeatherService(IWeatherRepository weatherRepository, IMapper mapper)
         {
