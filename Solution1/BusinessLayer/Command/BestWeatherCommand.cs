@@ -23,6 +23,7 @@ namespace BusinessLayer.Command
 
         public Task<Dictionary<ResponseStatus, IEnumerable<WeatherResponseDTO>>> ExecuteAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return _weatherServiсe.GetWeatherByArrayCityNameAsync(_cityNames, _currentWeatherUrl, cancellationToken);
         }
     }

@@ -1,4 +1,5 @@
 using DataAccessLayer.Configuration;
+using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,7 +47,8 @@ namespace WeatherApi
             services.AddValidators();
             services.AddLogging(opt => opt.AddSimpleConsole());
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(); 
             
             services.AddSwaggerGen(c =>
             {

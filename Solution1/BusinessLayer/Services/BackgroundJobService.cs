@@ -11,13 +11,13 @@ namespace BusinessLayer.Services
     public class BackgroundJobService : IBackgroundJobService
     {
         private readonly IRecurringJobManager _recurringJobManager;
-        private readonly IHistoryWeatherService _historyWeatherServiсe;
+        private readonly ISaveWeatherService _saveWeatherServiсe;
         private readonly JobStorage _jobStorage;
 
-        public BackgroundJobService(IHistoryWeatherService historyWeatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
+        public BackgroundJobService(ISaveWeatherService saveWeatherServiсe, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
         {
             _recurringJobManager = recurringJobManager;
-            _historyWeatherServiсe = historyWeatherServiсe;
+            _saveWeatherServiсe = saveWeatherServiсe;
             _jobStorage = jobStorage;
         }
 
@@ -49,7 +49,7 @@ namespace BusinessLayer.Services
 
             removeJobs.ForEach(x => _recurringJobManager.RemoveIfExists(x.Name));
             
-            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _historyWeatherServiсe.AddByArrayCityNameAsync(x.Value, currentWeatherUrl, CancellationToken.None), x.Key));
+            dictionaryNewJobs.ForEach(x => _recurringJobManager.AddOrUpdate(GetJobName(x.Value), () => _saveWeatherServiсe.AddByArrayCityNameAsync(x.Value, currentWeatherUrl, CancellationToken.None), x.Key));
         }
 
         private string GetJobName(IEnumerable<string> cities)

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using BusinessLayer.DTOs;
+using DataAccessLayer.Models;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +8,8 @@ namespace BusinessLayer.Services.Abstract
 {
     public interface IHistoryWeatherService
     {
-        Task AddByArrayCityNameAsync(IEnumerable<string> cities, string currentWeatherUrl, CancellationToken token);
+        Task<IEnumerable<WeatherWithDateTimeDTO>> GetByCityNameAndPeriodAsync(HistoryWeatherRequestDTO historyWeatherRequestDTO, CancellationToken token);
+
+        Task BulkSaveWeatherListAsync(IEnumerable<Weather> weatherList, CancellationToken token);
     }
 }

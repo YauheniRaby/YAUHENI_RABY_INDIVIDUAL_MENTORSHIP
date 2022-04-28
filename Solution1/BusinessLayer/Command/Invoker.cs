@@ -8,6 +8,7 @@ namespace BusinessLayer.Command
     {
         public Task<T> RunAsync<T>(ICommand<T> command, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return command.ExecuteAsync(cancellationToken);
         }
     }

@@ -16,6 +16,7 @@ namespace WeatherApi.Extensions
                 var appParams = serviseProvider.GetService<IOptions<AppConfiguration>>();
                 return new ForecastWeatherRequestDTOValidator(appParams.Value.MinCountDaysForecast, appParams.Value.MaxCountDaysForecast);
             });
+            services.AddSingleton<IValidator<HistoryWeatherRequestDTO>, HistoryWeatherRequestDTOValidator>();
         }
     }
 }
