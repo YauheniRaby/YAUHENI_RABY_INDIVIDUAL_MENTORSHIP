@@ -1,7 +1,5 @@
 ﻿using BusinessLayer.DTOs;
 using FluentValidation;
-using System;
-using System.Text.RegularExpressions;
 
 namespace BusinessLayer.Vlidators
 {
@@ -18,7 +16,7 @@ namespace BusinessLayer.Vlidators
                 .NotEmpty();
             RuleFor(w => w.StartPeriod)
                 .LessThanOrEqualTo(w => w.EndPeriod)
-                .WithMessage(x => $"'Start Period' must be less than or equal to 'End Period'.");
+                .WithMessage(x => $"'{nameof(x.StartPeriod)}' must be less than or equal to '{nameof(x.EndPeriod)}'.");
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Weather.Tests.Integration
                     new ValidationProblemDetails(
                         new Dictionary<string, string[]>()
                         {
-                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }}
+                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'StartPeriod' must be less than or equal to 'EndPeriod'." }}
                         }),
                     HttpStatusCode.BadRequest
                 },
@@ -133,7 +133,7 @@ namespace Weather.Tests.Integration
                         {
                             { "cityName", new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }},
                             { nameof(HistoryWeatherRequestDTO.EndPeriod), new string[] { "'End Period' must not be empty." }},
-                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }},
+                            { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'StartPeriod' must be less than or equal to 'EndPeriod'." }},
                         }),
                     HttpStatusCode.BadRequest
                 }
