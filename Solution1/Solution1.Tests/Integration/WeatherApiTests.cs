@@ -21,9 +21,9 @@ namespace Weather.Tests.Integration
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly string _cityName = "Minsk";
         private readonly int _countDays = 3;
-        private readonly string _currentWeatherURL = "/api/weather/current?cityName=";
-        private readonly string _forecastWeatherURL = "/api/weather/forecast?";
-        private readonly string _historyWeatherURL = "/api/weather/history?";
+        private readonly string _currentWeatherURL = "/api/weather/current/";
+        private readonly string _forecastWeatherURL = "/api/weather/forecast/";
+        private readonly string _historyWeatherURL = "/api/weather/history/";
         private readonly List<string> _comments = new() { "Dress warmly.", "It's fresh.", "Good weather.", "It's time to go to the beach." };
         private readonly DateTime _startPeriodHistory = new DateTime(2020, 02, 01, 10, 40, 0);
         private readonly DateTime _endPeriodHistory = new DateTime(2020, 02, 03, 14, 0, 0);
@@ -39,7 +39,8 @@ namespace Weather.Tests.Integration
                         new Dictionary<string, string[]>()
                         {
                             { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered -1." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
@@ -49,7 +50,8 @@ namespace Weather.Tests.Integration
                         new Dictionary<string, string[]>()
                         {
                             { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered 10." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
@@ -59,7 +61,8 @@ namespace Weather.Tests.Integration
                         new Dictionary<string, string[]>()
                         {
                             { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
@@ -70,28 +73,15 @@ namespace Weather.Tests.Integration
                         {
                             { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }},
                             { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered 7." }}
-                        })
-                },
-                new object[]
-                {
-                    string.Empty,
-                    10,
-                    new ValidationProblemDetails(
-                        new Dictionary<string, string[]>()
-                        {
-                            { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "'City Name' must not be empty." }},
-                            { nameof(ForecastWeatherRequestDTO.PeriodOfDays), new string[] { "'Period Of Days' must be between 0 and 5. You entered 10." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
                     string.Empty,
                     3,
-                    new ValidationProblemDetails(
-                        new Dictionary<string, string[]>()
-                        {
-                            { nameof(ForecastWeatherRequestDTO.CityName), new string[] { "'City Name' must not be empty." }}
-                        })
+                    new ValidationProblemDetails(new Dictionary<string, string[]>() { }),
+                    HttpStatusCode.NotFound
                 }
             };
 
@@ -101,11 +91,8 @@ namespace Weather.Tests.Integration
                 new object[]
                 {
                     new HistoryWeatherRequestDTO() { CityName = string.Empty, StartPeriod = new DateTime(2022, 01, 01, 15, 30, 00), EndPeriod = new DateTime(2022, 01, 02, 14, 10, 00), },
-                    new ValidationProblemDetails(
-                        new Dictionary<string, string[]>()
-                        {
-                            { nameof(HistoryWeatherRequestDTO.CityName), new string[] { "'City Name' must not be empty." }}
-                        })
+                    new ValidationProblemDetails(new Dictionary<string, string[]>(){ }),
+                    HttpStatusCode.NotFound
                 },
                 new object[]
                 {
@@ -113,8 +100,9 @@ namespace Weather.Tests.Integration
                     new ValidationProblemDetails(
                         new Dictionary<string, string[]>()
                         {
-                            { nameof(HistoryWeatherRequestDTO.CityName), new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }}
-                        })
+                            { "cityName", new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }}
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
@@ -123,7 +111,8 @@ namespace Weather.Tests.Integration
                         new Dictionary<string, string[]>()
                         {
                             { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
@@ -133,18 +122,20 @@ namespace Weather.Tests.Integration
                         {
                             { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must not be empty." }},
                             { nameof(HistoryWeatherRequestDTO.EndPeriod), new string[] { "'End Period' must not be empty." }}
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 },
                 new object[]
                 {
-                    new HistoryWeatherRequestDTO() { CityName = string.Empty, StartPeriod = new DateTime(2022, 01, 01), EndPeriod = (DateTime)default },
+                    new HistoryWeatherRequestDTO() { CityName = "aaaaaaaaaaaaaaaaaaaaa", StartPeriod = new DateTime(2022, 01, 01), EndPeriod = (DateTime)default },
                     new ValidationProblemDetails(
                         new Dictionary<string, string[]>()
                         {
-                            { nameof(HistoryWeatherRequestDTO.CityName), new string[] { "'City Name' must not be empty." }},
+                            { "cityName", new string[] { "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters." }},
                             { nameof(HistoryWeatherRequestDTO.EndPeriod), new string[] { "'End Period' must not be empty." }},
                             { nameof(HistoryWeatherRequestDTO.StartPeriod), new string[] { "'Start Period' must be less than or equal to 'End Period'." }},
-                        })
+                        }),
+                    HttpStatusCode.BadRequest
                 }
             };
 
@@ -160,7 +151,6 @@ namespace Weather.Tests.Integration
         public async Task GetWeatherByCityName_Success()
         {
             // Arrange
-
             var request = new HttpRequestMessage(HttpMethod.Get, UrlHelper.Combine(_currentWeatherURL, _cityName));
             var httpClient = GetClient();
 
@@ -187,6 +177,9 @@ namespace Weather.Tests.Integration
             // Arrange            
             var startDateTime = DateTime.Now.Date;
             var httpClient = GetClient();
+            
+            var t = GetForecastWeatherURL(_cityName, _countDays);
+
             var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(_cityName, _countDays));
 
             //Act
@@ -244,11 +237,12 @@ namespace Weather.Tests.Integration
         }
 
         [Theory]
-        [InlineData("aaaaaaaaaaaaaaaaaaaaa", "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters.")]
-        [InlineData("", "'City Name' must not be empty.")]
-        public async Task GetWeatherByCityName_EnterInvalidData_HandlingException(string cityName, string message)
+        [InlineData("aaaaaaaaaaaaaaaaaaaaa", "The length of 'City Name' must be 20 characters or fewer. You entered 21 characters.", HttpStatusCode.BadRequest)]
+        [InlineData("", "'City Name' must not be empty.", HttpStatusCode.NotFound)]
+        public async Task GetWeatherByCityName_EnterInvalidData_HandlingException(string cityName, string message, HttpStatusCode httpStatusCode)
         {
             // Arrange
+            var t = UrlHelper.Combine(_currentWeatherURL, cityName);
             var request = new HttpRequestMessage(HttpMethod.Get, UrlHelper.Combine(_currentWeatherURL, cityName));
             var httpClient = GetClient();
 
@@ -263,17 +257,19 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.NotNull(response.Content);
-
-            var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
-            Assert.NotNull(validationInfo);
-            Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            Assert.Equal(httpStatusCode, response.StatusCode);
+            if(httpStatusCode == HttpStatusCode.BadRequest)
+            {
+                Assert.NotNull(response.Content);
+                var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
+                Assert.NotNull(validationInfo);
+                Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            }            
         }
 
         [Theory]
         [MemberData(nameof(InvalidDataForForecastEndpoint))]
-        public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, ValidationProblemDetails validationDetails)
+        public async Task GetForecastByCityName_EnterInvalidData_HandlingException(string cityName, int countDays, ValidationProblemDetails validationDetails, HttpStatusCode httpStatusCode)
         {
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(cityName, countDays));
@@ -284,17 +280,19 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.NotNull(response.Content);
-
-            var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
-            Assert.NotNull(validationInfo);
-            Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            Assert.Equal(httpStatusCode, response.StatusCode);
+            if (httpStatusCode == HttpStatusCode.BadRequest)
+            {
+                Assert.NotNull(response.Content); 
+                var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
+                Assert.NotNull(validationInfo);
+                Assert.True(new CompareLogic().Compare(validationDetails, validationInfo).AreEqual);
+            }
         }
 
         [Theory]
         [MemberData(nameof(InvalidDataForHistoryEndpoint))]
-        public async Task GetHistoryByCityName_EnterInvalidData_HandlingException(HistoryWeatherRequestDTO historyWeatherRequestDTO, ValidationProblemDetails validationDetails)
+        public async Task GetHistoryByCityName_EnterInvalidData_HandlingException(HistoryWeatherRequestDTO historyWeatherRequestDTO, ValidationProblemDetails validationDetails, HttpStatusCode httpStatusCode)
         {
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, GetHistoryWeatherURL(historyWeatherRequestDTO.CityName, historyWeatherRequestDTO.StartPeriod, historyWeatherRequestDTO.EndPeriod));
@@ -305,12 +303,14 @@ namespace Weather.Tests.Integration
 
             //Assert
             Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.NotNull(response.Content);
-
-            var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
-            Assert.NotNull(validationInfo);
-            Assert.True(new CompareLogic().Compare(validationDetails.Errors, validationInfo.Errors).AreEqual);
+            Assert.Equal(httpStatusCode, response.StatusCode);
+            if (httpStatusCode == HttpStatusCode.BadRequest)
+            {
+                Assert.NotNull(response.Content);
+                var validationInfo = JsonSerializer.Deserialize<ValidationProblemDetails>(await response.Content.ReadAsStringAsync());
+                Assert.NotNull(validationInfo);
+                Assert.True(new CompareLogic().Compare(validationDetails.Errors, validationInfo.Errors).AreEqual);
+            }
         }
 
         [Fact]
@@ -389,13 +389,13 @@ namespace Weather.Tests.Integration
 
         private string GetForecastWeatherURL(string cityName, int countDays)
         {
-            return $"{_forecastWeatherURL}cityName={cityName}&countDays={countDays}";
+            return $"{_forecastWeatherURL}{cityName}?countDays={countDays}";
         }
 
         private string GetHistoryWeatherURL(string cityName, DateTime startPeriod, DateTime endPeriod)
         {
             var dateFormat = "MM/dd/yyyy HH:mm:ss";
-            return $"{_historyWeatherURL}cityName={cityName}&startPeriod={startPeriod.ToString(dateFormat)}&endPeriod={endPeriod.ToString(dateFormat)}";
+            return $"{_historyWeatherURL}{cityName}?startPeriod={startPeriod.ToString(dateFormat)}&endPeriod={endPeriod.ToString(dateFormat)}";
         }
     }
 }

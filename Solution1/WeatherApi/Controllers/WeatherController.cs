@@ -31,8 +31,8 @@ namespace WeatherApi.Controllers
             _invoker = invoker;
         }
 
-        [HttpGet("current")]
-        public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync([FromQuery] string cityName)
+        [HttpGet("current/{cityName}")]
+        public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync(string cityName)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
@@ -41,8 +41,8 @@ namespace WeatherApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("forecast")]
-        public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync([FromQuery] string cityName, [FromQuery] int countDays)
+        [HttpGet("forecast/{cityName}")]
+        public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync(string cityName, [FromQuery] int countDays)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
             token.ThrowIfCancellationRequested();
@@ -57,7 +57,7 @@ namespace WeatherApi.Controllers
             return Ok(result);            
         }
 
-        [HttpGet("history")]
+        [HttpGet("history/{сityName}")]
         public async Task<ActionResult<IEnumerable<WeatherWithDateTimeDTO>>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
@@ -65,6 +65,6 @@ namespace WeatherApi.Controllers
             var command = new HistoryWeatherCommand(_historyWeatherService, requestHistoryWeatherDto);
             var result = await _invoker.RunAsync(command, token);
             return Ok(result);            
-        }
+        }        
     }
 }
