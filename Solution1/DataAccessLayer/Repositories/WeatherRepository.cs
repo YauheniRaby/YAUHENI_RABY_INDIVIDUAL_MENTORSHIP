@@ -33,7 +33,8 @@ namespace DataAccessLayer.Repositories
                 .Where(x =>
                     x.CityName == cityName
                     && x.Datetime >= startPeriod
-                    && x.Datetime <= endPeriod).ToListAsync();
+                    && x.Datetime <= endPeriod)
+                .ToListAsync();
         }
     }
 }
