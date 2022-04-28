@@ -176,10 +176,7 @@ namespace Weather.Tests.Integration
         {
             // Arrange            
             var startDateTime = DateTime.Now.Date;
-            var httpClient = GetClient();
-            
-            var t = GetForecastWeatherURL(_cityName, _countDays);
-
+            var httpClient = GetClient();            
             var request = new HttpRequestMessage(HttpMethod.Get, GetForecastWeatherURL(_cityName, _countDays));
 
             //Act
