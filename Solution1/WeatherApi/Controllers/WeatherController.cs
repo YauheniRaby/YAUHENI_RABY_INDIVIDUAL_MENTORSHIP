@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using WeatherApi.Configuration;
 using BusinessLayer.Helpers;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WeatherApi.Controllers
 {
@@ -32,6 +33,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("current/{cityName}")]
+        [Authorize]
         public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync(string cityName)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
@@ -42,6 +44,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("forecast/{cityName}")]
+        [Authorize]
         public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync(string cityName, [FromQuery] int countDays)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
@@ -58,6 +61,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("history/{cityName}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<WeatherWithDateTimeDTO>>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);

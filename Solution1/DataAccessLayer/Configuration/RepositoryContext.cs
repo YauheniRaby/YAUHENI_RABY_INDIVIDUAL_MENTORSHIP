@@ -7,6 +7,8 @@ namespace DataAccessLayer.Configuration
     {
         public DbSet<Weather> CurrentWeathers { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         public RepositoryContext(DbContextOptions<RepositoryContext> options)
             : base(options)
         {
