@@ -21,7 +21,7 @@ namespace WeatherApi.Controllers
         private readonly IHistoryWeatherService _historyWeatherService;
         private readonly IOptionsMonitor<AppConfiguration> _appConfiguration;
         private readonly IOptionsMonitor<WeatherApiConfiguration> _apiConfiguration;
-        private readonly IInvoker _invoker; 
+        private readonly IInvoker _invoker;
 
         public WeatherController(IWeatherServiсe weatherServiсe, IHistoryWeatherService historyWeatherService, IOptionsMonitor<AppConfiguration> appConfiguration, IOptionsMonitor<WeatherApiConfiguration> apiConfiguration, IInvoker invoker)
         {
@@ -29,11 +29,10 @@ namespace WeatherApi.Controllers
             _historyWeatherService = historyWeatherService;
             _appConfiguration = appConfiguration;
             _apiConfiguration = apiConfiguration;
-            _invoker = invoker;
+            _invoker = invoker;            
         }
 
         [HttpGet("current/{cityName}")]
-        [Authorize]
         public async Task<ActionResult<WeatherDTO>> GetCurrentWeatherByCityNameAsync(string cityName)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
@@ -44,7 +43,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("forecast/{cityName}")]
-        [Authorize]
+        [Authorize(Policy = Constants.AllUsersPolicy)]
         public async Task<ActionResult<ForecastWeatherDTO>> GetForecastWeatherByCityNameAsync(string cityName, [FromQuery] int countDays)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);
@@ -61,7 +60,7 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("history/{cityName}")]
-        [Authorize]
+        [Authorize(Policy = Constants.AdminPolicy)]
         public async Task<ActionResult<IEnumerable<WeatherWithDateTimeDTO>>> GetHistoryWeatherByCityNameAsync([FromQuery] HistoryWeatherRequestDTO requestHistoryWeatherDto)
         {
             var token = TokenGenerator.GetCancellationToken(_appConfiguration.CurrentValue.RequestTimeout);

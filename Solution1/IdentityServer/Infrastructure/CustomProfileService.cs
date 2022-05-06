@@ -39,7 +39,8 @@ namespace IdentityServer.Infrastructure
                 var claims = new List<Claim>()
                 {
                     new Claim(JwtClaimTypes.Name, user.Name),
-                    new Claim(JwtClaimTypes.Email, user.Email)
+                    new Claim(JwtClaimTypes.Email, user.Email),
+                    new Claim(JwtClaimTypes.Role, user.Role.ToString())
                 };
 
                 context.IssuedClaims = claims;

@@ -1,4 +1,6 @@
-﻿namespace DataAccessLayer.Models
+﻿using DataAccessLayer.Enums;
+
+namespace DataAccessLayer.Models
 {
     public class User
     {
@@ -11,5 +13,7 @@
         public string Password { get; set; }
 
         public string Salt { get; set; }
+
+        public Role Role { get; set; }
     }
 }

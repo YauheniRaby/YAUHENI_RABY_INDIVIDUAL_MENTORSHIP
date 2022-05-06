@@ -1,4 +1,5 @@
 using DataAccessLayer.Configuration;
+using DataAccessLayer.Enums;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using IdentityServer4.AccessTokenValidation;
@@ -96,7 +97,11 @@ namespace WeatherApi
                 options.Authority = authority;
                 options.ApiName = "weather_api";
             });
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Constants.AllUsersPolicy, policy => policy.RequireRole(nameof(Role.Admin), nameof(Role.User)));
+                options.AddPolicy(Constants.AdminPolicy, policy => policy.RequireRole(nameof(Role.Admin)));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,8 +110,7 @@ namespace WeatherApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();                
-                app.UseHangfireDashboard("/dashboard");
-                
+                app.UseHangfireDashboard("/dashboard");                
             }
 
             app.UseSwagger();
